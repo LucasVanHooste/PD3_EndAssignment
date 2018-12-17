@@ -6,7 +6,7 @@ using UnityEngine;
 
 public enum PlayerState
 {
-    Normal, Pushing
+    Normal, Pushing, Cinematic
 }
 
 
@@ -67,10 +67,11 @@ public class CharacterControllerBehaviour : MonoBehaviour {
     private int _jumpingAnimationParameter = Animator.StringToHash("Jumping");
     private int _horizontalRotationAnimationParameter = Animator.StringToHash("HorizontalRotation");
     private int _pushingAnimationParameter = Animator.StringToHash("Pushing");
+    private int _pickingUpGunParameter = Animator.StringToHash("PickingUpGun");
 
     private PlayerState _state;
 
-    private GameObject _obstacle;
+    private GameObject _object;
     private bool _isFacingObstacle = false;
     private bool _hasHitObstacle=false;
     private bool _isPushing=false;
@@ -78,6 +79,9 @@ public class CharacterControllerBehaviour : MonoBehaviour {
     private Rigidbody _rigidBodyObstacle;
     [SerializeField] private GameObject _obstacleCollisionChecker;
     private List<Collider> _triggers = new List<Collider>();
+    [SerializeField] private CinematicBehaviour _cinematicBehaviour;
+    public Transform PistolHandle;
+    public Transform RightHand;
     // Use this for initialization
     void Start () {
         Cursor.visible = false;
@@ -118,50 +122,14 @@ public class CharacterControllerBehaviour : MonoBehaviour {
                 break;
             case PlayerState.Pushing:
                 {
-                    //if (!_isFacingObstacle)
-                    //{
-                    //    Vector3 direction = Vector3.Scale((_obstacle.transform.position - transform.position), new Vector3(1, 0, 1));
-                    //    if (Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
-                    //    {
-                    //        direction.z = 0;
-                    //    }
-                    //    else
-                    //    {
-                    //        direction.x = 0;
-                    //    }
-                    //    Vector3 newDir = Vector3.RotateTowards(_relativeForward.forward, direction, .05f, 0.0f);
-                    //    _relativeForward.rotation = Quaternion.LookRotation(newDir);
-                    //    Debug.Log("false");
-                    //    if (_relativeForward.rotation == Quaternion.LookRotation(direction))
-                    //        _isFacingObstacle = true;
-                    //}
-                    //else
-                    //{
-                        //if(!_hasHitObstacle)
-                        //_movement = Vector3.forward;
-                        //else
-                        //{
-                        //    _movement= new Vector3(0, 0, Input.GetAxis("Vertical")<0?0:Input.GetAxis("Vertical"));
-                        //    Debug.Log(_movement);
-                        //    if (_movement.z > 0)
-                        //    {
-                        //        //_isPushing = true;
-                        //    }
-                        //}
-
-                        //if (Input.GetButtonDown("Interact"))
-                        //{
-                        //    _animator.SetBool(_pushingAnimationParameter, false);
-                        //    _hasHitObstacle = false;
-                        //    _isFacingObstacle = false;
-                        //    _state = PlayerState.Normal;
-                        //}
-
-                    //}
 
 
                 }
                 break;
+            case PlayerState.Cinematic:
+                {
+
+                }break;
         }
 
             
@@ -187,13 +155,11 @@ public class CharacterControllerBehaviour : MonoBehaviour {
 
         //Vector3 relativeMovement = forwardRotation * _movement;
 
-        //Vector3 velocityXZ = Vector3.Scale(_velocity, new Vector3(1, 0, 1));
-        //Vector3 localVelocityXZ = gameObject.transform.InverseTransformDirection(velocityXZ);
-        //Vector3 localVelocityXZ = gameObject.transform.InverseTransformDirection(relativeMovement);
-        Vector3 localVelocityXZ = gameObject.transform.InverseTransformDirection(_velocity);
+   
+        Vector3 localVelocityXZ = Vector3.Scale(gameObject.transform.InverseTransformDirection(_velocity), new Vector3(1,0,1));
 
-        //_animator.SetFloat(_verticalVelocityAnimationParameter, localVelocityXZ.z);
-        //_animator.SetFloat(_horizontalVelocityAnimationParameter, localVelocityXZ.x);
+        Vector3 velocityXZNormalized = _characterController.velocity.normalized;
+
         _animator.SetFloat(_verticalVelocityAnimationParameter, _movement.z);
         _animator.SetFloat(_horizontalVelocityAnimationParameter, _movement.x);
         //_animator.SetBool(_aimingAnimationParameter, _aiming);
@@ -305,7 +271,7 @@ public class CharacterControllerBehaviour : MonoBehaviour {
 
     private void ApplyRotation()
     {
-        _relativeForward.eulerAngles += new Vector3(0, _aim.x, 0)*_rotationSpeed;
+        _characterController.transform.eulerAngles += new Vector3(0, _aim.x, 0)*_rotationSpeed;
     }
 
     private float CalculateHorizontalMovementAnimationValue()
@@ -329,20 +295,22 @@ public class CharacterControllerBehaviour : MonoBehaviour {
 
         if (Input.GetButtonDown("Interact") && _state != PlayerState.Pushing)
         {
-                _obstacle = GetClosestTriggerObject();
-            if (_obstacle == null) _obstacle = other.gameObject;
+                _object = GetClosestTriggerObject();
+            if (_object == null) _object = other.gameObject;
 
-            switch (_obstacle.tag)
+            switch (_object.tag)
             {
                 case "Obstacle":
                     {
-                        if (_state != PlayerState.Pushing)
-                        {
-                            _movement = Vector3.zero;
-                            _aim = Vector3.zero;
+                        //if (_state != PlayerState.Pushing)
+                        //{
                             StartCoroutine(MoveObstacle());
-                        }
+                        //}
 
+                    }break;
+                case "Gun":
+                    {
+                        StartCoroutine(PickupGun());
                     }break;
             }
         }
@@ -357,7 +325,7 @@ public class CharacterControllerBehaviour : MonoBehaviour {
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
         //if (hit.gameObject.tag == "Obstacle")
-            if (hit.gameObject==_obstacle)
+            if (hit.gameObject==_object)
         {
             if (!_hasHitObstacle && _state==PlayerState.Pushing)
             {
@@ -372,23 +340,23 @@ public class CharacterControllerBehaviour : MonoBehaviour {
 
     private IEnumerator MoveObstacle()
     {
+        _movement = Vector3.zero;
+        _aim = Vector3.zero;
         _state = PlayerState.Pushing;
-        GameObject _collisionCheck = GameObject.Instantiate(_obstacleCollisionChecker, _obstacle.transform.position + GetDirection().normalized, Quaternion.LookRotation(GetDirection()));
+        GameObject _collisionCheck = GameObject.Instantiate(_obstacleCollisionChecker, _object.transform.position + GetDirection().normalized, Quaternion.LookRotation(GetDirection()));
 
         yield return new WaitUntil(IsFacingObstacle);
         _animator.SetBool(_pushingAnimationParameter, true);
         _movement = Vector3.forward/2;
         yield return new WaitUntil(()=>_hasHitObstacle);
 
-
- 
         if (!_collisionCheck.GetComponent<ObstacleCollisionCheckerScript>().GetHasCollided())
         yield return new WaitUntil(HasPushedObstacle);
         else
         {
             yield return new WaitForSeconds(1);
         }
-
+        
         _rigidBodyObstacle.velocity = Vector3.zero;
         _rigidBodyObstacle.constraints = RigidbodyConstraints.FreezeAll;
         _animator.SetBool(_pushingAnimationParameter, false);
@@ -400,6 +368,12 @@ public class CharacterControllerBehaviour : MonoBehaviour {
         {
             _rigidBodyObstacle.constraints = RigidbodyConstraints.None;
             _rigidBodyObstacle.useGravity = true;
+            Collider[] triggers = _rigidBodyObstacle.GetComponents<Collider>();
+            for (int i = triggers.Length-1; i >= 0; i--)
+            {
+                if (triggers[i].isTrigger)
+                    triggers[i].enabled = false;
+            }
         }
 
         GameObject.Destroy(_collisionCheck);
@@ -408,18 +382,25 @@ public class CharacterControllerBehaviour : MonoBehaviour {
     private bool IsFacingObstacle()
     {
         Vector3 direction = GetDirection();
-        Vector3 newDir = Vector3.RotateTowards(_relativeForward.forward, direction, .05f, 0.0f);
-        _relativeForward.rotation = Quaternion.LookRotation(newDir);
+        Vector3 newDir = Vector3.RotateTowards(_characterController.transform.forward, direction, .05f, 0.0f);
+        //_characterController.transform.rotation = Quaternion.LookRotation(newDir);
 
-        if (Mathf.Abs(_relativeForward.rotation.eulerAngles.y - Quaternion.LookRotation(direction).eulerAngles.y) < 1)
+        float angle = Vector3.SignedAngle(_characterController.transform.forward, newDir, Vector3.up);
+        _aim.x = angle/Mathf.Abs(angle);
+
+        if (Quaternion.Angle(_characterController.transform.rotation, Quaternion.LookRotation(direction)) < 1)
+        {
+            _aim = Vector3.zero;
             return true;
+        }
+
 
         return false;
     }
 
     private Vector3 GetDirection()
     {
-        Vector3 direction = Vector3.Scale((_obstacle.transform.position - transform.position), new Vector3(1, 0, 1));
+        Vector3 direction = Vector3.Scale((_object.transform.position - transform.position), new Vector3(1, 0, 1));
         if (Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
         {
             direction.z = 0;
@@ -428,7 +409,7 @@ public class CharacterControllerBehaviour : MonoBehaviour {
         {
             direction.x = 0;
         }
-        return direction*10;
+        return direction*1000;
     }
 
     private bool HasPushedObstacle()
@@ -441,6 +422,48 @@ public class CharacterControllerBehaviour : MonoBehaviour {
         }
 
         return true;
+    }
+
+    private IEnumerator PickupGun()
+    {
+        Debug.Log("Pick up gun");
+        _movement = Vector3.zero;
+        _aim = Vector3.zero;
+        _state = PlayerState.Cinematic;
+        yield return new WaitUntil(IsFacingObject);
+        yield return new WaitForSeconds(.2f);
+        StartCoroutine(_cinematicBehaviour.PlayCinematicScene("PickUpFirstGun"));
+        //PistolHandle.SetParent(_relativeForward);
+
+        yield return new WaitForSeconds(1);
+        _animator.SetBool(_pickingUpGunParameter, true);
+        _animator.SetLayerWeight(1, 1);
+
+        yield return new WaitUntil(_cinematicBehaviour.GetIsSceneFinished);
+        _animator.SetBool(_pickingUpGunParameter, false);
+        _animator.SetLayerWeight(1, 0);
+        _state = PlayerState.Normal;
+    }
+
+    private bool IsFacingObject()
+    {
+        Vector3 direction = Vector3.Scale((_object.transform.position - transform.position), new Vector3(1, 0, 1));
+        Vector3 newDir = Vector3.RotateTowards(_characterController.transform.forward, direction, .05f, 0.0f);
+        //_characterController.transform.rotation = Quaternion.LookRotation(newDir);
+
+        //float angle = Quaternion.Angle(_characterController.transform.rotation, Quaternion.LookRotation(newDir));
+        float angle = Vector3.SignedAngle(_characterController.transform.forward, newDir, Vector3.up);
+        _aim.x = angle / Mathf.Abs(angle);
+        Debug.Log("angle: " + angle);
+
+        if (Quaternion.Angle(_characterController.transform.rotation, Quaternion.LookRotation(direction))  < 1)
+        {
+            _aim = Vector3.zero;
+            return true;
+        }
+
+
+        return false;
     }
 
     private GameObject GetClosestTriggerObject()
@@ -461,4 +484,19 @@ public class CharacterControllerBehaviour : MonoBehaviour {
         return closest;
     }
 
+    //private void OnAnimatorIK(int layerIndex)
+    //{
+            
+
+    //    if (_animator.GetLayerWeight(1)>0)
+    //    {
+    //        Debug.Log(PistolHandle.gameObject.name);
+    //        _animator.SetIKPosition(AvatarIKGoal.RightHand, PistolHandle.position);
+    //        //animator.SetIKRotation(AvatarIKGoal.RightHand, PistolHandle.rotation);
+    //        _animator.SetIKPositionWeight(AvatarIKGoal.RightHand, 1);
+    //        //animator.SetIKRotationWeight(AvatarIKGoal.RightHand, 1);
+    //    }
+
+
+    //}
 }
