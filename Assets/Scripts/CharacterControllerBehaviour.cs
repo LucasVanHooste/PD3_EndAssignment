@@ -6,7 +6,7 @@ using UnityEngine;
 
 public enum PlayerState
 {
-    Normal, Pushing, Cinematic
+    Normal, Pushing, Cinematic, HoldingGun
 }
 
 
@@ -59,7 +59,7 @@ public class CharacterControllerBehaviour : MonoBehaviour {
     private bool _jump;
     private bool _jumping;
     private Vector3 _aim;
-    private bool _aiming;
+    //private bool _aiming;
 
     private int _verticalVelocityAnimationParameter = Animator.StringToHash("VerticalVelocity");
     private int _horizontalVelocityAnimationParameter = Animator.StringToHash("HorizontalVelocity");
@@ -68,6 +68,7 @@ public class CharacterControllerBehaviour : MonoBehaviour {
     private int _horizontalRotationAnimationParameter = Animator.StringToHash("HorizontalRotation");
     private int _pushingAnimationParameter = Animator.StringToHash("Pushing");
     private int _pickingUpGunParameter = Animator.StringToHash("PickingUpGun");
+    private int _punchParameter = Animator.StringToHash("Punch");
 
     private PlayerState _state;
 
@@ -83,9 +84,12 @@ public class CharacterControllerBehaviour : MonoBehaviour {
     [SerializeField] private Transform PistolHandle;
     [SerializeField] private Transform RightHand;
     [SerializeField] private Transform _cameraRoot;
+    [SerializeField] private Transform _cameraTransform;
     [SerializeField] private float _camRotation;
     [SerializeField] private float _minCamAngle;
     [SerializeField] private float _maxCamAngle;
+    private bool _isAiming;
+
     // Use this for initialization
     void Start () {
         Cursor.visible = false;
@@ -111,18 +115,15 @@ public class CharacterControllerBehaviour : MonoBehaviour {
                         _jump = true;
                     }
 
-                    if (Input.GetButtonDown("Fire1"))
-                    {
-                        _aiming = !_aiming;
-                    }
-
                     if (!_jumping)
                         _movement = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
                     _aim = new Vector3(Input.GetAxis("RightJoystickX"), 0, Input.GetAxis("RightJoystickY"));
 
-                    //if (Input.GetButtonDown("Interact"))
-                    //    StartCoroutine(MoveObstacle());
+                    if (Input.GetButtonDown("Punch"))
+                    {
+                        _animator.SetTrigger(_punchParameter);
+                    }
                 }
                 break;
             case PlayerState.Pushing:
@@ -135,6 +136,33 @@ public class CharacterControllerBehaviour : MonoBehaviour {
                 {
 
                 }break;
+            case PlayerState.HoldingGun:
+                {
+                    if (Input.GetButtonDown("Jump") && !_jumping)
+                    {
+                        _jump = true;
+                    }
+
+                    //if (Input.GetButtonDown("Fire1"))
+                    //{
+                    //    _aiming = !_aiming;
+                    //}
+
+                    if (!_jumping)
+                        _movement = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+
+                    _aim = new Vector3(Input.GetAxis("RightJoystickX"), 0, Input.GetAxis("RightJoystickY"));
+
+                    if (Input.GetAxis("TriggerLeft") > 0.2f && !_jumping)
+                    {
+                        Debug.Log("Aim");
+                        _isAiming = true;
+                    }
+                    else _isAiming = false;
+
+                    AimGun();
+                }
+                break;
         }
 
             
@@ -320,7 +348,7 @@ public class CharacterControllerBehaviour : MonoBehaviour {
                         //}
 
                     }break;
-                case "Gun":
+                case "FirstGun":
                     {
                         StartCoroutine(PickupGun());
                     }break;
@@ -456,7 +484,7 @@ public class CharacterControllerBehaviour : MonoBehaviour {
         _animator.SetBool(_pickingUpGunParameter, false);
         _animator.SetLayerWeight(1, 0);
         //StartCoroutine(LerpLayerWeight(1, 0, .03f));
-        _state = PlayerState.Normal;
+        _state = PlayerState.HoldingGun;
     }
 
     private bool IsFacingObject()
@@ -509,5 +537,19 @@ public class CharacterControllerBehaviour : MonoBehaviour {
         }
 
 
+    }
+
+    void AimGun()
+    {
+        if (_isAiming)
+        {
+            _cameraTransform.position = Vector3.Lerp(_cameraTransform.position, _cameraRoot.GetChild(1).position, .2f);
+            _cameraTransform.rotation = Quaternion.Lerp(_cameraTransform.rotation, _cameraRoot.GetChild(1).rotation, .2f);
+        }
+        else
+        {
+            _cameraTransform.position = Vector3.Lerp(_cameraTransform.position, _cameraRoot.GetChild(0).position, .2f);
+            _cameraTransform.rotation = Quaternion.Lerp(_cameraTransform.rotation, _cameraRoot.GetChild(0).rotation, .2f);
+        }
     }
 }
