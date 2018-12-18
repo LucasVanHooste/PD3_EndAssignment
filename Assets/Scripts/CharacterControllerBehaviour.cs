@@ -80,8 +80,12 @@ public class CharacterControllerBehaviour : MonoBehaviour {
     [SerializeField] private GameObject _obstacleCollisionChecker;
     private List<Collider> _triggers = new List<Collider>();
     [SerializeField] private CinematicBehaviour _cinematicBehaviour;
-    public Transform PistolHandle;
-    public Transform RightHand;
+    [SerializeField] private Transform PistolHandle;
+    [SerializeField] private Transform RightHand;
+    [SerializeField] private Transform _cameraRoot;
+    [SerializeField] private float _camRotation;
+    [SerializeField] private float _minCamAngle;
+    [SerializeField] private float _maxCamAngle;
     // Use this for initialization
     void Start () {
         Cursor.visible = false;
@@ -92,6 +96,7 @@ public class CharacterControllerBehaviour : MonoBehaviour {
         _animator = GetComponent<Animator>();
 
         //_animator.GetBehaviour<AimPistolBehaviour>().AimTarget = _aimTarget;
+        ApplyRotation();
     }
 	
 	// Update is called once per frame
@@ -271,7 +276,14 @@ public class CharacterControllerBehaviour : MonoBehaviour {
 
     private void ApplyRotation()
     {
-        _characterController.transform.eulerAngles += new Vector3(0, _aim.x, 0)*_rotationSpeed;
+        _characterController.transform.eulerAngles += new Vector3(0, _aim.x, 0) * _rotationSpeed * Time.deltaTime;
+        //vertical rotation
+        _camRotation += _aim.z * _rotationSpeed * Time.deltaTime; //get vertical rotation
+                                                                                  
+        _camRotation = Mathf.Clamp(_camRotation, _minCamAngle, _maxCamAngle); //clamp vertical rotation
+                                                                            
+        _cameraRoot.eulerAngles = new Vector3(_camRotation, _cameraRoot.eulerAngles.y, _cameraRoot.eulerAngles.z);
+
     }
 
     private float CalculateHorizontalMovementAnimationValue()
@@ -293,7 +305,7 @@ public class CharacterControllerBehaviour : MonoBehaviour {
     private void OnTriggerStay(Collider other)
     {
 
-        if (Input.GetButtonDown("Interact") && _state != PlayerState.Pushing)
+        if (Input.GetButtonDown("Interact") && _state == PlayerState.Normal)
         {
                 _object = GetClosestTriggerObject();
             if (_object == null) _object = other.gameObject;
@@ -438,10 +450,12 @@ public class CharacterControllerBehaviour : MonoBehaviour {
         yield return new WaitForSeconds(1);
         _animator.SetBool(_pickingUpGunParameter, true);
         _animator.SetLayerWeight(1, 1);
+        //StartCoroutine(LerpLayerWeight(1, 1, .02f));
 
         yield return new WaitUntil(_cinematicBehaviour.GetIsSceneFinished);
         _animator.SetBool(_pickingUpGunParameter, false);
         _animator.SetLayerWeight(1, 0);
+        //StartCoroutine(LerpLayerWeight(1, 0, .03f));
         _state = PlayerState.Normal;
     }
 
@@ -484,19 +498,16 @@ public class CharacterControllerBehaviour : MonoBehaviour {
         return closest;
     }
 
-    //private void OnAnimatorIK(int layerIndex)
-    //{
-            
-
-    //    if (_animator.GetLayerWeight(1)>0)
-    //    {
-    //        Debug.Log(PistolHandle.gameObject.name);
-    //        _animator.SetIKPosition(AvatarIKGoal.RightHand, PistolHandle.position);
-    //        //animator.SetIKRotation(AvatarIKGoal.RightHand, PistolHandle.rotation);
-    //        _animator.SetIKPositionWeight(AvatarIKGoal.RightHand, 1);
-    //        //animator.SetIKRotationWeight(AvatarIKGoal.RightHand, 1);
-    //    }
+    private IEnumerator LerpLayerWeight(int layerIndex, float targetWeight, float speed)
+    {
+        while(!Mathf.Approximately(_animator.GetLayerWeight(layerIndex), targetWeight))
+        {
+            float weight = _animator.GetLayerWeight(layerIndex);
+            weight = Mathf.Lerp(weight, targetWeight, speed);
+            _animator.SetLayerWeight(layerIndex, weight);
+            yield return null;
+        }
 
 
-    //}
+    }
 }

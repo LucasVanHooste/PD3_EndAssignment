@@ -14,7 +14,6 @@ public class CinematicBehaviour : MonoBehaviour {
 
     private bool _isSceneFinished=true;
 
-    [SerializeField] private Camera _camera;
     [SerializeField] private List<CinematicScene> _cinematicScenes;
 
     private bool _hasFinished = false;
@@ -64,7 +63,7 @@ public class CinematicBehaviour : MonoBehaviour {
         while (distance.magnitude > .1f || Mathf.Abs(angle) > 2)
         {
             _currentScene._cameraTransform.position = Vector3.MoveTowards(_currentScene._cameraTransform.position, _currentScene._targetPosition.position, .1f);
-            _currentScene._cameraTransform.rotation= Quaternion.RotateTowards(_currentScene._cameraTransform.rotation, _currentScene._targetPosition.rotation, 2.2f);
+            _currentScene._cameraTransform.rotation= Quaternion.RotateTowards(_currentScene._cameraTransform.rotation, _currentScene._targetPosition.rotation, 3f);
             Debug.Log("angle: " + Quaternion.Angle(_currentScene._cameraTransform.rotation, _currentScene._targetPosition.rotation));
             Debug.Log("cam: " + _currentScene._cameraTransform.eulerAngles);
             Debug.Log("tar: " + _currentScene._targetPosition.eulerAngles);
@@ -82,7 +81,7 @@ public class CinematicBehaviour : MonoBehaviour {
         while (distance.magnitude > .1f || Mathf.Abs(angle)>2)
         {
             _currentScene._cameraTransform.position = Vector3.MoveTowards(_currentScene._cameraTransform.position, _camStartPos, .1f);
-            _currentScene._cameraTransform.rotation = Quaternion.RotateTowards(_currentScene._cameraTransform.rotation, _camStartRotation, 2f);
+            _currentScene._cameraTransform.rotation = Quaternion.RotateTowards(_currentScene._cameraTransform.rotation, _camStartRotation, 3f);
             Debug.Log("cam: " + _currentScene._cameraTransform.eulerAngles);
             Debug.Log("tar: " + _currentScene._targetPosition.eulerAngles);
             return false;

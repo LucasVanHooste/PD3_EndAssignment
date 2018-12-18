@@ -40,20 +40,26 @@ public class PickUpGunBehaviour : StateMachineBehaviour {
     override public void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         Debug.Log(PistolHandle.gameObject.name);
+
+        //before player grabs pistol
         if (stateInfo.normalizedTime < .14f)
             _iKWeight = Mathf.Lerp(_iKWeight, 1, .05f);
         else
         {
+            //when player grabs pistol
             if (PistolHandle.parent.parent == null)
             {
+                PistolHandle.parent.gameObject.layer = 9;
                 PistolHandle.parent.position = RightHand.position;
                 PistolHandle.parent.parent = RightHand;
                 PistolHandle.parent.localEulerAngles = new Vector3(0, -90, -90);
             }
 
+            //after player grabs pistol
             _iKWeight = Mathf.Lerp(_iKWeight, 0, .05f);
         }
 
+        //IK
         PistolHandle.rotation = Player.rotation;
         animator.SetIKPosition(AvatarIKGoal.RightHand, PistolHandle.position);
         animator.SetIKRotation(AvatarIKGoal.RightHand, PistolHandle.rotation);
