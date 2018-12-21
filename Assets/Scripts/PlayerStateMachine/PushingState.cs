@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,7 +9,6 @@ public class PushingState : IState
     private PhysicsController _physicsController;
     private PlayerController _playerController;
     private Animator _animator;
-    private GameObject _obstacleCollisionChecker;
 
     private List<Collider> _triggers;
     private GameObject _obstacle;
@@ -19,6 +19,7 @@ public class PushingState : IState
     private int _horizontalRotationAnimationParameter = Animator.StringToHash("HorizontalRotation");
     private int _pushingAnimationParameter = Animator.StringToHash("Pushing");
 
+    private GameObject _obstacleCollisionChecker;
     bool _hasHitObstacle = false;
     private Rigidbody _rigidBodyObstacle;
     private Vector3 _pushStartPosition;
@@ -31,10 +32,9 @@ public class PushingState : IState
         _playerController = playerController;
         _animator = animator;
         _obstacle = obstacle;
-        _obstacleCollisionChecker = _playerController._obstacleCollisionChecker;
         _triggers = _playerController.Triggers;
 
-        PushObstacle(playerController);
+        InteractWithObstacle();
     }
 
     public void Update()
@@ -67,39 +67,87 @@ public class PushingState : IState
 
         }
     }
-
-    public void PushObstacle(MonoBehaviour mono)
-    {
-        mono.StartCoroutine(MoveObstacle());
-    }
-
-    private IEnumerator MoveObstacle()
+    public void InteractWithObstacle()
     {
         _physicsController.Movement = Vector3.zero;
         _physicsController.Aim = Vector3.zero;
-        //_state = PlayerState.Pushing;
-        GameObject _collisionCheck = GameObject.Instantiate(_playerController._obstacleCollisionChecker, _obstacle.transform.position + GetDirection().normalized, Quaternion.LookRotation(GetDirection()));
+        _obstacleCollisionChecker = GameObject.Instantiate(_playerController._obstacleCollisionChecker, _obstacle.transform.position + GetDirection().normalized, Quaternion.LookRotation(GetDirection()));
 
-        yield return new WaitUntil(IsFacingObstacle);
+        _playerController.StartCoroutine(RotateToObstacle());
+    }
+
+    private IEnumerator RotateToObstacle()
+    {
+        Vector3 direction = GetDirection();
+
+        while(Quaternion.Angle(_playerTransform.rotation, Quaternion.LookRotation(direction)) > 1)
+        {
+            Debug.Log("rotate");
+            Vector3 newDir = Vector3.RotateTowards(_playerTransform.forward, direction, .05f, 0.0f);
+
+            float angle = Vector3.SignedAngle(_playerTransform.forward, newDir, Vector3.up);
+            _physicsController.Aim = new Vector3(angle / Mathf.Abs(angle), _physicsController.Aim.y, _physicsController.Aim.z);
+
+            yield return true;
+        }
+
+        Debug.Log("finish rotation");
+        _physicsController.Aim = Vector3.zero;
+        _playerController.StartCoroutine(MoveToObstacle());
+    }
+
+    private IEnumerator MoveToObstacle()
+    {
         _animator.SetBool(_pushingAnimationParameter, true);
         _physicsController.Movement = Vector3.forward / 2;
         yield return new WaitUntil(() => _hasHitObstacle);
+        Debug.Log("obstacle hit");
+        _playerController.StartCoroutine(PushObstacle(CheckIfObstacleCanBePushed()));
 
-        if (!_collisionCheck.GetComponent<ObstacleCollisionCheckerScript>().GetHasCollided())
-            yield return new WaitUntil(HasPushedObstacle);
+    }
+
+    private bool CheckIfObstacleCanBePushed()
+    {
+        if (!_obstacleCollisionChecker.GetComponent<ObstacleCollisionCheckerScript>().GetHasCollided())
+            return true;
+        else
+        {
+            return false;
+        }
+    }
+
+    private IEnumerator PushObstacle(bool canPlayerPushObstacle)
+    {
+        if (canPlayerPushObstacle)
+        {
+            float distance = 0;
+            Debug.Log("can push");
+            while (distance < 1.98f)
+            {
+                distance = Vector3.Magnitude(_pushStartPosition - _playerTransform.position);
+                Debug.Log(distance);
+                _rigidBodyObstacle.velocity = _playerTransform.TransformVector(_physicsController.Movement);
+                yield return false;
+            }
+        }
         else
         {
             yield return new WaitForSeconds(1);
         }
 
+
+        StopPushing();
+    }
+
+    private void StopPushing()
+    {
         _rigidBodyObstacle.velocity = Vector3.zero;
         _rigidBodyObstacle.constraints = RigidbodyConstraints.FreezeAll;
         _animator.SetBool(_pushingAnimationParameter, false);
         _hasHitObstacle = false;
         _isFacingObstacle = false;
-        //_state = PlayerState.Normal;
 
-        if (_collisionCheck.GetComponent<ObstacleCollisionCheckerScript>().GetHasGravity())
+        if (_obstacleCollisionChecker.GetComponent<ObstacleCollisionCheckerScript>().GetHasGravity())
         {
             _rigidBodyObstacle.constraints = RigidbodyConstraints.None;
             _rigidBodyObstacle.useGravity = true;
@@ -116,27 +164,8 @@ public class PushingState : IState
             }
         }
 
-        GameObject.Destroy(_collisionCheck);
+        GameObject.Destroy(_obstacleCollisionChecker);
         _playerController.ToNormalState();
-    }
-
-    private bool IsFacingObstacle()
-    {
-        Vector3 direction = GetDirection();
-        Vector3 newDir = Vector3.RotateTowards(_playerTransform.forward, direction, .05f, 0.0f);
-        //_characterController.transform.rotation = Quaternion.LookRotation(newDir);
-
-        float angle = Vector3.SignedAngle(_playerTransform.forward, newDir, Vector3.up);
-        _physicsController.Aim = new Vector3(angle / Mathf.Abs(angle),_physicsController.Aim.y, _physicsController.Aim.z);
-
-        if (Quaternion.Angle(_playerTransform.rotation, Quaternion.LookRotation(direction)) < 1)
-        {
-            _physicsController.Aim = Vector3.zero;
-            return true;
-        }
-
-
-        return false;
     }
 
     private Vector3 GetDirection()
@@ -150,18 +179,7 @@ public class PushingState : IState
         {
             direction.x = 0;
         }
-        return direction * 1000;
+        return direction;
     }
 
-    private bool HasPushedObstacle()
-    {
-        float distance = Vector3.Magnitude(_pushStartPosition - _playerTransform.position);
-        while (distance < 1.98f)
-        {
-            _rigidBodyObstacle.velocity = _playerTransform.TransformVector(_physicsController.Movement);
-            return false;
-        }
-
-        return true;
-    }
 }
