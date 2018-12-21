@@ -11862,7 +11862,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1139603842}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 35.5, y: 1, z: -5.5}
+  m_LocalPosition: {x: 37.5, y: 1, z: -12.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1554877140}
@@ -28834,6 +28834,8 @@ GameObject:
   - component: {fileID: 1139603845}
   - component: {fileID: 1139603844}
   - component: {fileID: 1139603843}
+  - component: {fileID: 1139603846}
+  - component: {fileID: 1139603847}
   m_Layer: 9
   m_Name: Player
   m_TagString: Untagged
@@ -28848,19 +28850,12 @@ MonoBehaviour:
     type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1139603842}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b0a203c3a4d51464f9299ddb4fd1508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mass: 75
-  _maxRunningSpeed: 8.333333
-  _acceleration: 50
-  _jumpHeight: 1
-  _dragOnGround: 10
-  _dragInAir: 1
-  _dragWhileFalling: 1
-  _relativeForward: {fileID: 1283403924}
+  _playerTransform: {fileID: 397939482}
   _aimHandle: {fileID: 0}
   _aimTarget: {fileID: 0}
   _rotationSpeed: 90
@@ -28911,6 +28906,43 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.9, z: 0}
+--- !u!114 &1139603846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1139603842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e07e6d3d51493644a6c05fdf592d15f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mass: 75
+  MaxRunningSpeed: 8.333333
+  _acceleration: 50
+  _jumpHeight: 1
+  _dragOnGround: 10
+  _dragInAir: 1
+  _dragWhileFalling: 1
+  _cameraRoot: {fileID: 1554877140}
+  _camRotation: 0
+  _minCamAngle: -80
+  _maxCamAngle: 80
+  _rotationSpeed: 100
+--- !u!114 &1139603847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1139603842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd9a40bd7daf124491a17979e69f439, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _obstacleCollisionChecker: {fileID: 1876933309386424, guid: 58143f27c6904414186d7227f6351460,
+    type: 2}
+  Triggers: []
 --- !u!1 &1147218553
 GameObject:
   m_ObjectHideFlags: 0
