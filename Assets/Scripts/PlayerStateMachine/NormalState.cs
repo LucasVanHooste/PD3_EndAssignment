@@ -81,10 +81,20 @@ public class NormalState : IState
                 break;
             case "Gun":
                 {
-                    _object.transform.parent = _playerController.RightHand;
-                    _object.transform.position = _playerController.RightHand.position;
-                    _object.transform.localEulerAngles = new Vector3(0, -90, -90);
-                    _object.layer = 9;
+                    GunScript _gunScript = _object.GetComponent<GunScript>();
+                    if (_gunScript.IsTwoHanded)
+                    {
+                        _gunScript.TakeGun(_playerTransform.gameObject.layer, _playerTransform, _animationsController.HoldGunIK);
+                    }
+                    else
+                    {
+                        _gunScript.TakeGun(_playerTransform.gameObject.layer, _playerController.RightHand, _animationsController.HoldGunIK);
+
+                    }
+                    //_object.transform.parent = _playerController.RightHand;
+                    //_object.transform.position = _playerController.RightHand.position;
+                    //_object.transform.localEulerAngles = new Vector3(0, -90, -90);
+                    //_object.layer = 9;
                     _playerController.ToGunState(_object);
                 }
                 break;

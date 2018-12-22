@@ -6,12 +6,18 @@ public class ObstacleCollisionCheckerScript : MonoBehaviour {
 
     private bool _hasCollided=false;
     private bool _hasGravity = false;
+    private int _gravityBoxLayer;
+
+    private void Start()
+    {
+        _gravityBoxLayer = LayerMask.NameToLayer("GravityBox");
+    }
 
     private void OnTriggerEnter(Collider other)
     {
         if (!other.isTrigger)
         {
-            if (other.gameObject.layer != LayerMask.NameToLayer("GravityBox"))
+            if (other.gameObject.layer != _gravityBoxLayer)
                 _hasCollided = true;
             else
             {
@@ -22,12 +28,6 @@ public class ObstacleCollisionCheckerScript : MonoBehaviour {
         }
 
     }
-
-    //private void OnTriggerExit(Collider other)
-    //{
-    //    if (!other.isTrigger)
-    //        _hasCollided = false;
-    //}
 
     public bool GetHasCollided()
     {

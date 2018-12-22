@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class AnimationsController {
 
+    public readonly HoldGunStateBehaviour HoldGunIK;
+
     private Animator _animator;
     private PhysicsController _physicsController;
 
@@ -21,6 +23,7 @@ public class AnimationsController {
     {
         _animator = animator;
         _physicsController = physicsController;
+        HoldGunIK = _animator.GetBehaviour<HoldGunStateBehaviour>();
     }
 
     public void Update()
@@ -54,7 +57,7 @@ public class AnimationsController {
         _animator.GetBehaviour<PickUpGunStateBehaviour>().Gun = gun;
     }
 
-    internal void SetLayerWeight(int layerIndex, float weight)
+    public void SetLayerWeight(int layerIndex, float weight)
     {
         _animator.SetLayerWeight(layerIndex, weight);
     }

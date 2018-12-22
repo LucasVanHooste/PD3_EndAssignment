@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour {
     public Transform LeftHand;
     public Transform RightHand;
 
+    private Transform _transform;
     private PhysicsController _physicsController;
     private Animator _animator;
     private PlayerController _playerController;
@@ -23,12 +24,14 @@ public class PlayerController : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        _transform = transform;
         _physicsController = GetComponent<PhysicsController>();
         _animator = GetComponent<Animator>();
         _playerController = GetComponent<PlayerController>();
         _animationsController = new AnimationsController(_animator, _physicsController);
+        _animationsController.HoldGunIK.SetPlayer(_transform);
 
-        _state = new NormalState(transform, _physicsController, _playerController, _animationsController);
+        _state = new NormalState(_transform, _physicsController, _playerController, _animationsController);
     }
 	
 	// Update is called once per frame
@@ -62,22 +65,22 @@ public class PlayerController : MonoBehaviour {
 
     public void ToNormalState()
     {
-        _state = new NormalState(transform, _physicsController,_playerController, _animationsController);
+        _state = new NormalState(_transform, _physicsController,_playerController, _animationsController);
         Debug.Log("ToNormalState");
     }
     public void ToPushingState(GameObject _obstacle)
     {
-        _state = new PushingState(transform, _physicsController, _playerController, _animationsController, _obstacle);
+        _state = new PushingState(_transform, _physicsController, _playerController, _animationsController, _obstacle);
         Debug.Log("ToPushingState");
     }
     public void ToCinematicState(GameObject _object)
     {
-        _state = new CinematicState(transform, _physicsController, _playerController, _animationsController, _object, _cinematicBehaviour);
+        _state = new CinematicState(_transform, _physicsController, _playerController, _animationsController, _object, _cinematicBehaviour);
         Debug.Log("ToPushingState");
     }
     public void ToGunState(GameObject _object)
     {
-        _state = new GunState(transform, _physicsController, _playerController, _animationsController, _object);
+        _state = new GunState(_transform, _physicsController, _playerController, _animationsController, _object);
         Debug.Log("ToPushingState");
     }
 }

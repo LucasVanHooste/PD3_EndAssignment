@@ -4,25 +4,26 @@ using UnityEngine;
 
 public class HoldGunStateBehaviour : StateMachineBehaviour {
 
-    public Transform Player;
-    public Transform Gun;
+    private Transform _player;
+    private Transform _gun;
     public Transform RightHand;
     public Transform LeftHand;
 
-    private float _iKWeight;
+    private float _iKWeight=1;
     private GunScript _gunScript;
 
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
-    override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    {
-        _iKWeight = 0;
-        _gunScript = Gun.GetComponent<GunScript>();
-    }
+    //override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    //{
 
-    // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
-    //override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-    //
     //}
+
+    //OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
+    override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    {
+        if(_gun!=null)
+        _gunScript = _gun.GetComponent<GunScript>();
+    }
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     //override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
@@ -38,42 +39,41 @@ public class HoldGunStateBehaviour : StateMachineBehaviour {
 
     override public void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        Debug.Log(Gun.gameObject.name);
+        if (_gun == null || _player==null) return;
+        //Debug.Log(_gun.gameObject.name);
 
-        _iKWeight = 1;
-
-            //when player grabs pistol
-        if (Gun.parent == null)
-        {
-            if (_gunScript.IsTwoHanded)
-            {
-                _gunScript.TakeGun(Player.gameObject.layer, Player);
-            }
-            else
-            {
-                _gunScript.TakeGun(Player.gameObject.layer, RightHand);
-                //Gun.gameObject.layer = 9;
-                //Gun.position = RightHand.position;
-                //Gun.parent = RightHand;
-                //Gun.localEulerAngles = new Vector3(0, -90, -90);
-            }
-
-        }
 
         //IK
-        _gunScript.RightHand.rotation = Player.rotation;
-        animator.SetIKPosition(AvatarIKGoal.RightHand, Gun.GetComponent<GunScript>().RightHand.position);
-        animator.SetIKRotation(AvatarIKGoal.RightHand, Gun.GetComponent<GunScript>().RightHand.rotation);
+        animator.SetIKPosition(AvatarIKGoal.RightHand, _gunScript.RightHand.position);
+        animator.SetIKRotation(AvatarIKGoal.RightHand, _gunScript.RightHand.rotation);
         animator.SetIKPositionWeight(AvatarIKGoal.RightHand, _iKWeight);
         animator.SetIKRotationWeight(AvatarIKGoal.RightHand, _iKWeight);
 
         if (_gunScript.IsTwoHanded)
         {
-            _gunScript.LeftHand.rotation = Player.rotation;
-            animator.SetIKPosition(AvatarIKGoal.LeftHand, Gun.GetComponent<GunScript>().LeftHand.position);
-            animator.SetIKRotation(AvatarIKGoal.LeftHand, Gun.GetComponent<GunScript>().LeftHand.rotation);
+            animator.SetIKPosition(AvatarIKGoal.LeftHand, _gunScript.LeftHand.position);
+            animator.SetIKRotation(AvatarIKGoal.LeftHand, _gunScript.LeftHand.rotation);
             animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, _iKWeight);
             animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, _iKWeight);
+            if (_gunScript.LeftElbow)
+            {
+                animator.SetIKHintPosition(AvatarIKHint.LeftElbow, _gunScript.LeftElbow.position);
+                animator.SetIKHintPositionWeight(AvatarIKHint.LeftElbow, 1f);
+            }
+            if (_gunScript.RightElbow)
+            {
+                animator.SetIKHintPosition(AvatarIKHint.RightElbow, _gunScript.RightElbow.position);
+                animator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, .5f);
+            }
         }
+    }
+
+    public void SetGun(Transform gun)
+    {
+        _gun = gun;
+    }
+    public void SetPlayer(Transform player)
+    {
+        _player = player;
     }
 }
