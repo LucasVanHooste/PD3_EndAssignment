@@ -6,17 +6,15 @@ using UnityEngine;
 public class PickUpGunStateBehaviour : StateMachineBehaviour {
 
     public Transform Player;
-    public Transform PistolHandle;
+    public Transform Gun;
     public Transform RightHand;
+    public Transform LeftHand;
 
     private float _iKWeight;
 
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        PistolHandle = GameObject.Find("Pistol").transform.GetChild(0);
-        Player = GameObject.Find("Player").transform;
-        RightHand = GameObject.Find("mixamorig:RightHand").transform;
         _iKWeight = 0;
     }
 
@@ -39,7 +37,7 @@ public class PickUpGunStateBehaviour : StateMachineBehaviour {
 
     override public void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        Debug.Log(PistolHandle.gameObject.name);
+        Debug.Log(Gun.gameObject.name);
 
         //before player grabs pistol
         if (stateInfo.normalizedTime < .14f)
@@ -47,12 +45,12 @@ public class PickUpGunStateBehaviour : StateMachineBehaviour {
         else
         {
             //when player grabs pistol
-            if (PistolHandle.parent.parent == null)
+            if (Gun.parent == null)
             {
-                PistolHandle.parent.gameObject.layer = 9;
-                PistolHandle.parent.position = RightHand.position;
-                PistolHandle.parent.parent = RightHand;
-                PistolHandle.parent.localEulerAngles = new Vector3(0, -90, -90);
+                Gun.gameObject.layer = 9;
+                Gun.position = RightHand.position;
+                Gun.parent = RightHand;
+                Gun.localEulerAngles = new Vector3(0, -90, -90);
             }
 
             //after player grabs pistol
@@ -60,9 +58,9 @@ public class PickUpGunStateBehaviour : StateMachineBehaviour {
         }
 
         //IK
-        PistolHandle.rotation = Player.rotation;
-        animator.SetIKPosition(AvatarIKGoal.RightHand, PistolHandle.position);
-        animator.SetIKRotation(AvatarIKGoal.RightHand, PistolHandle.rotation);
+        Gun.GetComponent<GunScript>().RightHand.rotation = Player.rotation;
+        animator.SetIKPosition(AvatarIKGoal.RightHand, Gun.GetComponent<GunScript>().RightHand.position);
+        animator.SetIKRotation(AvatarIKGoal.RightHand, Gun.GetComponent<GunScript>().RightHand.rotation);
         animator.SetIKPositionWeight(AvatarIKGoal.RightHand, _iKWeight);
         animator.SetIKRotationWeight(AvatarIKGoal.RightHand, _iKWeight);
 

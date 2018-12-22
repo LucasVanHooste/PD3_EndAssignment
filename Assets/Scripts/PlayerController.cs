@@ -7,14 +7,17 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour {
 
-    [SerializeField] public GameObject _obstacleCollisionChecker;
+    public GameObject _obstacleCollisionChecker;
     [SerializeField] private CinematicBehaviour _cinematicBehaviour;
+    public Transform LeftHand;
+    public Transform RightHand;
 
     private PhysicsController _physicsController;
     private Animator _animator;
     private PlayerController _playerController;
     private CharacterController _characterController;
     private IState _state;
+    private AnimationsController _animationsController;
 
     [HideInInspector] public List<Collider> Triggers = new List<Collider>();
 
@@ -23,12 +26,15 @@ public class PlayerController : MonoBehaviour {
         _physicsController = GetComponent<PhysicsController>();
         _animator = GetComponent<Animator>();
         _playerController = GetComponent<PlayerController>();
-        _state = new NormalState(transform, _physicsController, _playerController, _animator);
-	}
+        _animationsController = new AnimationsController(_animator, _physicsController);
+
+        _state = new NormalState(transform, _physicsController, _playerController, _animationsController);
+    }
 	
 	// Update is called once per frame
 	void Update () {
         _state.Update();
+        _animationsController.Update();
 	}
 
     private void OnTriggerEnter(Collider other)
@@ -56,22 +62,22 @@ public class PlayerController : MonoBehaviour {
 
     public void ToNormalState()
     {
-        _state = new NormalState(transform, _physicsController,_playerController, _animator);
+        _state = new NormalState(transform, _physicsController,_playerController, _animationsController);
         Debug.Log("ToNormalState");
     }
     public void ToPushingState(GameObject _obstacle)
     {
-        _state = new PushingState(transform, _physicsController, _playerController, _animator, _obstacle);
+        _state = new PushingState(transform, _physicsController, _playerController, _animationsController, _obstacle);
         Debug.Log("ToPushingState");
     }
     public void ToCinematicState(GameObject _object)
     {
-        _state = new CinematicState(transform, _physicsController, _playerController, _animator, _object, _cinematicBehaviour);
+        _state = new CinematicState(transform, _physicsController, _playerController, _animationsController, _object, _cinematicBehaviour);
         Debug.Log("ToPushingState");
     }
-    public void ToGunState()
+    public void ToGunState(GameObject _object)
     {
-        _state = new GunState(transform, _physicsController, _playerController, _animator);
+        _state = new GunState(transform, _physicsController, _playerController, _animationsController, _object);
         Debug.Log("ToPushingState");
     }
 }

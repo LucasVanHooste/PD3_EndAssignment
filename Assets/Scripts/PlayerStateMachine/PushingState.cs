@@ -10,16 +10,16 @@ public class PushingState : IState
     private Transform _playerTransform;
     private PhysicsController _physicsController;
     private PlayerController _playerController;
-    private Animator _animator;
+    private AnimationsController _animationsController;
 
     private List<Collider> _triggers;
     private GameObject _obstacle;
 
-    private int _verticalVelocityAnimationParameter = Animator.StringToHash("VerticalVelocity");
-    private int _horizontalVelocityAnimationParameter = Animator.StringToHash("HorizontalVelocity");
+    //private int _verticalVelocityAnimationParameter = Animator.StringToHash("VerticalVelocity");
+    //private int _horizontalVelocityAnimationParameter = Animator.StringToHash("HorizontalVelocity");
 
-    private int _horizontalRotationAnimationParameter = Animator.StringToHash("HorizontalRotation");
-    private int _pushingAnimationParameter = Animator.StringToHash("Pushing");
+    //private int _horizontalRotationAnimationParameter = Animator.StringToHash("HorizontalRotation");
+    //private int _pushingAnimationParameter = Animator.StringToHash("Pushing");
 
     private GameObject _obstacleCollisionChecker;
     bool _hasHitObstacle = false;
@@ -27,12 +27,12 @@ public class PushingState : IState
     private Vector3 _pushStartPosition;
     private bool _isFacingObstacle = false;
 
-    public PushingState(Transform playerTransform, PhysicsController physicsController,PlayerController playerController, Animator animator, GameObject obstacle)
+    public PushingState(Transform playerTransform, PhysicsController physicsController,PlayerController playerController, AnimationsController animationsController, GameObject obstacle)
     {
         _playerTransform = playerTransform;
         _physicsController = physicsController;
         _playerController = playerController;
-        _animator = animator;
+        _animationsController = animationsController;
         _obstacle = obstacle;
         _triggers = _playerController.Triggers;
 
@@ -41,9 +41,9 @@ public class PushingState : IState
 
     public void Update()
     {
-        _animator.SetFloat(_verticalVelocityAnimationParameter, _physicsController.Movement.z);
-        _animator.SetFloat(_horizontalVelocityAnimationParameter, _physicsController.Movement.x);
-        _animator.SetFloat(_horizontalRotationAnimationParameter, _physicsController.Aim.x);
+        //_animationsController.SetFloat(_verticalVelocityAnimationParameter, _physicsController.Movement.z);
+        //_animationsController.SetFloat(_horizontalVelocityAnimationParameter, _physicsController.Movement.x);
+        //_animationsController.SetFloat(_horizontalRotationAnimationParameter, _physicsController.Aim.x);
     }
 
     public void OnTriggerEnter(Collider other)
@@ -99,7 +99,7 @@ public class PushingState : IState
 
     private IEnumerator MoveToObstacle()
     {
-        _animator.SetBool(_pushingAnimationParameter, true);
+        _animationsController.Push(true);
         _physicsController.Movement = Vector3.forward / 2;
         yield return new WaitUntil(() => _hasHitObstacle);
         Debug.Log("obstacle hit");
@@ -159,7 +159,7 @@ public class PushingState : IState
     {
         _rigidBodyObstacle.velocity = Vector3.zero;
         _rigidBodyObstacle.constraints = RigidbodyConstraints.FreezeAll;
-        _animator.SetBool(_pushingAnimationParameter, false);
+        _animationsController.Push(false);
         _hasHitObstacle = false;
         _isFacingObstacle = false;
 

@@ -8,25 +8,25 @@ public class NormalState : IState
     private Transform _playerTransform;
     private PhysicsController _physicsController;
     private PlayerController _playerController;
-    private Animator _animator;
+    private AnimationsController _animationsController;
     private List<Collider> _triggers;
     private GameObject _object;
 
-    private int _verticalVelocityAnimationParameter = Animator.StringToHash("VerticalVelocity");
-    private int _horizontalVelocityAnimationParameter = Animator.StringToHash("HorizontalVelocity");
-    //private int _aimingAnimationParameter = Animator.StringToHash("Aiming");
-    private int _jumpingAnimationParameter = Animator.StringToHash("Jumping");
-    private int _horizontalRotationAnimationParameter = Animator.StringToHash("HorizontalRotation");
-    private int _pushingAnimationParameter = Animator.StringToHash("Pushing");
-    private int _pickingUpGunParameter = Animator.StringToHash("PickingUpGun");
-    private int _punchParameter = Animator.StringToHash("Punch");
+    //private int _verticalVelocityAnimationParameter = Animator.StringToHash("VerticalVelocity");
+    //private int _horizontalVelocityAnimationParameter = Animator.StringToHash("HorizontalVelocity");
+    ////private int _aimingAnimationParameter = Animator.StringToHash("Aiming");
+    //private int _jumpingAnimationParameter = Animator.StringToHash("Jumping");
+    //private int _horizontalRotationAnimationParameter = Animator.StringToHash("HorizontalRotation");
+    //private int _pushingAnimationParameter = Animator.StringToHash("Pushing");
+    //private int _pickingUpGunParameter = Animator.StringToHash("PickingUpGun");
+    //private int _punchParameter = Animator.StringToHash("Punch");
 
-    public NormalState(Transform playerTransform, PhysicsController physicsController,PlayerController playerController, Animator animator)
+    public NormalState(Transform playerTransform, PhysicsController physicsController,PlayerController playerController, AnimationsController animationsController)
     {
         _playerTransform = playerTransform;
         _physicsController = physicsController;
         _playerController = playerController;
-        _animator = animator;
+        _animationsController = animationsController;
         _triggers = _playerController.Triggers;
     }
 
@@ -44,7 +44,7 @@ public class NormalState : IState
 
         if (Input.GetButtonDown("Punch"))
         {
-            _animator.SetTrigger(_punchParameter);
+            _animationsController.Punch();
         }
 
         if (Input.GetButtonDown("Interact") && !_physicsController.Jumping)
@@ -52,10 +52,10 @@ public class NormalState : IState
             InteractWithObject();
         }
 
-        _animator.SetFloat(_verticalVelocityAnimationParameter, _physicsController.Movement.z);
-        _animator.SetFloat(_horizontalVelocityAnimationParameter, _physicsController.Movement.x);
-        _animator.SetBool(_jumpingAnimationParameter, _physicsController.Jumping);
-        _animator.SetFloat(_horizontalRotationAnimationParameter, _physicsController.Aim.x);
+        //_animator.SetFloat(_verticalVelocityAnimationParameter, _physicsController.Movement.z);
+        //_animator.SetFloat(_horizontalVelocityAnimationParameter, _physicsController.Movement.x);
+        //_animator.SetBool(_jumpingAnimationParameter, _physicsController.Jumping);
+        //_animator.SetFloat(_horizontalRotationAnimationParameter, _physicsController.Aim.x);
     }
 
     private void InteractWithObject()
@@ -75,7 +75,17 @@ public class NormalState : IState
                 break;
             case "FirstGun":
                 {
+                    _animationsController.SetPickUpGunStateBehaviour(_playerController.RightHand, _playerController.LeftHand, _playerTransform, _object.transform);
                     _playerController.ToCinematicState(_object);
+                }
+                break;
+            case "Gun":
+                {
+                    _object.transform.parent = _playerController.RightHand;
+                    _object.transform.position = _playerController.RightHand.position;
+                    _object.transform.localEulerAngles = new Vector3(0, -90, -90);
+                    _object.layer = 9;
+                    _playerController.ToGunState(_object);
                 }
                 break;
         }
