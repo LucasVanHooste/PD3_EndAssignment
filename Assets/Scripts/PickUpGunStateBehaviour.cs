@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class PickUpGunBehaviour : StateMachineBehaviour {
+public class PickUpGunStateBehaviour : StateMachineBehaviour {
 
     public Transform Player;
     public Transform PistolHandle;

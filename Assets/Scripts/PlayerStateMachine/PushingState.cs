@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class PushingState : IState
 {
+    public const float ObstacleWidth=2;
+
     private Transform _playerTransform;
     private PhysicsController _physicsController;
     private PlayerController _playerController;
@@ -39,7 +41,9 @@ public class PushingState : IState
 
     public void Update()
     {
-        
+        _animator.SetFloat(_verticalVelocityAnimationParameter, _physicsController.Movement.z);
+        _animator.SetFloat(_horizontalVelocityAnimationParameter, _physicsController.Movement.x);
+        _animator.SetFloat(_horizontalRotationAnimationParameter, _physicsController.Aim.x);
     }
 
     public void OnTriggerEnter(Collider other)
@@ -54,14 +58,11 @@ public class PushingState : IState
 
     public void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        //if (hit.gameObject.tag == "Obstacle")
         if (hit.gameObject == _obstacle)
         {
             if (!_hasHitObstacle)
             {
                 _rigidBodyObstacle = hit.transform.GetComponent<Rigidbody>();
-                _rigidBodyObstacle.constraints = RigidbodyConstraints.None;
-                _pushStartPosition = _playerTransform.position;
                 _hasHitObstacle = true;
             }
 
@@ -118,17 +119,32 @@ public class PushingState : IState
 
     private IEnumerator PushObstacle(bool canPlayerPushObstacle)
     {
+
+        _rigidBodyObstacle.constraints = RigidbodyConstraints.None;
+        _pushStartPosition = _playerTransform.position;
+        //Vector3 _targetPosition = _playerTransform.position + GetDirection().normalized * 2;
+        //Debug.Log(_pushStartPosition);
+        //Debug.Log(_targetPosition);
         if (canPlayerPushObstacle)
         {
-            float distance = 0;
+            float distance = Vector3.Magnitude(_pushStartPosition - _playerTransform.position);
             Debug.Log("can push");
-            while (distance < 1.98f)
+            while (distance < ObstacleWidth-.02f)
             {
                 distance = Vector3.Magnitude(_pushStartPosition - _playerTransform.position);
                 Debug.Log(distance);
                 _rigidBodyObstacle.velocity = _playerTransform.TransformVector(_physicsController.Movement);
                 yield return false;
             }
+            //while (!Mathf.Approximately(_playerTransform.position.magnitude, _targetPosition.magnitude))
+            //{ 
+            //    Vector3 lerp= Vector3.MoveTowards(_playerTransform.position, _targetPosition, 1f);
+            //    Debug.Log(_playerTransform.position);
+            //    //_rigidBodyObstacle.position+=lerp-_playerTransform.position;
+            //    _physicsController.Movement = new Vector3(0, 0, (lerp-_playerTransform.position).magnitude);
+            //    _rigidBodyObstacle.velocity = _playerTransform.TransformVector(_physicsController.Movement);
+            //    yield return false;
+            //}
         }
         else
         {

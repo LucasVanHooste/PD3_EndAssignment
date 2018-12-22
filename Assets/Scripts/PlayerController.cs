@@ -8,6 +8,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour {
 
     [SerializeField] public GameObject _obstacleCollisionChecker;
+    [SerializeField] private CinematicBehaviour _cinematicBehaviour;
 
     private PhysicsController _physicsController;
     private Animator _animator;
@@ -15,7 +16,7 @@ public class PlayerController : MonoBehaviour {
     private CharacterController _characterController;
     private IState _state;
 
-    public List<Collider> Triggers = new List<Collider>();
+    [HideInInspector] public List<Collider> Triggers = new List<Collider>();
 
     // Use this for initialization
     void Start () {
@@ -61,6 +62,16 @@ public class PlayerController : MonoBehaviour {
     public void ToPushingState(GameObject _obstacle)
     {
         _state = new PushingState(transform, _physicsController, _playerController, _animator, _obstacle);
+        Debug.Log("ToPushingState");
+    }
+    public void ToCinematicState(GameObject _object)
+    {
+        _state = new CinematicState(transform, _physicsController, _playerController, _animator, _object, _cinematicBehaviour);
+        Debug.Log("ToPushingState");
+    }
+    public void ToGunState()
+    {
+        _state = new GunState(transform, _physicsController, _playerController, _animator);
         Debug.Log("ToPushingState");
     }
 }

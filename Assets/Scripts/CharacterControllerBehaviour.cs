@@ -123,29 +123,29 @@ public class CharacterControllerBehaviour : MonoBehaviour {
                 }break;
             case PlayerState.HoldingGun:
                 {
-                    if (Input.GetButtonDown("Jump") && !_physicsController.Jumping)
-                    {
-                       _physicsController.Jump = true;
-                    }
-
-                    //if (Input.GetButtonDown("Fire1"))
+                    //if (Input.GetButtonDown("Jump") && !_physicsController.Jumping)
                     //{
-                    //    _aiming = !_aiming;
+                    //   _physicsController.Jump = true;
                     //}
 
-                    if (!_physicsController.Jumping)
-                        _physicsController.Movement = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+                    ////if (Input.GetButtonDown("Fire1"))
+                    ////{
+                    ////    _aiming = !_aiming;
+                    ////}
 
-                    _physicsController.Aim = new Vector3(Input.GetAxis("RightJoystickX"), 0, Input.GetAxis("RightJoystickY"));
+                    //if (!_physicsController.Jumping)
+                    //    _physicsController.Movement = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
-                    if (Input.GetAxis("TriggerLeft") > 0.2f && !_physicsController.Jumping)
-                    {
-                        Debug.Log("Aim");
-                        _isAiming = true;
-                    }
-                    else _isAiming = false;
+                    //_physicsController.Aim = new Vector3(Input.GetAxis("RightJoystickX"), 0, Input.GetAxis("RightJoystickY"));
 
-                    AimGun();
+                    //if (Input.GetAxis("TriggerLeft") > 0.2f && !_physicsController.Jumping)
+                    //{
+                    //    Debug.Log("Aim");
+                    //    _isAiming = true;
+                    //}
+                    //else _isAiming = false;
+
+                    //AimGun();
                 }
                 break;
         }
@@ -472,26 +472,26 @@ public class CharacterControllerBehaviour : MonoBehaviour {
     //    _state = PlayerState.HoldingGun;
     //}
 
-    private bool IsFacingObject()
-    {
-        Vector3 direction = Vector3.Scale((_object.transform.position - transform.position), new Vector3(1, 0, 1));
-        Vector3 newDir = Vector3.RotateTowards(_characterController.transform.forward, direction, .05f, 0.0f);
-        //_characterController.transform.rotation = Quaternion.LookRotation(newDir);
+    //private bool IsFacingObject()
+    //{
+    //    Vector3 direction = Vector3.Scale((_object.transform.position - transform.position), new Vector3(1, 0, 1));
+    //    Vector3 newDir = Vector3.RotateTowards(_characterController.transform.forward, direction, .05f, 0.0f);
+    //    //_characterController.transform.rotation = Quaternion.LookRotation(newDir);
 
-        //float angle = Quaternion.Angle(_characterController.transform.rotation, Quaternion.LookRotation(newDir));
-        float angle = Vector3.SignedAngle(_characterController.transform.forward, newDir, Vector3.up);
-        _aim.x = angle / Mathf.Abs(angle);
-        Debug.Log("angle: " + angle);
+    //    //float angle = Quaternion.Angle(_characterController.transform.rotation, Quaternion.LookRotation(newDir));
+    //    float angle = Vector3.SignedAngle(_characterController.transform.forward, newDir, Vector3.up);
+    //    _aim.x = angle / Mathf.Abs(angle);
+    //    Debug.Log("angle: " + angle);
 
-        if (Quaternion.Angle(_characterController.transform.rotation, Quaternion.LookRotation(direction))  < 1)
-        {
-            _aim = Vector3.zero;
-            return true;
-        }
+    //    if (Quaternion.Angle(_characterController.transform.rotation, Quaternion.LookRotation(direction))  < 1)
+    //    {
+    //        _aim = Vector3.zero;
+    //        return true;
+    //    }
 
 
-        return false;
-    }
+    //    return false;
+    //}
 
     //private GameObject GetClosestTriggerObject()
     //{
@@ -524,17 +524,17 @@ public class CharacterControllerBehaviour : MonoBehaviour {
 
     }
 
-    void AimGun()
-    {
-        if (_isAiming)
-        {
-            _cameraTransform.position = Vector3.Lerp(_cameraTransform.position, _cameraRoot.GetChild(1).position, .2f);
-            _cameraTransform.rotation = Quaternion.Lerp(_cameraTransform.rotation, _cameraRoot.GetChild(1).rotation, .2f);
-        }
-        else
-        {
-            _cameraTransform.position = Vector3.Lerp(_cameraTransform.position, _cameraRoot.GetChild(0).position, .2f);
-            _cameraTransform.rotation = Quaternion.Lerp(_cameraTransform.rotation, _cameraRoot.GetChild(0).rotation, .2f);
-        }
-    }
+    //void AimGun()
+    //{
+    //    if (_isAiming)
+    //    {
+    //        _cameraTransform.position = Vector3.Lerp(_cameraTransform.position, _cameraRoot.GetChild(1).position, .2f);
+    //        _cameraTransform.rotation = Quaternion.Lerp(_cameraTransform.rotation, _cameraRoot.GetChild(1).rotation, .2f);
+    //    }
+    //    else
+    //    {
+    //        _cameraTransform.position = Vector3.Lerp(_cameraTransform.position, _cameraRoot.GetChild(0).position, .2f);
+    //        _cameraTransform.rotation = Quaternion.Lerp(_cameraTransform.rotation, _cameraRoot.GetChild(0).rotation, .2f);
+    //    }
+    //}
 }

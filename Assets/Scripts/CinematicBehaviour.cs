@@ -32,7 +32,7 @@ public class CinematicBehaviour : MonoBehaviour {
 		
 	}
 
-    public IEnumerator PlayCinematicScene(string sceneName)
+    public void PlayCinematicScene(string sceneName)
     {
         _isSceneFinished = false;
         Debug.Log("Play cinematic");
@@ -49,13 +49,10 @@ public class CinematicBehaviour : MonoBehaviour {
         _camStartPos = _currentScene._cameraTransform.position;
         _camStartRotation  = _currentScene._cameraTransform.rotation;
 
-        yield return new WaitUntil(MoveCameraToTargetPosition);
-        yield return new WaitForSeconds(4);
-        yield return new WaitUntil(MoveCameraToStartPosition);
-        _isSceneFinished = true;
+        StartCoroutine(MoveCameraToTargetPosition());
     }
 
-    private bool MoveCameraToTargetPosition()
+    private IEnumerator MoveCameraToTargetPosition()
     {
         Vector3 distance = _currentScene._cameraTransform.position - _currentScene._targetPosition.position;
         float angle = Quaternion.Angle(_currentScene._cameraTransform.rotation, _currentScene._targetPosition.rotation);
@@ -67,13 +64,17 @@ public class CinematicBehaviour : MonoBehaviour {
             Debug.Log("angle: " + Quaternion.Angle(_currentScene._cameraTransform.rotation, _currentScene._targetPosition.rotation));
             Debug.Log("cam: " + _currentScene._cameraTransform.eulerAngles);
             Debug.Log("tar: " + _currentScene._targetPosition.eulerAngles);
-            return false;
+
+            distance = _currentScene._cameraTransform.position - _currentScene._targetPosition.position;
+            angle = Quaternion.Angle(_currentScene._cameraTransform.rotation, _currentScene._targetPosition.rotation);
+            yield return null;
         }
 
-        return true;
+        yield return new WaitForSeconds(4);
+        StartCoroutine(MoveCameraToStartPosition());
     }
 
-    private bool MoveCameraToStartPosition()
+    private IEnumerator MoveCameraToStartPosition()
     {
         Vector3 distance = _currentScene._cameraTransform.position - _camStartPos;
         float angle = Quaternion.Angle(_currentScene._cameraTransform.rotation, _camStartRotation);
@@ -84,10 +85,12 @@ public class CinematicBehaviour : MonoBehaviour {
             _currentScene._cameraTransform.rotation = Quaternion.RotateTowards(_currentScene._cameraTransform.rotation, _camStartRotation, 3f);
             Debug.Log("cam: " + _currentScene._cameraTransform.eulerAngles);
             Debug.Log("tar: " + _currentScene._targetPosition.eulerAngles);
-            return false;
+            distance = _currentScene._cameraTransform.position - _camStartPos;
+            angle = Quaternion.Angle(_currentScene._cameraTransform.rotation, _camStartRotation);
+            yield return null;
         }
 
-        return true;
+        _isSceneFinished = true;
     }
 
     public bool GetIsSceneFinished()
