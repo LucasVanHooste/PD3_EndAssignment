@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(CameraController))]
 public class PhysicsController : MonoBehaviour {
 
     [Header("Locomotion Parameters")]
@@ -28,24 +29,25 @@ public class PhysicsController : MonoBehaviour {
     private float _dragWhileFalling = 1; // []
 
     private CharacterController _characterController;
+    private CameraController _cameraController;
+    private Transform _playerTransform;
 
     public Vector3 Movement { get; set; }
     public Vector3 Aim { get; set; }
-    private Vector3 _velocity = Vector3.zero;
-    private Transform _playerTransform;
     public bool Jump { get; set; }
     public bool Jumping { get; set; }
 
+    private Vector3 _velocity = Vector3.zero;
 
-    [SerializeField] private Transform _cameraRoot;
-    [SerializeField] private float _camRotation;
-    [SerializeField] private float _minCamAngle;
-    [SerializeField] private float _maxCamAngle;
-    [SerializeField] private float _rotationSpeed;
+
+    [SerializeField] private float _horizontalRotationSpeed;
+    [SerializeField] private float _verticalRotationSpeed;
+
 
     // Use this for initialization
     void Start () {
         _characterController = GetComponent<CharacterController>();
+        _cameraController = GetComponent<CameraController>();
         _playerTransform = transform;
 	}
 
@@ -160,13 +162,7 @@ public class PhysicsController : MonoBehaviour {
 
     public void ApplyRotation()
     {
-        _characterController.transform.eulerAngles += new Vector3(0, Aim.x, 0) * _rotationSpeed * Time.deltaTime;
-        //vertical rotation
-        _camRotation += Aim.z * _rotationSpeed * Time.deltaTime; //get vertical rotation
-
-        _camRotation = Mathf.Clamp(_camRotation, _minCamAngle, _maxCamAngle); //clamp vertical rotation
-
-        _cameraRoot.eulerAngles = new Vector3(_camRotation, _cameraRoot.eulerAngles.y, _cameraRoot.eulerAngles.z);
-
+        _characterController.transform.eulerAngles += new Vector3(0, Aim.x, 0) * _horizontalRotationSpeed * Time.deltaTime;
+        _cameraController.RotateVertically(Aim.z * _verticalRotationSpeed);
     }
 }

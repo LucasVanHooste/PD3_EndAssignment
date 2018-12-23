@@ -6,7 +6,7 @@ using UnityEngine;
 public class AnimationsController {
 
     public readonly HoldGunStateBehaviour HoldGunIK;
-    public readonly PickUpFirstGunStateBehaviour PickUpGunIK;
+    public readonly LookAtStateBehaviour LookAtIK;
 
     private Animator _animator;
     private PhysicsController _physicsController;
@@ -19,13 +19,16 @@ public class AnimationsController {
     private int _pushingAnimationParameter = Animator.StringToHash("Pushing");
     private int _pickingUpGunParameter = Animator.StringToHash("PickingUpGun");
     private int _punchParameter = Animator.StringToHash("Punch");
+    private int _isAimingGunParameter = Animator.StringToHash("IsAiming");
+    private int _isTwoHandedGunParameter = Animator.StringToHash("IsTwoHandedGun");
 
     public AnimationsController(Animator animator, PhysicsController physicsController)
     {
         _animator = animator;
         _physicsController = physicsController;
+
         HoldGunIK = _animator.GetBehaviour<HoldGunStateBehaviour>();
-        PickUpGunIK = _animator.GetBehaviour<PickUpFirstGunStateBehaviour>();
+        LookAtIK = _animator.GetBehaviour<LookAtStateBehaviour>();
     }
 
     public void Update()
@@ -46,15 +49,20 @@ public class AnimationsController {
         _animator.SetBool(_pickingUpGunParameter, pickup);
     }
 
+    public void AimGun(bool aimGun)
+    {
+        HoldGunIK.SetIsAiming(aimGun);
+        _animator.SetBool(_isAimingGunParameter, aimGun);
+    }
+
+    public void IsTwoHandedGun(bool isTwoHandedGun)
+    {
+        _animator.SetBool(_isTwoHandedGunParameter, isTwoHandedGun);
+    }
+
     public void Punch()
     {
         _animator.SetTrigger(_punchParameter);
-    }
-
-    public void SetPickUpFirstGunStateBehaviour(Transform gun, Transform rightHand)
-    {
-        _animator.GetBehaviour<PickUpFirstGunStateBehaviour>().SetGun(gun);
-        _animator.GetBehaviour<PickUpFirstGunStateBehaviour>().SetRightHand(rightHand);
     }
 
     public void SetLayerWeight(int layerIndex, float weight)

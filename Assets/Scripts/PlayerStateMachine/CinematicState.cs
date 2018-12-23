@@ -11,12 +11,6 @@ public class CinematicState : IState
     private List<Collider> _triggers;
     private GameObject _object;
 
-    private int _verticalVelocityAnimationParameter = Animator.StringToHash("VerticalVelocity");
-    private int _horizontalVelocityAnimationParameter = Animator.StringToHash("HorizontalVelocity");
-
-    private int _horizontalRotationAnimationParameter = Animator.StringToHash("HorizontalRotation");
-    private int _pickingUpGunParameter = Animator.StringToHash("PickingUpGun");
-
     private CinematicBehaviour _cinematicBehaviour;
 
     public CinematicState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, AnimationsController animationsController, GameObject triggerObject, CinematicBehaviour cinematicBehaviour)
@@ -82,22 +76,52 @@ public class CinematicState : IState
         Debug.Log("finish rotation");
         _physicsController.Aim = Vector3.zero;
         yield return new WaitForSeconds(.2f);
-        _playerController.StartCoroutine(PickUpGun());
+        _playerController.StartCoroutine(PickUpFirstGun());
     }
 
-    private IEnumerator PickUpGun()
+    private IEnumerator PickUpFirstGun()
     {
+        _animationsController.HoldGunIK.SetGun(_object.transform);
         _cinematicBehaviour.PlayCinematicScene("PickUpFirstGun");
         yield return new WaitForSeconds(1);
 
         _animationsController.PickUpGun(true);
-        _animationsController.SetLayerWeight(2, 1);
-        //StartCoroutine(LerpLayerWeight(1, 1, .02f));
 
         yield return new WaitUntil(_cinematicBehaviour.GetIsSceneFinished);
+
         _animationsController.PickUpGun(false);
-        _animationsController.SetLayerWeight(2, 0);
-        //StartCoroutine(LerpLayerWeight(1, 0, .03f));
         _playerController.ToGunState(_object);
+    }
+
+    public void PickUpGun()
+    {
+        if (_object.GetComponent<GunScript>())
+        {
+            GunScript _gunScript = _object.GetComponent<GunScript>();
+            if (_gunScript.IsTwoHanded)
+            {
+                _gunScript.TakeFirstGun(_playerController.gameObject.layer, _playerController.RightHand, _playerController.CameraRoot);
+            }
+            else
+            {
+                _gunScript.TakeFirstGun(_playerController.gameObject.layer, _playerController.RightHand, _playerController.CameraRoot);
+
+            }
+        }
+
+        RemoveTriggersFromList(_object.GetComponents<Collider>());
+    }
+
+    public void RemoveTriggersFromList(Collider[] colliders)
+    {
+        for (int i = colliders.Length - 1; i >= 0; i--)
+        {
+            if (colliders[i].isTrigger)
+            {
+                if (_triggers.Contains(colliders[i]))
+                    _triggers.Remove(colliders[i]);
+            }
+
+        }
     }
 }

@@ -198,4 +198,8 @@ public class PushingState : IState
         return direction;
     }
 
+    public void PickUpGun()
+    {
+
+    }
 }

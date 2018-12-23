@@ -5,12 +5,16 @@ using UnityEngine;
 [RequireComponent(typeof(PhysicsController))]
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(CameraController))]
+
 public class PlayerController : MonoBehaviour {
 
     public GameObject _obstacleCollisionChecker;
     [SerializeField] private CinematicBehaviour _cinematicBehaviour;
     public Transform LeftHand;
     public Transform RightHand;
+    public Transform CameraRoot;
+    [SerializeField] private Transform _lookAtTransform;
 
     private Transform _transform;
     private PhysicsController _physicsController;
@@ -19,6 +23,9 @@ public class PlayerController : MonoBehaviour {
     private CharacterController _characterController;
     private IState _state;
     private AnimationsController _animationsController;
+    private CameraController _cameraController;
+
+    private GameObject _gun;
 
     [HideInInspector] public List<Collider> Triggers = new List<Collider>();
 
@@ -30,7 +37,9 @@ public class PlayerController : MonoBehaviour {
         _playerController = GetComponent<PlayerController>();
         _animationsController = new AnimationsController(_animator, _physicsController);
         _animationsController.HoldGunIK.SetPlayer(_transform);
-        _animationsController.PickUpGunIK.SetPlayer(_transform);
+        //_animationsController.PickUpGunIK.SetPlayer(_transform);
+        _animationsController.LookAtIK.SetLookAtPosition(_lookAtTransform);
+        _cameraController = GetComponent<CameraController>();
 
         _state = new NormalState(_transform, _physicsController, _playerController, _animationsController);
     }
@@ -77,11 +86,18 @@ public class PlayerController : MonoBehaviour {
     public void ToCinematicState(GameObject _object)
     {
         _state = new CinematicState(_transform, _physicsController, _playerController, _animationsController, _object, _cinematicBehaviour);
-        Debug.Log("ToPushingState");
+        _gun = _object;
+        Debug.Log("ToCinematicState");
     }
     public void ToGunState(GameObject _object)
     {
-        _state = new GunState(_transform, _physicsController, _playerController, _animationsController, _object);
-        Debug.Log("ToPushingState");
+        _state = new GunState(_transform, _physicsController, _playerController, _animationsController, _object, _cameraController);
+        Debug.Log("ToGunState");
     }
+
+    public void PickUpGun()
+    {
+        _state.PickUpGun();
+    }
+
 }

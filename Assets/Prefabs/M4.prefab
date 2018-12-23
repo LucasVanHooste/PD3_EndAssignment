@@ -43,6 +43,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1816800982548038
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4901866369071980}
+  m_Layer: 0
+  m_Name: LeftElbowPosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1874045950997222
 GameObject:
   m_ObjectHideFlags: 0
@@ -115,12 +130,13 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1874045950997222}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 33.48, y: 1.5, z: -4.64}
+  m_LocalPosition: {x: 33.98, y: 1.5, z: -4.64}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
+  - {fileID: 4901866369071980}
   - {fileID: 4690073679984790}
-  - {fileID: 4578655927998530}
   - {fileID: 4512974745969854}
+  - {fileID: 4578655927998530}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -132,7 +148,7 @@ Transform:
   m_GameObject: {fileID: 1948924588006370}
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
   m_Children:
   - {fileID: 4757310166336102}
   - {fileID: 4548613997233240}
@@ -158,26 +174,26 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1087731766999204}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.078, y: -0.058, z: -0.345}
+  m_LocalRotation: {x: 0, y: 0, z: -0.5629491, w: 0.8264916}
+  m_LocalPosition: {x: 0.034, y: -0.058, z: -0.26}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4029506120772300}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -68.52}
 --- !u!4 &4690073679984790
 Transform:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1938613199061648}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.031, z: 0.193}
+  m_LocalRotation: {x: 0.17484838, y: -0.036538906, z: 0.92791384, w: 0.32721388}
+  m_LocalPosition: {x: -0.059, y: 0.051, z: -0.0369999}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4029506120772300}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 10.5, y: 17.8, z: 142.8}
 --- !u!4 &4757310166336102
 Transform:
   m_ObjectHideFlags: 1
@@ -189,6 +205,19 @@ Transform:
   m_LocalScale: {x: 0.59823596, y: 0.59823596, z: 0.59823596}
   m_Children: []
   m_Father: {fileID: 4512974745969854}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4901866369071980
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1816800982548038}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.318, y: -0.113, z: -0.1049999}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4029506120772300}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &23714905734542344
@@ -298,10 +327,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d25d268b471fb8419ebc191ebd23876, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RightHand: {fileID: 4690073679984790}
-  LeftHand: {fileID: 4578655927998530}
-  PositionOnPlayer: {x: 0, y: 0, z: 0}
+  RightHandIK: {fileID: 4578655927998530}
+  LeftHandIK: {fileID: 4690073679984790}
+  LeftElbowIK: {fileID: 4901866369071980}
+  RightElbowIK: {fileID: 0}
+  LocalPositionOnPlayer: {x: 0.15, y: -0.19, z: 0.37}
   LocalRotationOnPlayer: {x: 0, y: 0, z: 0}
+  LocalAimPositionOnPlayer: {x: 0.12, y: 0.05, z: 0.52}
+  LocalAimRotationOnPlayer: {x: 0, y: 0, z: 0}
   IsTwoHanded: 1
 --- !u!136 &136956032901571058
 CapsuleCollider:
@@ -312,7 +345,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_Enabled: 1
-  m_Radius: 0.7
+  m_Radius: 0.4
   m_Height: 4
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}

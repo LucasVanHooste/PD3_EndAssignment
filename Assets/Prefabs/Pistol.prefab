@@ -20,7 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4228762622465478}
   m_Layer: 0
-  m_Name: PistolHandle
+  m_Name: LeftHandHandle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -70,6 +70,21 @@ GameObject:
   - component: {fileID: 23853879323193208}
   m_Layer: 0
   m_Name: Plane_001
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &1526611922945602
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4746323834654218}
+  m_Layer: 0
+  m_Name: RightHandHandle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -197,13 +212,13 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1035913631896306}
-  m_LocalRotation: {x: 0.7071068, y: -0.7071068, z: 0, w: 0}
-  m_LocalPosition: {x: 0.025, y: 0, z: -0.1}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0.8087113, y: -0.583261, z: 0.0617301, w: 0.044521157}
+  m_LocalPosition: {x: 0.091, y: -0.001, z: -0.026}
+  m_LocalScale: {x: 1.0000005, y: 1.0000005, z: 1.000001}
   m_Children: []
   m_Father: {fileID: 4539907306585758}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 180, y: 0, z: 90}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: -171.27, z: 108.4}
 --- !u!4 &4250352556100778
 Transform:
   m_ObjectHideFlags: 1
@@ -212,7 +227,7 @@ Transform:
   m_GameObject: {fileID: 1411985130093218}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.025, y: -0.069, z: -0.193}
-  m_LocalScale: {x: 2.5, y: 2.5, z: 2.5}
+  m_LocalScale: {x: 3, y: 2.5, z: 2.5}
   m_Children:
   - {fileID: 4749547217011532}
   - {fileID: 4788226577401924}
@@ -222,7 +237,7 @@ Transform:
   - {fileID: 4958734311120348}
   - {fileID: 4483450171480084}
   m_Father: {fileID: 4539907306585758}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4331402188244828
 Transform:
@@ -270,14 +285,28 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1736665933458720}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 38.982, y: 1.5, z: -5.144}
+  m_LocalPosition: {x: 31.98, y: 1.5, z: -4.64}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
+  - {fileID: 4746323834654218}
   - {fileID: 4228762622465478}
   - {fileID: 4250352556100778}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4746323834654218
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1526611922945602}
+  m_LocalRotation: {x: 0.7071068, y: -0.7071068, z: 0, w: 0}
+  m_LocalPosition: {x: -0.007, y: 0.051, z: 0.008}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4539907306585758}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 180, y: 0, z: 90}
 --- !u!4 &4749547217011532
 Transform:
   m_ObjectHideFlags: 1
@@ -634,10 +663,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d25d268b471fb8419ebc191ebd23876, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RightHand: {fileID: 4228762622465478}
-  LeftHand: {fileID: 0}
-  PositionOnPlayer: {x: 0, y: 0, z: 0}
+  RightHandIK: {fileID: 4746323834654218}
+  LeftHandIK: {fileID: 4228762622465478}
+  LeftElbowIK: {fileID: 0}
+  RightElbowIK: {fileID: 0}
+  LocalPositionOnPlayer: {x: 0, y: 0, z: 0}
   LocalRotationOnPlayer: {x: 0, y: -90, z: -90}
+  LocalAimPositionOnPlayer: {x: 0.1, y: 0.06, z: 0.45}
+  LocalAimRotationOnPlayer: {x: 0, y: 180, z: 0}
   IsTwoHanded: 0
 --- !u!136 &136092659466899060
 CapsuleCollider:

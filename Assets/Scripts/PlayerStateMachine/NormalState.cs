@@ -75,32 +75,21 @@ public class NormalState : IState
                 break;
             case "FirstGun":
                 {
-                    _animationsController.SetPickUpFirstGunStateBehaviour(_object.transform, _playerController.RightHand);
                     
                     _playerController.ToCinematicState(_object);
                 }
                 break;
             case "Gun":
                 {
-                    GunScript _gunScript = _object.GetComponent<GunScript>();
-                    if (_gunScript.IsTwoHanded)
-                    {
-                        _gunScript.TakeGun(_playerTransform.gameObject.layer, _playerTransform, _animationsController.HoldGunIK);
-                    }
-                    else
-                    {
-                        _gunScript.TakeGun(_playerTransform.gameObject.layer, _playerController.RightHand, _animationsController.HoldGunIK);
+                    PickUpGun();
+                    RemoveTriggersFromList(_object.GetComponents<Collider>());
 
-                    }
-                    //_object.transform.parent = _playerController.RightHand;
-                    //_object.transform.position = _playerController.RightHand.position;
-                    //_object.transform.localEulerAngles = new Vector3(0, -90, -90);
-                    //_object.layer = 9;
                     _playerController.ToGunState(_object);
                 }
                 break;
         }
     }
+
 
     public void OnTriggerEnter(Collider other)
     {
@@ -133,6 +122,38 @@ public class NormalState : IState
 
         }
         return closest;
+    }
+
+    public void PickUpGun()
+    {
+        if (_object.GetComponent<GunScript>())
+        {
+            GunScript _gunScript = _object.GetComponent<GunScript>();
+            if (_gunScript.IsTwoHanded)
+            {
+                _gunScript.TakeGun(_playerController.gameObject.layer, _playerController.RightHand, _playerController.CameraRoot/*, _animationsController.HoldGunIK*/);
+            }
+            else
+            {
+                _gunScript.TakeGun(_playerController.gameObject.layer, _playerController.RightHand, _playerController.CameraRoot/*, _animationsController.HoldGunIK*/);
+
+            }
+
+            _animationsController.HoldGunIK.SetGun(_object.transform);
+        }
+    }
+
+    public void RemoveTriggersFromList(Collider[] colliders)
+    {
+        for (int i = colliders.Length - 1; i >= 0; i--)
+        {
+            if (colliders[i].isTrigger)
+            {
+                if (_triggers.Contains(colliders[i]))
+                    _triggers.Remove(colliders[i]);
+            }
+
+        }
     }
 
 }

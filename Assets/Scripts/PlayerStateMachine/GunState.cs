@@ -11,19 +11,12 @@ public class GunState : IState
     private AnimationsController _animationsController;
     private List<Collider> _triggers;
     private GameObject _object;
+    private CameraController _cameraController;
 
     private bool _isAiming;
     private GameObject _gun;
 
-    private int _verticalVelocityAnimationParameter = Animator.StringToHash("VerticalVelocity");
-    private int _horizontalVelocityAnimationParameter = Animator.StringToHash("HorizontalVelocity");
-
-    private int _jumpingAnimationParameter = Animator.StringToHash("Jumping");
-    private int _horizontalRotationAnimationParameter = Animator.StringToHash("HorizontalRotation");
-
-    private int _punchParameter = Animator.StringToHash("Punch");
-
-    public GunState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, AnimationsController animationsController, GameObject gun)
+    public GunState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, AnimationsController animationsController, GameObject gun, CameraController cameraController)
     {
         _playerTransform = playerTransform;
         _physicsController = physicsController;
@@ -31,6 +24,8 @@ public class GunState : IState
         _animationsController = animationsController;
         _triggers = _playerController.Triggers;
         _gun = gun;
+        _cameraController = cameraController;
+
     }
 
     public void Update()
@@ -74,18 +69,11 @@ public class GunState : IState
                 {
                     _gun.GetComponent<GunScript>().DropGun();
 
-                    GunScript _gunScript = _object.GetComponent<GunScript>();
-                    if (_gunScript.IsTwoHanded)
-                    {
-                        _gunScript.TakeGun(_playerTransform.gameObject.layer, _playerTransform, _animationsController.HoldGunIK);
-                    }
-                    else
-                    {
-                        _gunScript.TakeGun(_playerTransform.gameObject.layer, _playerController.RightHand, _animationsController.HoldGunIK);
-
-                    }
-
+                    PickUpGun();
+                    RemoveTriggersFromList(_object.GetComponents<Collider>());
                     _gun = _object;
+
+
                 }
                 break;
         }
@@ -108,16 +96,11 @@ public class GunState : IState
 
     void AimGun()
     {
-        if (_isAiming)
-        {
-            //_cameraTransform.position = Vector3.Lerp(_cameraTransform.position, _cameraRoot.GetChild(1).position, .2f);
-            //_cameraTransform.rotation = Quaternion.Lerp(_cameraTransform.rotation, _cameraRoot.GetChild(1).rotation, .2f);
-        }
-        else
-        {
-            //_cameraTransform.position = Vector3.Lerp(_cameraTransform.position, _cameraRoot.GetChild(0).position, .2f);
-            //_cameraTransform.rotation = Quaternion.Lerp(_cameraTransform.rotation, _cameraRoot.GetChild(0).rotation, .2f);
-        }
+        _animationsController.AimGun(_isAiming);
+        _animationsController.IsTwoHandedGun(_gun.GetComponent<GunScript>().IsTwoHanded);
+
+        _cameraController.AimGun(_isAiming);
+        _gun.GetComponent<GunScript>().AimGun(_isAiming);
     }
 
     private GameObject GetClosestTriggerObject()
@@ -136,5 +119,37 @@ public class GunState : IState
 
         }
         return closest;
+    }
+
+    public void PickUpGun()
+    {
+            if (_object.GetComponent<GunScript>())
+            {
+                GunScript _gunScript = _object.GetComponent<GunScript>();
+                if (_gunScript.IsTwoHanded)
+                {
+                    _gunScript.TakeGun(_playerController.gameObject.layer, _playerController.RightHand, _playerController.CameraRoot/*, _animationsController.HoldGunIK*/);
+                }
+                else
+                {
+                    _gunScript.TakeGun(_playerController.gameObject.layer, _playerController.RightHand, _playerController.CameraRoot/*, _animationsController.HoldGunIK*/);
+
+                }
+
+            _animationsController.HoldGunIK.SetGun(_object.transform);
+        }
+    }
+
+    public void RemoveTriggersFromList(Collider[] colliders)
+    {
+        for (int i = colliders.Length - 1; i >= 0; i--)
+        {
+            if (colliders[i].isTrigger)
+            {
+                if (_triggers.Contains(colliders[i]))
+                    _triggers.Remove(colliders[i]);
+            }
+
+        }
     }
 }

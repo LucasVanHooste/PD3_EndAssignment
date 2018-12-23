@@ -19,11 +19,10 @@ public class PickUpFirstGunStateBehaviour : StateMachineBehaviour {
     }
 
     //OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
-    override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    {
-        if (_gun != null)
-            _gunScript = _gun.GetComponent<GunScript>();
-    }
+    //override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    //{
+        
+    //}
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     //override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
@@ -39,30 +38,35 @@ public class PickUpFirstGunStateBehaviour : StateMachineBehaviour {
 
     override public void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
+        if (_gun != null)
+            _gunScript = _gun.GetComponent<GunScript>();
+
         Debug.Log(_gun.gameObject.name);
 
         //before player grabs pistol
-        if (stateInfo.normalizedTime < .14f)
-            _iKWeight = Mathf.Lerp(_iKWeight, 1, .05f);
-        else
-        {
-            //when player grabs pistol
-            if (_gun.parent == null)
-            {
-                _gunScript.TakeFirstGun(layerIndex, _rightHand);
-            }
+        //if (stateInfo.normalizedTime < .14f)
+            _iKWeight = Mathf.Lerp(_iKWeight, 1, .02f);
+        //else
+        //{
+        //    //when player grabs pistol
+        //    if (_gun.parent == null)
+        //    {
+        //        _gunScript.TakeFirstGun(layerIndex, _rightHand, _player.GetComponent<PlayerController>().CameraRoot);
+        //    }
 
-            //after player grabs pistol
-            _iKWeight = Mathf.Lerp(_iKWeight, 0, .05f);
-        }
+        //    //after player grabs pistol
+        //    _iKWeight = Mathf.Lerp(_iKWeight, 0, .05f);
+        //}
 
         //IK
-        _gun.GetComponent<GunScript>().RightHand.rotation = _player.rotation;
-        animator.SetIKPosition(AvatarIKGoal.RightHand, _gun.GetComponent<GunScript>().RightHand.position);
-        animator.SetIKRotation(AvatarIKGoal.RightHand, _gun.GetComponent<GunScript>().RightHand.rotation);
-        animator.SetIKPositionWeight(AvatarIKGoal.RightHand, _iKWeight);
-        animator.SetIKRotationWeight(AvatarIKGoal.RightHand, _iKWeight);
-
+        if (_gun.parent != null && _gunScript.RightHandIK)
+        {
+            _gun.GetComponent<GunScript>().RightHandIK.rotation = _player.rotation;
+            animator.SetIKPosition(AvatarIKGoal.RightHand, _gun.GetComponent<GunScript>().RightHandIK.position);
+            animator.SetIKRotation(AvatarIKGoal.RightHand, _gun.GetComponent<GunScript>().RightHandIK.rotation);
+            animator.SetIKPositionWeight(AvatarIKGoal.RightHand, _iKWeight);
+            animator.SetIKRotationWeight(AvatarIKGoal.RightHand, _iKWeight);
+        }
 
     }
 

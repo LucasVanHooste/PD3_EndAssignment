@@ -6,11 +6,11 @@ public class HoldGunStateBehaviour : StateMachineBehaviour {
 
     private Transform _player;
     private Transform _gun;
-    public Transform RightHand;
-    public Transform LeftHand;
+    private bool _isAiming = false;
 
-    private float _iKWeight=1;
+    private float _iKWeight=0;
     private GunScript _gunScript;
+
 
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     //override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
@@ -39,32 +39,55 @@ public class HoldGunStateBehaviour : StateMachineBehaviour {
 
     override public void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if (_gun == null || _player==null) return;
-        //Debug.Log(_gun.gameObject.name);
+        if (_gun == null || _player == null) return;
+        Debug.Log(_gun.gameObject.name);
 
-        //IK
-        animator.SetIKPosition(AvatarIKGoal.RightHand, _gunScript.RightHand.position);
-        animator.SetIKRotation(AvatarIKGoal.RightHand, _gunScript.RightHand.rotation);
-        animator.SetIKPositionWeight(AvatarIKGoal.RightHand, _iKWeight);
-        animator.SetIKRotationWeight(AvatarIKGoal.RightHand, _iKWeight);
-
-        if (_gunScript.IsTwoHanded)
+        //IK first pistol
+        if (_gun.tag == "FirstGun")
         {
-            animator.SetIKPosition(AvatarIKGoal.LeftHand, _gunScript.LeftHand.position);
-            animator.SetIKRotation(AvatarIKGoal.LeftHand, _gunScript.LeftHand.rotation);
+            _iKWeight = Mathf.Lerp(_iKWeight, 1, .01f);
+
+            animator.SetIKPosition(AvatarIKGoal.RightHand, _gun.position);
+            animator.SetIKRotation(AvatarIKGoal.RightHand, _player.rotation);
+
+            animator.SetIKPositionWeight(AvatarIKGoal.RightHand, _iKWeight);
+            animator.SetIKRotationWeight(AvatarIKGoal.RightHand, _iKWeight);
+        }
+
+        if (!_gunScript.IsTwoHanded && !_isAiming) return;
+
+        _iKWeight = 1;
+
+        //IK all other guns
+        if (_gunScript.RightHandIK)
+        {
+            animator.SetIKPosition(AvatarIKGoal.RightHand, _gunScript.RightHandIK.position);
+            animator.SetIKRotation(AvatarIKGoal.RightHand, _gunScript.RightHandIK.rotation);
+           
+
+            animator.SetIKPositionWeight(AvatarIKGoal.RightHand, _iKWeight);
+            animator.SetIKRotationWeight(AvatarIKGoal.RightHand, _iKWeight);
+        }
+
+        if (_gunScript.LeftHandIK)
+        {
+            animator.SetIKPosition(AvatarIKGoal.LeftHand, _gunScript.LeftHandIK.position);
+            animator.SetIKRotation(AvatarIKGoal.LeftHand, _gunScript.LeftHandIK.rotation);
             animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, _iKWeight);
             animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, _iKWeight);
-            if (_gunScript.LeftElbow)
+        }
+
+            if (_gunScript.LeftElbowIK)
             {
-                animator.SetIKHintPosition(AvatarIKHint.LeftElbow, _gunScript.LeftElbow.position);
+                animator.SetIKHintPosition(AvatarIKHint.LeftElbow, _gunScript.LeftElbowIK.position);
                 animator.SetIKHintPositionWeight(AvatarIKHint.LeftElbow, 1f);
             }
-            if (_gunScript.RightElbow)
+            if (_gunScript.RightElbowIK)
             {
-                animator.SetIKHintPosition(AvatarIKHint.RightElbow, _gunScript.RightElbow.position);
+                animator.SetIKHintPosition(AvatarIKHint.RightElbow, _gunScript.RightElbowIK.position);
                 animator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, .5f);
             }
-        }
+        
     }
 
     public void SetGun(Transform gun)
@@ -74,5 +97,9 @@ public class HoldGunStateBehaviour : StateMachineBehaviour {
     public void SetPlayer(Transform player)
     {
         _player = player;
+    }
+    public void SetIsAiming(bool isAiming)
+    {
+        _isAiming = isAiming;
     }
 }
