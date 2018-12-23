@@ -30,6 +30,7 @@ public class PlayerController : MonoBehaviour {
         _playerController = GetComponent<PlayerController>();
         _animationsController = new AnimationsController(_animator, _physicsController);
         _animationsController.HoldGunIK.SetPlayer(_transform);
+        _animationsController.PickUpGunIK.SetPlayer(_transform);
 
         _state = new NormalState(_transform, _physicsController, _playerController, _animationsController);
     }

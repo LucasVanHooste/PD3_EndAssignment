@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class PickUpGunStateBehaviour : StateMachineBehaviour {
+public class PickUpFirstGunStateBehaviour : StateMachineBehaviour {
 
-    public Transform Player;
-    public Transform Gun;
-    public Transform RightHand;
-    public Transform LeftHand;
+    private Transform _player;
+    private Transform _gun;
+    private Transform _rightHand;
 
     private float _iKWeight;
+    private GunScript _gunScript;
 
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
@@ -18,10 +18,12 @@ public class PickUpGunStateBehaviour : StateMachineBehaviour {
         _iKWeight = 0;
     }
 
-    // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
-    //override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-    //
-    //}
+    //OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
+    override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    {
+        if (_gun != null)
+            _gunScript = _gun.GetComponent<GunScript>();
+    }
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     //override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
@@ -37,7 +39,7 @@ public class PickUpGunStateBehaviour : StateMachineBehaviour {
 
     override public void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        Debug.Log(Gun.gameObject.name);
+        Debug.Log(_gun.gameObject.name);
 
         //before player grabs pistol
         if (stateInfo.normalizedTime < .14f)
@@ -45,12 +47,9 @@ public class PickUpGunStateBehaviour : StateMachineBehaviour {
         else
         {
             //when player grabs pistol
-            if (Gun.parent == null)
+            if (_gun.parent == null)
             {
-                Gun.gameObject.layer = 9;
-                Gun.position = RightHand.position;
-                Gun.parent = RightHand;
-                Gun.localEulerAngles = new Vector3(0, -90, -90);
+                _gunScript.TakeFirstGun(layerIndex, _rightHand);
             }
 
             //after player grabs pistol
@@ -58,12 +57,26 @@ public class PickUpGunStateBehaviour : StateMachineBehaviour {
         }
 
         //IK
-        Gun.GetComponent<GunScript>().RightHand.rotation = Player.rotation;
-        animator.SetIKPosition(AvatarIKGoal.RightHand, Gun.GetComponent<GunScript>().RightHand.position);
-        animator.SetIKRotation(AvatarIKGoal.RightHand, Gun.GetComponent<GunScript>().RightHand.rotation);
+        _gun.GetComponent<GunScript>().RightHand.rotation = _player.rotation;
+        animator.SetIKPosition(AvatarIKGoal.RightHand, _gun.GetComponent<GunScript>().RightHand.position);
+        animator.SetIKRotation(AvatarIKGoal.RightHand, _gun.GetComponent<GunScript>().RightHand.rotation);
         animator.SetIKPositionWeight(AvatarIKGoal.RightHand, _iKWeight);
         animator.SetIKRotationWeight(AvatarIKGoal.RightHand, _iKWeight);
 
 
+    }
+
+    public void SetGun(Transform gun)
+    {
+        _gun = gun;
+    }
+    public void SetPlayer(Transform player)
+    {
+        _player = player;
+        
+    }
+    public void SetRightHand(Transform rightHand)
+    {
+        _rightHand = rightHand;
     }
 }

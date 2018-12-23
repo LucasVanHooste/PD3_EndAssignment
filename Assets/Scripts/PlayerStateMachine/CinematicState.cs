@@ -91,12 +91,12 @@ public class CinematicState : IState
         yield return new WaitForSeconds(1);
 
         _animationsController.PickUpGun(true);
-        _animationsController.SetLayerWeight(1, 1);
+        _animationsController.SetLayerWeight(2, 1);
         //StartCoroutine(LerpLayerWeight(1, 1, .02f));
 
         yield return new WaitUntil(_cinematicBehaviour.GetIsSceneFinished);
         _animationsController.PickUpGun(false);
-        _animationsController.SetLayerWeight(1, 0);
+        _animationsController.SetLayerWeight(2, 0);
         //StartCoroutine(LerpLayerWeight(1, 0, .03f));
         _playerController.ToGunState(_object);
     }

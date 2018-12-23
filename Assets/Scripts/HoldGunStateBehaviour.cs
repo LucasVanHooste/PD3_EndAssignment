@@ -42,7 +42,6 @@ public class HoldGunStateBehaviour : StateMachineBehaviour {
         if (_gun == null || _player==null) return;
         //Debug.Log(_gun.gameObject.name);
 
-
         //IK
         animator.SetIKPosition(AvatarIKGoal.RightHand, _gunScript.RightHand.position);
         animator.SetIKRotation(AvatarIKGoal.RightHand, _gunScript.RightHand.rotation);

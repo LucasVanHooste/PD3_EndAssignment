@@ -75,7 +75,8 @@ public class NormalState : IState
                 break;
             case "FirstGun":
                 {
-                    _animationsController.SetPickUpGunStateBehaviour(_playerController.RightHand, _playerController.LeftHand, _playerTransform, _object.transform);
+                    _animationsController.SetPickUpFirstGunStateBehaviour(_object.transform, _playerController.RightHand);
+                    
                     _playerController.ToCinematicState(_object);
                 }
                 break;

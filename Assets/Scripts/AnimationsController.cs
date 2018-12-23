@@ -6,6 +6,7 @@ using UnityEngine;
 public class AnimationsController {
 
     public readonly HoldGunStateBehaviour HoldGunIK;
+    public readonly PickUpFirstGunStateBehaviour PickUpGunIK;
 
     private Animator _animator;
     private PhysicsController _physicsController;
@@ -24,6 +25,7 @@ public class AnimationsController {
         _animator = animator;
         _physicsController = physicsController;
         HoldGunIK = _animator.GetBehaviour<HoldGunStateBehaviour>();
+        PickUpGunIK = _animator.GetBehaviour<PickUpFirstGunStateBehaviour>();
     }
 
     public void Update()
@@ -49,12 +51,10 @@ public class AnimationsController {
         _animator.SetTrigger(_punchParameter);
     }
 
-    public void SetPickUpGunStateBehaviour(Transform rightHand, Transform leftHand, Transform playerTransform, Transform gun)
+    public void SetPickUpFirstGunStateBehaviour(Transform gun, Transform rightHand)
     {
-        _animator.GetBehaviour<PickUpGunStateBehaviour>().RightHand = rightHand;
-        _animator.GetBehaviour<PickUpGunStateBehaviour>().LeftHand = leftHand;
-        _animator.GetBehaviour<PickUpGunStateBehaviour>().Player = playerTransform;
-        _animator.GetBehaviour<PickUpGunStateBehaviour>().Gun = gun;
+        _animator.GetBehaviour<PickUpFirstGunStateBehaviour>().SetGun(gun);
+        _animator.GetBehaviour<PickUpFirstGunStateBehaviour>().SetRightHand(rightHand);
     }
 
     public void SetLayerWeight(int layerIndex, float weight)

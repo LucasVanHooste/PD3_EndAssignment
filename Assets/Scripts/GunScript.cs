@@ -29,6 +29,14 @@ public class GunScript : MonoBehaviour {
         }
     }
 
+    public void TakeFirstGun(int layerIndex, Transform parent)
+    {
+        gameObject.layer = 9;
+        _transform.parent = parent;
+        _transform.localPosition = LocalPositionOnPlayer;
+        _transform.localEulerAngles = LocalRotationOnPlayer;
+    }
+
     public void TakeGun(int layerIndex, Transform parent, HoldGunStateBehaviour holdGunIK)
     {
         gameObject.layer = 9;
