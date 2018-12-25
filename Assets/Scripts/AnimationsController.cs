@@ -11,16 +11,23 @@ public class AnimationsController {
     private Animator _animator;
     private PhysicsController _physicsController;
 
-    private int _verticalVelocityAnimationParameter = Animator.StringToHash("VerticalVelocity");
-    private int _horizontalVelocityAnimationParameter = Animator.StringToHash("HorizontalVelocity");
+    private int _zMovementAnimationParameter = Animator.StringToHash("ZMovement");
+    private int _xMovementVelocityAnimationParameter = Animator.StringToHash("XMovement");
 
-    private int _jumpingAnimationParameter = Animator.StringToHash("Jumping");
+    private int _isGroundedAnimationParameter = Animator.StringToHash("IsGrounded");
+    //private int _jumpingAnimationParameter = Animator.StringToHash("JumpingTrigger");
+
     private int _horizontalRotationAnimationParameter = Animator.StringToHash("HorizontalRotation");
+    private int _verticalVelocityAnimationParameter = Animator.StringToHash("VerticalVelocity");
+    //private int _timeInAirAnimationParameter = Animator.StringToHash("TimeInAir");
     private int _pushingAnimationParameter = Animator.StringToHash("Pushing");
     private int _pickingUpGunParameter = Animator.StringToHash("PickingUpGun");
     private int _punchParameter = Animator.StringToHash("Punch");
     private int _isAimingGunParameter = Animator.StringToHash("IsAiming");
     private int _isTwoHandedGunParameter = Animator.StringToHash("IsTwoHandedGun");
+    private int _distanceFromGroundParameter = Animator.StringToHash("DistanceFromGround");
+
+    private int _resetParameter = Animator.StringToHash("Reset");
 
     public AnimationsController(Animator animator, PhysicsController physicsController)
     {
@@ -33,10 +40,16 @@ public class AnimationsController {
 
     public void Update()
     {
-        _animator.SetFloat(_verticalVelocityAnimationParameter, _physicsController.Movement.z);
-        _animator.SetFloat(_horizontalVelocityAnimationParameter, _physicsController.Movement.x);
-        _animator.SetBool(_jumpingAnimationParameter, _physicsController.Jumping);
+        _animator.SetFloat(_zMovementAnimationParameter, _physicsController.Movement.z);
+        _animator.SetFloat(_xMovementVelocityAnimationParameter, _physicsController.Movement.x);
+        _animator.SetBool(_isGroundedAnimationParameter, _physicsController.IsGrounded());
+        //_animator.SetBool(_jumpingAnimationParameter, _physicsController.Jumping);
+
         _animator.SetFloat(_horizontalRotationAnimationParameter, _physicsController.Aim.x);
+        _animator.SetFloat(_verticalVelocityAnimationParameter, _physicsController.GetVelocity().y);
+
+        //_animator.SetFloat(_timeInAirAnimationParameter, _physicsController.GetTimeInAir());
+        _animator.SetFloat(_distanceFromGroundParameter, _physicsController.GetDistanceFromGround());
     }
 
     public void Push(bool push)
@@ -68,5 +81,22 @@ public class AnimationsController {
     public void SetLayerWeight(int layerIndex, float weight)
     {
         _animator.SetLayerWeight(layerIndex, weight);
+    }
+
+    public void ResetAnimations()
+    {
+        //_animator.SetFloat(_zMovementAnimationParameter, 0);
+        //_animator.SetFloat(_xMovementVelocityAnimationParameter, 0);
+
+        //_animator.SetFloat(_horizontalRotationAnimationParameter, 0);
+        //_animator.SetFloat(_verticalVelocityAnimationParameter, 0);
+        //_animator.SetFloat(_distanceFromGroundParameter, _physicsController.GetDistanceFromGround());
+
+        //_animator.SetBool(_jumpingAnimationParameter, true);
+        //_animator.SetBool(_pushingAnimationParameter, false);
+        //_animator.SetBool(_pickingUpGunParameter, false);
+        _animator.SetBool(_punchParameter, false);
+        _animator.SetBool(_isAimingGunParameter, false);
+        _animator.SetTrigger(_resetParameter);
     }
 }

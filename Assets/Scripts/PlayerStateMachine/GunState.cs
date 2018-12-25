@@ -14,7 +14,9 @@ public class GunState : IState
     private CameraController _cameraController;
 
     private bool _isAiming;
+    private bool _isShooting;
     private GameObject _gun;
+    private GunScript _gunScript;
 
     public GunState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, AnimationsController animationsController, GameObject gun, CameraController cameraController)
     {
@@ -24,35 +26,48 @@ public class GunState : IState
         _animationsController = animationsController;
         _triggers = _playerController.Triggers;
         _gun = gun;
+        _gunScript = _gun.GetComponent<GunScript>();
         _cameraController = cameraController;
 
     }
 
     public void Update()
     {
-        if (Input.GetButtonDown("Jump") && !_physicsController.Jumping)
+        if (Input.GetButtonDown("Jump") && _physicsController.IsGrounded())
         {
             _physicsController.Jump = true;
         }
 
-        if (!_physicsController.Jumping)
+        if (_physicsController.IsGrounded())
             _physicsController.Movement = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
         _physicsController.Aim = new Vector3(Input.GetAxis("RightJoystickX"), 0, Input.GetAxis("RightJoystickY"));
 
-        if (Input.GetAxis("TriggerLeft") > 0.2f && !_physicsController.Jumping)
+        if (Input.GetAxis("TriggerLeft") > 0.2f && _physicsController.IsGrounded())
         {
-            Debug.Log("Aim");
+            //Debug.Log("Aim");
             _isAiming = true;
         }
         else _isAiming = false;
 
         AimGun();
 
-        if (Input.GetButtonDown("Interact") && !_physicsController.Jumping && !_isAiming)
+        if (Input.GetAxis("TriggerRight") > 0.2f && _isAiming)
+        {
+            //Debug.Log("Shoot");
+            _isShooting = true;
+        }
+        else _isShooting = false;
+
+        ShootGun();
+
+        if (Input.GetButtonDown("Interact") && _physicsController.IsGrounded() && !_isAiming)
         {
             InteractWithObject();
         }
+
+        if (_physicsController.GetVelocity().y < -6.5f)
+            DropGun();
     }
 
     private void InteractWithObject()
@@ -67,40 +82,30 @@ public class GunState : IState
         {
             case "Gun":
                 {
-                    _gun.GetComponent<GunScript>().DropGun();
+                    _gunScript.DropGun();
 
                     PickUpGun();
                     RemoveTriggersFromList(_object.GetComponents<Collider>());
                     _gun = _object;
-
+                    //_gunScript = _gun.GetComponent<GunScript>();
 
                 }
                 break;
         }
     }
 
-    public void OnControllerColliderHit(ControllerColliderHit hit)
-    {
-        
-    }
-
-    public void OnTriggerEnter(Collider other)
-    {
-        
-    }
-
-    public void OnTriggerExit(Collider other)
-    {
-        
-    }
-
     void AimGun()
     {
         _animationsController.AimGun(_isAiming);
-        _animationsController.IsTwoHandedGun(_gun.GetComponent<GunScript>().IsTwoHanded);
+        _animationsController.IsTwoHandedGun(_gunScript.IsTwoHanded);
 
         _cameraController.AimGun(_isAiming);
-        _gun.GetComponent<GunScript>().AimGun(_isAiming);
+        _gunScript.AimGun(_isAiming);
+    }
+
+    private void ShootGun()
+    {
+        _gunScript.ShootGun(_isShooting);
     }
 
     private GameObject GetClosestTriggerObject()
@@ -125,16 +130,8 @@ public class GunState : IState
     {
             if (_object.GetComponent<GunScript>())
             {
-                GunScript _gunScript = _object.GetComponent<GunScript>();
-                if (_gunScript.IsTwoHanded)
-                {
+                _gunScript = _object.GetComponent<GunScript>();
                     _gunScript.TakeGun(_playerController.gameObject.layer, _playerController.RightHand, _playerController.CameraRoot/*, _animationsController.HoldGunIK*/);
-                }
-                else
-                {
-                    _gunScript.TakeGun(_playerController.gameObject.layer, _playerController.RightHand, _playerController.CameraRoot/*, _animationsController.HoldGunIK*/);
-
-                }
 
             _animationsController.HoldGunIK.SetGun(_object.transform);
         }
@@ -151,5 +148,29 @@ public class GunState : IState
             }
 
         }
+    }
+
+    public void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+
+    }
+
+    public void OnTriggerEnter(Collider other)
+    {
+
+    }
+
+    public void OnTriggerExit(Collider other)
+    {
+
+    }
+
+    public void DropGun()
+    {
+        _gunScript.DropGun();
+
+        _animationsController.HoldGunIK.SetGun(null);
+
+        _playerController.ToNormalState();
     }
 }

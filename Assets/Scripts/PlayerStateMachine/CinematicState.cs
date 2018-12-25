@@ -98,15 +98,7 @@ public class CinematicState : IState
         if (_object.GetComponent<GunScript>())
         {
             GunScript _gunScript = _object.GetComponent<GunScript>();
-            if (_gunScript.IsTwoHanded)
-            {
                 _gunScript.TakeFirstGun(_playerController.gameObject.layer, _playerController.RightHand, _playerController.CameraRoot);
-            }
-            else
-            {
-                _gunScript.TakeFirstGun(_playerController.gameObject.layer, _playerController.RightHand, _playerController.CameraRoot);
-
-            }
         }
 
         RemoveTriggersFromList(_object.GetComponents<Collider>());
@@ -124,4 +116,9 @@ public class CinematicState : IState
 
         }
     }
+
+    //public void DropGun()
+    //{
+    //    throw new System.NotImplementedException();
+    //}
 }

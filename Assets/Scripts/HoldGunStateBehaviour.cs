@@ -40,7 +40,7 @@ public class HoldGunStateBehaviour : StateMachineBehaviour {
     override public void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         if (_gun == null || _player == null) return;
-        Debug.Log(_gun.gameObject.name);
+        //Debug.Log(_gun.gameObject.name);
 
         //IK first pistol
         if (_gun.tag == "FirstGun")

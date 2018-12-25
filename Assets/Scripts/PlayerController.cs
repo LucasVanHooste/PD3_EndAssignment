@@ -26,6 +26,8 @@ public class PlayerController : MonoBehaviour {
     private CameraController _cameraController;
 
     private GameObject _gun;
+    private Vector3 _startPosition;
+    private Quaternion _startRotation;
 
     [HideInInspector] public List<Collider> Triggers = new List<Collider>();
 
@@ -40,6 +42,8 @@ public class PlayerController : MonoBehaviour {
         //_animationsController.PickUpGunIK.SetPlayer(_transform);
         _animationsController.LookAtIK.SetLookAtPosition(_lookAtTransform);
         _cameraController = GetComponent<CameraController>();
+        _startPosition= _transform.position;
+        _startRotation = _transform.rotation;
 
         _state = new NormalState(_transform, _physicsController, _playerController, _animationsController);
     }
@@ -94,10 +98,20 @@ public class PlayerController : MonoBehaviour {
         _state = new GunState(_transform, _physicsController, _playerController, _animationsController, _object, _cameraController);
         Debug.Log("ToGunState");
     }
+    public void ToDeadState()
+    {
+        _state = new DeadState(_transform, _physicsController, _playerController, _animationsController, _startPosition, _startRotation);
+        Debug.Log("ToDeadState");
+    }
 
     public void PickUpGun()
     {
         _state.PickUpGun();
     }
 
+    //public void DropGun()
+    //{
+    //    Debug.Log("drop gun");
+    //    _state.DropGun();
+    //}
 }

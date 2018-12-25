@@ -12,15 +12,6 @@ public class NormalState : IState
     private List<Collider> _triggers;
     private GameObject _object;
 
-    //private int _verticalVelocityAnimationParameter = Animator.StringToHash("VerticalVelocity");
-    //private int _horizontalVelocityAnimationParameter = Animator.StringToHash("HorizontalVelocity");
-    ////private int _aimingAnimationParameter = Animator.StringToHash("Aiming");
-    //private int _jumpingAnimationParameter = Animator.StringToHash("Jumping");
-    //private int _horizontalRotationAnimationParameter = Animator.StringToHash("HorizontalRotation");
-    //private int _pushingAnimationParameter = Animator.StringToHash("Pushing");
-    //private int _pickingUpGunParameter = Animator.StringToHash("PickingUpGun");
-    //private int _punchParameter = Animator.StringToHash("Punch");
-
     public NormalState(Transform playerTransform, PhysicsController physicsController,PlayerController playerController, AnimationsController animationsController)
     {
         _playerTransform = playerTransform;
@@ -32,12 +23,13 @@ public class NormalState : IState
 
     public void Update()
     {
-        if (Input.GetButtonDown("Jump") && !_physicsController.Jumping)
+        //Debug.Log(_physicsController.GetDistanceFromGround());
+        if (Input.GetButtonDown("Jump") && _physicsController.IsGrounded())
         {
             _physicsController.Jump = true;
         }
 
-        if (!_physicsController.Jumping)
+        if (_physicsController.IsGrounded())
             _physicsController.Movement = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
         _physicsController.Aim = new Vector3(Input.GetAxis("RightJoystickX"), 0, Input.GetAxis("RightJoystickY"));
@@ -47,15 +39,11 @@ public class NormalState : IState
             _animationsController.Punch();
         }
 
-        if (Input.GetButtonDown("Interact") && !_physicsController.Jumping)
+        if (Input.GetButtonDown("Interact") && _physicsController.IsGrounded())
         {
             InteractWithObject();
         }
 
-        //_animator.SetFloat(_verticalVelocityAnimationParameter, _physicsController.Movement.z);
-        //_animator.SetFloat(_horizontalVelocityAnimationParameter, _physicsController.Movement.x);
-        //_animator.SetBool(_jumpingAnimationParameter, _physicsController.Jumping);
-        //_animator.SetFloat(_horizontalRotationAnimationParameter, _physicsController.Aim.x);
     }
 
     private void InteractWithObject()
@@ -129,15 +117,7 @@ public class NormalState : IState
         if (_object.GetComponent<GunScript>())
         {
             GunScript _gunScript = _object.GetComponent<GunScript>();
-            if (_gunScript.IsTwoHanded)
-            {
                 _gunScript.TakeGun(_playerController.gameObject.layer, _playerController.RightHand, _playerController.CameraRoot/*, _animationsController.HoldGunIK*/);
-            }
-            else
-            {
-                _gunScript.TakeGun(_playerController.gameObject.layer, _playerController.RightHand, _playerController.CameraRoot/*, _animationsController.HoldGunIK*/);
-
-            }
 
             _animationsController.HoldGunIK.SetGun(_object.transform);
         }

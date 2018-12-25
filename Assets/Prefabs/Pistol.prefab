@@ -667,11 +667,18 @@ MonoBehaviour:
   LeftHandIK: {fileID: 4228762622465478}
   LeftElbowIK: {fileID: 0}
   RightElbowIK: {fileID: 0}
+  _gunCollisionCheckerPrefab: {fileID: 4598727941178456, guid: 4373d0fc47d94674a867f845a048164b,
+    type: 2}
   LocalPositionOnPlayer: {x: 0, y: 0, z: 0}
   LocalRotationOnPlayer: {x: 0, y: -90, z: -90}
   LocalAimPositionOnPlayer: {x: 0.1, y: 0.06, z: 0.45}
   LocalAimRotationOnPlayer: {x: 0, y: 180, z: 0}
   IsTwoHanded: 0
+  _fireRate: 0
+  _bulletDamage: 0
+  _bulletLayermask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!136 &136092659466899060
 CapsuleCollider:
   m_ObjectHideFlags: 1

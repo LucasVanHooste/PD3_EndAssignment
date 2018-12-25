@@ -35,20 +35,24 @@ public class PhysicsController : MonoBehaviour {
     public Vector3 Movement { get; set; }
     public Vector3 Aim { get; set; }
     public bool Jump { get; set; }
-    public bool Jumping { get; set; }
+    //public bool Jumping { get; set; }
 
     private Vector3 _velocity = Vector3.zero;
-
+    private float _timeInAir = 0;
+    private float _skinWidth;
+    private float _prevPosY;
 
     [SerializeField] private float _horizontalRotationSpeed;
     [SerializeField] private float _verticalRotationSpeed;
-
+    [SerializeField] private LayerMask _mapLayerMask;
 
     // Use this for initialization
     void Start () {
         _characterController = GetComponent<CharacterController>();
         _cameraController = GetComponent<CameraController>();
         _playerTransform = transform;
+
+        _skinWidth = _characterController.skinWidth;
 	}
 
     private void Update()
@@ -71,7 +75,9 @@ public class PhysicsController : MonoBehaviour {
 
         LimitMaximumRunningSpeed();
 
+        _prevPosY = _playerTransform.position.y;
         _characterController.Move(_velocity * Time.deltaTime);
+        //Debug.Log("Velocity: "+_velocity);
     }
 
     private void ApplyMovement()
@@ -97,7 +103,7 @@ public class PhysicsController : MonoBehaviour {
         if (_characterController.isGrounded)
         {
             _velocity -= Vector3.Project(_velocity, Physics.gravity.normalized);
-            Jumping = false;
+            //Jumping = false;
         }
     }
 
@@ -106,6 +112,7 @@ public class PhysicsController : MonoBehaviour {
         if (!_characterController.isGrounded)
         {
             _velocity += Physics.gravity * Time.deltaTime; // g[m/s^2] * t[s]
+            _timeInAir += Time.fixedDeltaTime;
         }
 
     }
@@ -126,7 +133,8 @@ public class PhysicsController : MonoBehaviour {
         {
             _velocity += -Physics.gravity.normalized * Mathf.Sqrt(2 * Physics.gravity.magnitude * _jumpHeight);
             Jump = false;
-            Jumping = true;
+            //Jumping = true;
+            _timeInAir = 0;
         }
 
     }
@@ -165,4 +173,39 @@ public class PhysicsController : MonoBehaviour {
         _characterController.transform.eulerAngles += new Vector3(0, Aim.x, 0) * _horizontalRotationSpeed * Time.deltaTime;
         _cameraController.RotateVertically(Aim.z * _verticalRotationSpeed);
     }
+
+    public Vector3 GetVelocity()
+    {
+        return _velocity;
+    }
+
+    public float GetDistanceFromGround()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(_playerTransform.position, Vector3.down,out hit, 1000, _mapLayerMask))
+        {
+            //print("I'm looking at " + hit.transform.name);
+            return (hit.point - _playerTransform.position).magnitude;
+        }
+            //print("I'm looking at nothing!");
+        return 1000;
+    }
+
+    public bool IsGrounded()
+    {
+        if (_characterController.isGrounded || GetDistanceFromGround() < _skinWidth + 0.01f) //.01 is padding
+        {
+            
+            return true;
+        }
+        return false;
+    }
+
+    //public bool IsGroundedAnimationCheck()
+    //{
+    //    if (IsGrounded() || Mathf.Approximately((float)System.Math.Round(_prevPosY, 1), (float)System.Math.Round(_playerTransform.position.y, 1)))
+    //        return true;
+
+    //    return false;
+    //}
 }
