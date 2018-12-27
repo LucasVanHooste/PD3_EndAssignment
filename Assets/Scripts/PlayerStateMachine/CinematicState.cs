@@ -52,7 +52,7 @@ public class CinematicState : IState
     private void PickupFirstGun()
     {
         Debug.Log("Pick up gun");
-        _physicsController.Movement = Vector3.zero;
+        _physicsController.StopMoving();
         _physicsController.Aim = Vector3.zero;
 
         _playerController.StartCoroutine(RotateToObject());

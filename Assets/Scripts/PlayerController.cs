@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour {
         _animationsController.HoldGunIK.SetPlayer(_transform);
         //_animationsController.PickUpGunIK.SetPlayer(_transform);
         _animationsController.LookAtIK.SetLookAtPosition(_lookAtTransform);
-        _animationsController.ClimbTopLadderAnimationBehaviour.SetBehaviour(_playerController, _physicsController, _animationsController);
+        //_animationsController.ClimbTopLadderAnimationBehaviour.SetBehaviour(_playerController, _physicsController, _animationsController);
 
         _cameraController = GetComponent<CameraController>();
         _startPosition= _transform.position;

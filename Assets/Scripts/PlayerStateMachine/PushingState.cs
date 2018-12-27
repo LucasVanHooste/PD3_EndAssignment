@@ -70,7 +70,7 @@ public class PushingState : IState
     }
     public void InteractWithObstacle()
     {
-        _physicsController.Movement = Vector3.zero;
+        _physicsController.StopMoving();
         _physicsController.Aim = Vector3.zero;
         _obstacleCollisionChecker = GameObject.Instantiate(_playerController._obstacleCollisionChecker, _obstacle.transform.position + GetDirection().normalized, Quaternion.LookRotation(GetDirection()));
 

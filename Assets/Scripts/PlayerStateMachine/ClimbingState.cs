@@ -13,7 +13,7 @@ public class ClimbingState : IState
     private GameObject _ladder;
     private LadderScript _ladderScript;
 
-    float _ladderPaddingDistance = 0.1f;
+    float _ladderPaddingDistance = 0.15f;
 
     public ClimbingState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, AnimationsController animationsController, GameObject ladder)
     {
@@ -25,13 +25,16 @@ public class ClimbingState : IState
         _ladderScript = _ladder.GetComponent<LadderScript>();
         _triggers = _playerController.Triggers;
 
+        _animationsController.ClimbTopLadderAnimationBehaviour.SetBehaviour(_playerController, _physicsController, _animationsController);
+        _animationsController.TopLadderIK.SetLadderScript(_ladderScript);
+
         Climb();
     }
 
     private void Climb()
     {
         _physicsController.Aim = Vector3.zero;
-        _physicsController.Movement = Vector3.zero;
+        _physicsController.StopMoving();
 
         _playerController.StartCoroutine(RotateToLadder());
 
@@ -139,8 +142,10 @@ public class ClimbingState : IState
 
     public void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.tag == "Ladder")
+        if (other.gameObject.tag == "Ladder" && !_physicsController.IsGrounded())
         {
+            _playerTransform.gameObject.layer = 15;
+
             _animationsController.ClimbTopLadder();
         }
     }

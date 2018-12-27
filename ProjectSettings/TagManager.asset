@@ -24,7 +24,7 @@ TagManager:
   - GravityBox
   - NoCollisionWithPlayer
   - Guns
-  - 
+  - NoCollisions
   - 
   - 
   - 

@@ -8,6 +8,7 @@ public class AnimationsController {
     public readonly HoldGunStateBehaviour HoldGunIK;
     public readonly LookAtStateBehaviour LookAtIK;
     public readonly ClimbTopLadderStateBehaviour ClimbTopLadderAnimationBehaviour;
+    public readonly TopLadderStateBehaviour TopLadderIK;
 
     private Animator _animator;
     private PhysicsController _physicsController;
@@ -41,6 +42,7 @@ public class AnimationsController {
         HoldGunIK = _animator.GetBehaviour<HoldGunStateBehaviour>();
         LookAtIK = _animator.GetBehaviour<LookAtStateBehaviour>();
         ClimbTopLadderAnimationBehaviour = _animator.GetBehaviour<ClimbTopLadderStateBehaviour>();
+        TopLadderIK = _animator.GetBehaviour<TopLadderStateBehaviour>();
     }
 
     public void Update()

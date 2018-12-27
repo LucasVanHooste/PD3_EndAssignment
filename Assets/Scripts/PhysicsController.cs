@@ -175,6 +175,12 @@ public class PhysicsController : MonoBehaviour {
         _cameraController.RotateVertically(Aim.z * _verticalRotationSpeed);
     }
 
+    public void StopMoving()
+    {
+        Movement = Vector3.zero;
+        _velocity = Vector3.zero;
+    }
+
     public Vector3 GetVelocity()
     {
         return _velocity;
@@ -204,7 +210,8 @@ public class PhysicsController : MonoBehaviour {
 
     //public bool IsGroundedAnimationCheck()
     //{
-    //    if (IsGrounded() || Mathf.Approximately((float)System.Math.Round(_prevPosY, 1), (float)System.Math.Round(_playerTransform.position.y, 1)))
+    //    Debug.Log(Mathf.Abs(_prevPosY - _playerTransform.position.y));
+    //    if (IsGrounded() || (Mathf.Abs(_prevPosY - _playerTransform.position.y) < .001f))
     //        return true;
 
     //    return false;
