@@ -10,8 +10,8 @@ public class PhysicsController : MonoBehaviour {
     [SerializeField]
     private float _mass = 75; // [kg]
 
-    [SerializeField]    
-    public float MaxRunningSpeed =(30.0f * 1000) / (60 * 60);
+    [SerializeField]
+    public float MaxRunningSpeed = (30.0f * 1000) / (60 * 60);
 
     [SerializeField]
     private float _acceleration = 3; // [m/s^2]
@@ -41,27 +41,28 @@ public class PhysicsController : MonoBehaviour {
     private float _timeInAir = 0;
     private float _skinWidth;
     private float _prevPosY;
+    private bool _hasGravity = true;
 
     [SerializeField] private float _horizontalRotationSpeed;
     [SerializeField] private float _verticalRotationSpeed;
     [SerializeField] private LayerMask _mapLayerMask;
 
     // Use this for initialization
-    void Start () {
+    void Start() {
         _characterController = GetComponent<CharacterController>();
         _cameraController = GetComponent<CameraController>();
         _playerTransform = transform;
 
         _skinWidth = _characterController.skinWidth;
-	}
+    }
 
     private void Update()
     {
-        
+
     }
 
     // Update is called once per frame
-    void FixedUpdate () {
+    void FixedUpdate() {
         ApplyGround();
         ApplyGravity();
 
@@ -109,7 +110,7 @@ public class PhysicsController : MonoBehaviour {
 
     private void ApplyGravity()
     {
-        if (!_characterController.isGrounded)
+        if (_hasGravity && !_characterController.isGrounded)
         {
             _velocity += Physics.gravity * Time.deltaTime; // g[m/s^2] * t[s]
             _timeInAir += Time.fixedDeltaTime;
@@ -182,12 +183,12 @@ public class PhysicsController : MonoBehaviour {
     public float GetDistanceFromGround()
     {
         RaycastHit hit;
-        if (Physics.Raycast(_playerTransform.position, Vector3.down,out hit, 1000, _mapLayerMask))
+        if (Physics.Raycast(_playerTransform.position, Vector3.down, out hit, 1000, _mapLayerMask))
         {
             //print("I'm looking at " + hit.transform.name);
             return (hit.point - _playerTransform.position).magnitude;
         }
-            //print("I'm looking at nothing!");
+        //print("I'm looking at nothing!");
         return 1000;
     }
 
@@ -195,7 +196,7 @@ public class PhysicsController : MonoBehaviour {
     {
         if (_characterController.isGrounded || GetDistanceFromGround() < _skinWidth + 0.01f) //.01 is padding
         {
-            
+
             return true;
         }
         return false;
@@ -208,4 +209,9 @@ public class PhysicsController : MonoBehaviour {
 
     //    return false;
     //}
+
+    public void HasGravity(bool hasGravity)
+    {
+        _hasGravity = hasGravity;
+    }
 }

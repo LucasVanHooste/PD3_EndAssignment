@@ -25,7 +25,7 @@ public class PlayerController : MonoBehaviour {
     private AnimationsController _animationsController;
     private CameraController _cameraController;
 
-    private GameObject _gun;
+    //private GameObject _gun;
     private Vector3 _startPosition;
     private Quaternion _startRotation;
 
@@ -38,9 +38,12 @@ public class PlayerController : MonoBehaviour {
         _animator = GetComponent<Animator>();
         _playerController = GetComponent<PlayerController>();
         _animationsController = new AnimationsController(_animator, _physicsController);
+
         _animationsController.HoldGunIK.SetPlayer(_transform);
         //_animationsController.PickUpGunIK.SetPlayer(_transform);
         _animationsController.LookAtIK.SetLookAtPosition(_lookAtTransform);
+        _animationsController.ClimbTopLadderAnimationBehaviour.SetBehaviour(_playerController, _physicsController, _animationsController);
+
         _cameraController = GetComponent<CameraController>();
         _startPosition= _transform.position;
         _startRotation = _transform.rotation;
@@ -90,18 +93,24 @@ public class PlayerController : MonoBehaviour {
     public void ToCinematicState(GameObject _object)
     {
         _state = new CinematicState(_transform, _physicsController, _playerController, _animationsController, _object, _cinematicBehaviour);
-        _gun = _object;
+        //_gun = _object;
         Debug.Log("ToCinematicState");
     }
-    public void ToGunState(GameObject _object)
+    public void ToGunState(GameObject _gun)
     {
-        _state = new GunState(_transform, _physicsController, _playerController, _animationsController, _object, _cameraController);
+        _state = new GunState(_transform, _physicsController, _playerController, _animationsController, _gun, _cameraController);
         Debug.Log("ToGunState");
     }
     public void ToDeadState()
     {
         _state = new DeadState(_transform, _physicsController, _playerController, _animationsController, _startPosition, _startRotation);
         Debug.Log("ToDeadState");
+    }
+
+    public void ToClimbingState(GameObject _ladder)
+    {
+        _state = new ClimbingState(_transform, _physicsController, _playerController, _animationsController, _ladder);
+        Debug.Log("ToClimbingState");
     }
 
     public void PickUpGun()

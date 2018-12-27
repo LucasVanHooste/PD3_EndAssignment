@@ -75,6 +75,12 @@ public class NormalState : IState
                     _playerController.ToGunState(_object);
                 }
                 break;
+            case "Ladder":
+                {
+
+                    _playerController.ToClimbingState(_object);
+                }
+                break;
         }
     }
 

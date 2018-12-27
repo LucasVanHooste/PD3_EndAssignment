@@ -7,6 +7,7 @@ TagManager:
   - Obstacle
   - Gun
   - FirstGun
+  - Ladder
   layers:
   - Default
   - TransparentFX

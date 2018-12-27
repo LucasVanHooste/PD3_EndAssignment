@@ -7,6 +7,7 @@ public class AnimationsController {
 
     public readonly HoldGunStateBehaviour HoldGunIK;
     public readonly LookAtStateBehaviour LookAtIK;
+    public readonly ClimbTopLadderStateBehaviour ClimbTopLadderAnimationBehaviour;
 
     private Animator _animator;
     private PhysicsController _physicsController;
@@ -26,6 +27,9 @@ public class AnimationsController {
     private int _isAimingGunParameter = Animator.StringToHash("IsAiming");
     private int _isTwoHandedGunParameter = Animator.StringToHash("IsTwoHandedGun");
     private int _distanceFromGroundParameter = Animator.StringToHash("DistanceFromGround");
+    private int _climbingAnimationParameter = Animator.StringToHash("Climbing");
+    private int _climbTopAnimationParameter = Animator.StringToHash("ClimbTopLadder");
+
 
     private int _resetParameter = Animator.StringToHash("Reset");
 
@@ -36,6 +40,7 @@ public class AnimationsController {
 
         HoldGunIK = _animator.GetBehaviour<HoldGunStateBehaviour>();
         LookAtIK = _animator.GetBehaviour<LookAtStateBehaviour>();
+        ClimbTopLadderAnimationBehaviour = _animator.GetBehaviour<ClimbTopLadderStateBehaviour>();
     }
 
     public void Update()
@@ -78,6 +83,15 @@ public class AnimationsController {
         _animator.SetTrigger(_punchParameter);
     }
 
+    public void Climb(bool climb)
+    {
+        _animator.SetBool(_climbingAnimationParameter, climb);
+    }
+    public void ClimbTopLadder()
+    {
+        _animator.SetTrigger(_climbTopAnimationParameter);
+    }
+
     public void SetLayerWeight(int layerIndex, float weight)
     {
         _animator.SetLayerWeight(layerIndex, weight);
@@ -98,5 +112,10 @@ public class AnimationsController {
         _animator.SetBool(_punchParameter, false);
         _animator.SetBool(_isAimingGunParameter, false);
         _animator.SetTrigger(_resetParameter);
+    }
+
+    public void ApplyRootMotion(bool apply)
+    {
+        _animator.applyRootMotion = apply;
     }
 }
