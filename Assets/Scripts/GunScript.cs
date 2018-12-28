@@ -72,6 +72,7 @@ public class GunScript : MonoBehaviour {
 
     public void TakeGun(int layerIndex, Transform RightHand, Transform CameraRootTransform/*, HoldGunStateBehaviour holdGunIK*/)
     {
+        if(_gunCollisionChecker)
         GameObject.Destroy(_gunCollisionChecker.gameObject);
 
         gameObject.layer = 9;

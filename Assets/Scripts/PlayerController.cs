@@ -15,6 +15,9 @@ public class PlayerController : MonoBehaviour {
     public Transform RightHand;
     public Transform CameraRoot;
     [SerializeField] private Transform _lookAtTransform;
+    [SerializeField] private Transform _holsterGun1Hand;
+    [SerializeField] private Transform _holsterGun2Hands;
+
 
     private Transform _transform;
     private PhysicsController _physicsController;
@@ -98,7 +101,7 @@ public class PlayerController : MonoBehaviour {
     }
     public void ToGunState(GameObject _gun)
     {
-        _state = new GunState(_transform, _physicsController, _playerController, _animationsController, _gun, _cameraController);
+        _state = new GunState(_transform, _physicsController, _playerController, _animationsController, _gun, _cameraController, _holsterGun1Hand, _holsterGun2Hands);
         Debug.Log("ToGunState");
     }
     public void ToDeadState()

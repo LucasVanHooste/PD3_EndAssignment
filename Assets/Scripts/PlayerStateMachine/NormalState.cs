@@ -44,6 +44,11 @@ public class NormalState : IState
             InteractWithObject();
         }
 
+        if (Input.GetButtonDown("HolsterGun"))
+        {
+            _playerController.ToGunState(null);
+        }
+
     }
 
     private void InteractWithObject()

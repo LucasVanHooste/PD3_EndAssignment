@@ -12,27 +12,52 @@ public class GunState : IState
     private List<Collider> _triggers;
     private GameObject _object;
     private CameraController _cameraController;
+    private Transform _holsterGun1Hand;
+    private Transform _holsterGun2Hands;
 
     private bool _isAiming;
     private bool _isShooting;
     private GameObject _gun;
     private GunScript _gunScript;
 
-    public GunState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, AnimationsController animationsController, GameObject gun, CameraController cameraController)
+    private float _dropGunTime = 1;
+    private float _dropGunTimer=0;
+
+    public GunState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, AnimationsController animationsController, GameObject gun, 
+        CameraController cameraController, Transform holsterGun1Hand, Transform holsterGun2Hands)
     {
         _playerTransform = playerTransform;
         _physicsController = physicsController;
         _playerController = playerController;
         _animationsController = animationsController;
         _triggers = _playerController.Triggers;
-        _gun = gun;
-        _gunScript = _gun.GetComponent<GunScript>();
         _cameraController = cameraController;
+        _holsterGun1Hand = holsterGun1Hand;
+        _holsterGun2Hands = holsterGun2Hands;
 
+        if (gun == null)
+        {
+            GameObject tempGun = GetGunInHolster();
+            if (tempGun != null)
+                TakeGunFromHolster(tempGun);
+            
+        }
+        else
+        {
+            _gun = gun;
+            _gunScript = _gun.GetComponent<GunScript>();
+        }
     }
 
     public void Update()
     {
+        if (_gun == null)
+        {
+            Debug.Log("to normal please");
+            _playerController.ToNormalState();
+            return;
+        }
+
         if (Input.GetButtonDown("Jump") && _physicsController.IsGrounded())
         {
             _physicsController.Jump = true;
@@ -66,8 +91,27 @@ public class GunState : IState
             InteractWithObject();
         }
 
+        if (Input.GetButton("Interact"))
+        {
+            _dropGunTimer += Time.deltaTime;
+        }
+        else
+        {
+            _dropGunTimer = 0;
+        }
+
+        if (_dropGunTimer >= _dropGunTime)
+        {
+            DropGun();
+        }
+
         if (_physicsController.GetVelocity().y < -6.5f)
             DropGun();
+
+        if(Input.GetButtonDown("HolsterGun") && !_isAiming)
+        {
+            HolsterGun();
+        }
     }
 
     private void InteractWithObject()
@@ -172,5 +216,60 @@ public class GunState : IState
         _animationsController.HoldGunIK.SetGun(null);
 
         _playerController.ToNormalState();
+    }
+
+    private void HolsterGun()
+    {
+
+        GameObject tempGun = GetGunInHolster();
+
+        if (_gunScript.IsTwoHanded)
+        {
+            _gun.transform.parent = _holsterGun2Hands;
+            _gun.transform.position = _holsterGun2Hands.position;
+            _gun.transform.rotation = _holsterGun2Hands.rotation;
+        }
+        else
+        {
+            _gun.transform.parent = _holsterGun1Hand;
+            _gun.transform.position = _holsterGun1Hand.position;
+            _gun.transform.rotation = _holsterGun1Hand.rotation;
+        }
+
+        _animationsController.HoldGunIK.SetGun(null);
+
+
+        if (tempGun!=null)
+        {
+            TakeGunFromHolster(tempGun);
+        }
+        else
+        {
+            _playerController.ToNormalState();
+        }
+
+
+
+    }
+
+    private GameObject GetGunInHolster()
+    {
+        GameObject tempGun = null;
+
+        if (_holsterGun1Hand.childCount > 0)
+            tempGun = _holsterGun1Hand.GetChild(0).gameObject;
+
+        if (_holsterGun2Hands.childCount > 0)
+            tempGun = _holsterGun2Hands.GetChild(0).gameObject;
+
+        return tempGun;
+    }
+
+    private void TakeGunFromHolster(GameObject gun)
+    {
+        _object = gun;
+
+        PickUpGun();
+        _gun = _object;
     }
 }

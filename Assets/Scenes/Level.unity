@@ -5697,6 +5697,11 @@ Transform:
   m_Father: {fileID: 547931846}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &187535303 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4166753146273434, guid: ac5eae4ee151913489c82c210b1f2983,
+    type: 2}
+  m_PrefabInternal: {fileID: 1291011373}
 --- !u!1001 &229337948
 Prefab:
   m_ObjectHideFlags: 0
@@ -8145,6 +8150,34 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &265075288
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 265075289}
+  m_Layer: 0
+  m_Name: HolsterGun2Hands
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &265075289
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 265075288}
+  m_LocalRotation: {x: 0.3642437, y: -0.6162566, z: -0.35764384, w: -0.5997042}
+  m_LocalPosition: {x: 0.08601691, y: -0.021927208, z: -0.09816713}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 187535303}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 241.363, y: -87.02301, z: 177.611}
 --- !u!1 &281843229
 GameObject:
   m_ObjectHideFlags: 0
@@ -9981,7 +10014,7 @@ Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: pb_Mesh4872
+  m_Name: pb_Mesh5214
   serializedVersion: 9
   m_SubMeshes:
   - serializedVersion: 2
@@ -32005,7 +32038,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 4010126182098336, guid: ac5eae4ee151913489c82c210b1f2983, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 40.5
+      value: 34.5
       objectReference: {fileID: 0}
     - target: {fileID: 4010126182098336, guid: ac5eae4ee151913489c82c210b1f2983, type: 2}
       propertyPath: m_LocalPosition.y
@@ -32013,7 +32046,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4010126182098336, guid: ac5eae4ee151913489c82c210b1f2983, type: 2}
       propertyPath: m_LocalPosition.z
-      value: 13.5
+      value: -6
       objectReference: {fileID: 0}
     - target: {fileID: 4010126182098336, guid: ac5eae4ee151913489c82c210b1f2983, type: 2}
       propertyPath: m_LocalRotation.x
@@ -32153,6 +32186,16 @@ Prefab:
       propertyPath: m_LocalRotation.z
       value: 0.00000046116907
       objectReference: {fileID: 0}
+    - target: {fileID: 114751527524649496, guid: ac5eae4ee151913489c82c210b1f2983,
+        type: 2}
+      propertyPath: _holsterGun1Hand
+      value: 
+      objectReference: {fileID: 1783931507}
+    - target: {fileID: 114751527524649496, guid: ac5eae4ee151913489c82c210b1f2983,
+        type: 2}
+      propertyPath: _holsterGun2Hands
+      value: 
+      objectReference: {fileID: 265075289}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ac5eae4ee151913489c82c210b1f2983, type: 2}
   m_IsPrefabAsset: 0
@@ -34460,6 +34503,11 @@ Transform:
   m_Father: {fileID: 1963440701}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: -10, y: 190, z: 40}
+--- !u!4 &1370311651 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4166279658351510, guid: ac5eae4ee151913489c82c210b1f2983,
+    type: 2}
+  m_PrefabInternal: {fileID: 1291011373}
 --- !u!1 &1390585473
 GameObject:
   m_ObjectHideFlags: 0
@@ -42187,7 +42235,7 @@ Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: pb_Mesh4982
+  m_Name: pb_Mesh5320
   serializedVersion: 9
   m_SubMeshes:
   - serializedVersion: 2
@@ -42337,6 +42385,34 @@ Mesh:
   m_MeshMetrics[0]: 1
   m_MeshMetrics[1]: 1
   m_MeshOptimized: 0
+--- !u!1 &1783931506
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1783931507}
+  m_Layer: 0
+  m_Name: HolsterGun1Hand
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1783931507
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1783931506}
+  m_LocalRotation: {x: -0.03999498, y: 0.6564783, z: 0.7346431, w: 0.16654176}
+  m_LocalPosition: {x: 0.157, y: -0.043, z: -0.003}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1370311651}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: -77.925, y: 49.852, z: 113.258}
 --- !u!43 &1809292464
 Mesh:
   m_ObjectHideFlags: 0
