@@ -200,7 +200,9 @@ public class PhysicsController : MonoBehaviour {
 
     public bool IsGrounded()
     {
-        if (_characterController.isGrounded || GetDistanceFromGround() < _skinWidth + 0.01f) //.01 is padding
+
+
+        if (_characterController.isGrounded || GetDistanceFromGround() < _skinWidth + 0.02f) //.02 is padding
         {
 
             return true;

@@ -9,11 +9,13 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
-    public GameObject _obstacleCollisionChecker;
     [SerializeField] private CinematicBehaviour _cinematicBehaviour;
     public Transform LeftHand;
     public Transform RightHand;
     public Transform CameraRoot;
+    [SerializeField] private Transform _obstacleIKLeftHand;
+    [SerializeField] private Transform _obstacleIKRightHand;
+
     [SerializeField] private Transform _lookAtTransform;
     [SerializeField] private Transform _holsterGun1Hand;
     [SerializeField] private Transform _holsterGun2Hands;
@@ -90,7 +92,7 @@ public class PlayerController : MonoBehaviour {
     }
     public void ToPushingState(GameObject _obstacle)
     {
-        _state = new PushingState(_transform, _physicsController, _playerController, _animationsController, _obstacle);
+        _state = new PushingState(_transform, _physicsController, _playerController, _animationsController, _obstacle, _obstacleIKLeftHand, _obstacleIKRightHand);
         Debug.Log("ToPushingState");
     }
     public void ToCinematicState(GameObject _object)

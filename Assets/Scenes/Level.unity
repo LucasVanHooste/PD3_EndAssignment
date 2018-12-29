@@ -23526,6 +23526,34 @@ Mesh:
   m_MeshMetrics[0]: 1
   m_MeshMetrics[1]: 1
   m_MeshOptimized: 0
+--- !u!1 &946223241
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 946223242}
+  m_Layer: 0
+  m_Name: ObstacleIKRightHand
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &946223242
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 946223241}
+  m_LocalRotation: {x: 0.7558288, y: 0.11301291, z: -0.03941721, w: -0.64373696}
+  m_LocalPosition: {x: 0.3540001, y: 1.3387054, z: 0.42300987}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1139603844}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: -74.623, y: 230.65999, z: 123.31901}
 --- !u!1 &951801255
 GameObject:
   m_ObjectHideFlags: 0
@@ -27903,6 +27931,11 @@ MonoBehaviour:
   _camRotation: 20
   _minCamAngle: -50
   _maxCamAngle: 50
+--- !u!4 &1139603844 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4010126182098336, guid: ac5eae4ee151913489c82c210b1f2983,
+    type: 2}
+  m_PrefabInternal: {fileID: 1291011373}
 --- !u!1 &1146980089
 GameObject:
   m_ObjectHideFlags: 0
@@ -27936,7 +27969,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 16, y: 16}
+  m_SizeDelta: {x: 14, y: 14}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1146980091
 MonoBehaviour:
@@ -32038,7 +32071,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 4010126182098336, guid: ac5eae4ee151913489c82c210b1f2983, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 34.5
+      value: 37.5
       objectReference: {fileID: 0}
     - target: {fileID: 4010126182098336, guid: ac5eae4ee151913489c82c210b1f2983, type: 2}
       propertyPath: m_LocalPosition.y
@@ -32046,7 +32079,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4010126182098336, guid: ac5eae4ee151913489c82c210b1f2983, type: 2}
       propertyPath: m_LocalPosition.z
-      value: -6
+      value: -12
       objectReference: {fileID: 0}
     - target: {fileID: 4010126182098336, guid: ac5eae4ee151913489c82c210b1f2983, type: 2}
       propertyPath: m_LocalRotation.x
@@ -32168,7 +32201,7 @@ Prefab:
     - target: {fileID: 114685799192635404, guid: ac5eae4ee151913489c82c210b1f2983,
         type: 2}
       propertyPath: _mapLayerMask.m_Bits
-      value: 1
+      value: 1025
       objectReference: {fileID: 0}
     - target: {fileID: 4138264787485306, guid: ac5eae4ee151913489c82c210b1f2983, type: 2}
       propertyPath: m_LocalRotation.w
@@ -32196,6 +32229,28 @@ Prefab:
       propertyPath: _holsterGun2Hands
       value: 
       objectReference: {fileID: 265075289}
+    - target: {fileID: 4686534188014304, guid: ac5eae4ee151913489c82c210b1f2983, type: 2}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4524170121496224, guid: ac5eae4ee151913489c82c210b1f2983, type: 2}
+      propertyPath: m_RootOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4179113895210262, guid: ac5eae4ee151913489c82c210b1f2983, type: 2}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114751527524649496, guid: ac5eae4ee151913489c82c210b1f2983,
+        type: 2}
+      propertyPath: _obstacleIKRightHand
+      value: 
+      objectReference: {fileID: 946223242}
+    - target: {fileID: 114751527524649496, guid: ac5eae4ee151913489c82c210b1f2983,
+        type: 2}
+      propertyPath: _obstacleIKLeftHand
+      value: 
+      objectReference: {fileID: 1379070045}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ac5eae4ee151913489c82c210b1f2983, type: 2}
   m_IsPrefabAsset: 0
@@ -33938,7 +33993,7 @@ Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: pb_Mesh5118
+  m_Name: pb_Mesh5144
   serializedVersion: 9
   m_SubMeshes:
   - serializedVersion: 2
@@ -34508,6 +34563,34 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4166279658351510, guid: ac5eae4ee151913489c82c210b1f2983,
     type: 2}
   m_PrefabInternal: {fileID: 1291011373}
+--- !u!1 &1379070044
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1379070045}
+  m_Layer: 0
+  m_Name: ObstacleIKLeftHand
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1379070045
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1379070044}
+  m_LocalRotation: {x: -0.7659441, y: 0.082410835, z: 0.042588316, w: 0.63617945}
+  m_LocalPosition: {x: -0.38000107, y: 1.3392948, z: 0.43198967}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1139603844}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: -78.984, y: -191.96599, z: 202.155}
 --- !u!1 &1390585473
 GameObject:
   m_ObjectHideFlags: 0
@@ -39145,31 +39228,6 @@ Prefab:
     - target: {fileID: 1210212794022208, guid: be71da146b7ff1147b237dcea67abdf8, type: 2}
       propertyPath: m_Name
       value: Obstacle (3)
-      objectReference: {fileID: 0}
-    - target: {fileID: 54064802687385988, guid: be71da146b7ff1147b237dcea67abdf8,
-        type: 2}
-      propertyPath: m_UseGravity
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 54064802687385988, guid: be71da146b7ff1147b237dcea67abdf8,
-        type: 2}
-      propertyPath: m_Mass
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 54064802687385988, guid: be71da146b7ff1147b237dcea67abdf8,
-        type: 2}
-      propertyPath: m_Drag
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 54064802687385988, guid: be71da146b7ff1147b237dcea67abdf8,
-        type: 2}
-      propertyPath: m_Constraints
-      value: 126
-      objectReference: {fileID: 0}
-    - target: {fileID: 65727243413223982, guid: be71da146b7ff1147b237dcea67abdf8,
-        type: 2}
-      propertyPath: m_Size.z
-      value: 0.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: be71da146b7ff1147b237dcea67abdf8, type: 2}
@@ -44708,26 +44766,6 @@ Prefab:
     - target: {fileID: 1210212794022208, guid: be71da146b7ff1147b237dcea67abdf8, type: 2}
       propertyPath: m_Name
       value: Obstacle (2)
-      objectReference: {fileID: 0}
-    - target: {fileID: 54064802687385988, guid: be71da146b7ff1147b237dcea67abdf8,
-        type: 2}
-      propertyPath: m_UseGravity
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 54064802687385988, guid: be71da146b7ff1147b237dcea67abdf8,
-        type: 2}
-      propertyPath: m_Mass
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 54064802687385988, guid: be71da146b7ff1147b237dcea67abdf8,
-        type: 2}
-      propertyPath: m_Drag
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 54064802687385988, guid: be71da146b7ff1147b237dcea67abdf8,
-        type: 2}
-      propertyPath: m_Constraints
-      value: 126
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: be71da146b7ff1147b237dcea67abdf8, type: 2}
