@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private Transform _holsterGun1Hand;
     [SerializeField] private Transform _holsterGun2Hands;
 
+    private bool _isAlive=true;
 
     private Transform _transform;
     private PhysicsController _physicsController;
@@ -87,6 +88,7 @@ public class PlayerController : MonoBehaviour {
 
     public void ToNormalState()
     {
+        _isAlive = true;
         _state = new NormalState(_transform, _physicsController,_playerController, _animationsController);
         Debug.Log("ToNormalState");
     }
@@ -108,6 +110,7 @@ public class PlayerController : MonoBehaviour {
     }
     public void ToDeadState()
     {
+        _isAlive = false;
         _state = new DeadState(_transform, _physicsController, _playerController, _animationsController, _startPosition, _startRotation);
         Debug.Log("ToDeadState");
     }
@@ -128,4 +131,11 @@ public class PlayerController : MonoBehaviour {
     //    Debug.Log("drop gun");
     //    _state.DropGun();
     //}
+
+    public void TakePunch()
+    {
+        if (!_isAlive) return;
+        _animationsController.TakePunch();
+        ToDeadState();
+    }
 }

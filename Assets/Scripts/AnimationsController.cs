@@ -32,6 +32,8 @@ public class AnimationsController {
     private int _climbingAnimationParameter = Animator.StringToHash("Climbing");
     private int _climbTopAnimationParameter = Animator.StringToHash("ClimbTopLadder");
 
+    private int _takePunchAnimationParameter = Animator.StringToHash("TakePunch");
+
 
     private int _resetParameter = Animator.StringToHash("Reset");
 
@@ -85,6 +87,11 @@ public class AnimationsController {
     public void Punch()
     {
         _animator.SetTrigger(_punchParameter);
+    }
+
+    public void TakePunch()
+    {
+        _animator.SetTrigger(_takePunchAnimationParameter);
     }
 
     public void Climb(bool climb)
