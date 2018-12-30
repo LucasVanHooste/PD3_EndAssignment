@@ -22,15 +22,21 @@ public class CinematicBehaviour : MonoBehaviour {
     private Vector3 _camStartPos;
     private Quaternion _camStartRotation;
 
+    private bool _isInPosition = false;
+
     // Use this for initialization
     void Start () {
-		
-	}
+
+    }
 	
 	// Update is called once per frame
 	void Update () {
-		
-	}
+        if (_isInPosition)
+        {
+            _currentScene._cameraTransform.position = _currentScene._targetPosition.position;
+            _currentScene._cameraTransform.rotation = _currentScene._targetPosition.rotation;
+        }
+    }
 
     public void PlayCinematicScene(string sceneName)
     {
@@ -70,7 +76,9 @@ public class CinematicBehaviour : MonoBehaviour {
             yield return null;
         }
 
+        _isInPosition = true;
         yield return new WaitForSeconds(4);
+        _isInPosition = false;
         StartCoroutine(MoveCameraToStartPosition());
     }
 

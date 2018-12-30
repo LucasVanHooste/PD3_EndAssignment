@@ -7,34 +7,52 @@ using UnityEngine;
 public class PhysicsController : MonoBehaviour {
 
     [Header("Locomotion Parameters")]
-    [SerializeField]
-    private float _mass = 75; // [kg]
+    [SerializeField] private float _mass = 75; // [kg]
 
-    [SerializeField]
-    public float MaxRunningSpeed = (30.0f * 1000) / (60 * 60);
+    [SerializeField] public float MaxRunningSpeed = (30.0f * 1000) / (60 * 60);
 
-    [SerializeField]
-    private float _acceleration = 3; // [m/s^2]
+    [SerializeField] private float _acceleration = 3; // [m/s^2]
 
-    [SerializeField]
-    private float _jumpHeight = 1; // [m/s^2]
+    [SerializeField] private float _jumpHeight = 1; // [m/s^2]
 
-    [SerializeField]
-    private float _dragOnGround = 1; // []
+    [SerializeField] private float _dragOnGround = 1; // []
 
-    [SerializeField]
-    private float _dragInAir = 1; // []
+    [SerializeField] private float _dragInAir = 1; // []
 
-    [SerializeField]
-    private float _dragWhileFalling = 1; // []
+    [SerializeField] private float _dragWhileFalling = 1; // []
+
+    [SerializeField] private float _walkingSpeedMultiplier;
 
     private CharacterController _characterController;
     private CameraController _cameraController;
     private Transform _playerTransform;
 
-    public Vector3 Movement { get; set; }
-    public Vector3 Aim { get; set; }
+    private Vector3 _movement;
+    private Vector3 _aim;
+
+    public bool IsWalking { get; set; }
     public bool Jump { get; set; }
+    public Vector3 Movement
+    {
+        get
+        {
+            if (IsWalking)
+                return Vector3.ClampMagnitude(_movement, _walkingSpeedMultiplier);
+            return _movement;
+        }
+        set { _movement = value; }
+    }
+    public Vector3 Aim
+    {
+        get
+        {
+            if (IsWalking)
+                return Vector3.ClampMagnitude(_aim, _walkingSpeedMultiplier);
+            return _aim;
+        }
+        set { _aim = value; }
+    }
+
     //public bool Jumping { get; set; }
 
     private Vector3 _velocity = Vector3.zero;
@@ -85,7 +103,7 @@ public class PhysicsController : MonoBehaviour {
     {
         if (_characterController.isGrounded)
         {
-            var relativeMovement = RelativeDirection(Movement);
+            Vector3 relativeMovement = RelativeDirection(Movement);
             _velocity += relativeMovement * _acceleration * Time.deltaTime; // F(= m.a) [m/s^2] * t [s]
         }
     }

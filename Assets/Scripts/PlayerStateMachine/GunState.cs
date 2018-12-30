@@ -140,6 +140,8 @@ public class GunState : IState
 
     void AimGun()
     {
+        _physicsController.IsWalking=_isAiming;
+
         _animationsController.AimGun(_isAiming);
         _animationsController.IsTwoHandedGun(_gunScript.IsTwoHanded);
 
