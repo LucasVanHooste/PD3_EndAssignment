@@ -38,6 +38,24 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
+    [SerializeField] private int _punchDamage;
+    public int PunchDamage
+    {
+        get
+        {
+            return _punchDamage;
+        }
+    }
+
+    [SerializeField] private float _punchRange;
+    public float PunchRange
+    {
+        get
+        {
+            return _punchRange;
+        }
+    }
+
     private Transform _transform;
     private PhysicsController _physicsController;
     private Animator _animator;

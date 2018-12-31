@@ -41,7 +41,7 @@ public class NormalState : PlayerState
         {
             if (_punchCoolDownTimer >= _playerController.PunchCoolDown)
             {
-                _animationsController.Punch();
+                Punch();
                 _punchCoolDownTimer = 0;
             }
 
@@ -141,4 +141,17 @@ public class NormalState : PlayerState
         }
     }
 
+    private void Punch()
+    {
+        _animationsController.Punch();
+        RaycastHit hit;
+        if (Physics.Raycast(_playerTransform.position+ new Vector3(0,1.5f,0), _playerTransform.forward, out hit, _playerController.PunchRange))
+        {
+            if (hit.transform.gameObject.layer == 16)
+            {
+                if (hit.transform.GetComponent<MeleeEnemyBehaviour>())
+                    hit.transform.GetComponent<MeleeEnemyBehaviour>().TakePunch(_playerController.PunchDamage);
+            }
+        }
+    }
 }

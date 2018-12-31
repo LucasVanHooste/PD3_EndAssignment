@@ -1,14 +1,20 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
+[RequireComponent(typeof(Animator))]
 public class MeleeEnemyBehaviour : MonoBehaviour {
 
     private INode _rootNode;
     private Transform _transform;
+    private MeleeEnemyBehaviour _meleeEnemyBehaviour;
+    private Animator _animator;
+    private EnemyAnimationsController _animationsController;
     private NavMeshAgent _navMeshAgent;
+
     private PlayerController _playerController;
 
     [SerializeField] private Transform _playerTransform;
@@ -30,6 +36,15 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
         }
     }
 
+    Vector3 _relativeVelocity;
+    public Vector3 RelativeVelocity
+    {
+        get
+        {
+            return _relativeVelocity;
+        }
+    }
+
     private Vector3 _targetPosition;
     void Start()
     {
@@ -37,6 +52,9 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
         _transform = GetComponent<Transform>();
         _targetPosition = _transform.position;
         _navMeshAgent = GetComponent<NavMeshAgent>();
+        _meleeEnemyBehaviour = GetComponent<MeleeEnemyBehaviour>();
+        _animator = GetComponent<Animator>();
+        _animationsController = new EnemyAnimationsController(_transform, _meleeEnemyBehaviour, _animator, _navMeshAgent);
         _playerController = _playerTransform.GetComponent<PlayerController>();
 
         //#region test
@@ -63,6 +81,20 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
         //_rootNode = new SelectorNode(followPlayerAI);
 
         StartCoroutine(RunTree());
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        //Debug.Log("rigidbody: " + _rigidBody.velocity);
+        Debug.Log("navmesh: " + _navMeshAgent.velocity);
+
+        Debug.Log("navmesh desired: " + _navMeshAgent.desiredVelocity);
+        Debug.Log("navmesh speed: " + _navMeshAgent.speed);
+
+
+        _relativeVelocity = GetRelativeVelocity();
+        _animationsController.Update();
     }
 
     private IEnumerator<NodeResult> Roam()
@@ -106,12 +138,6 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
         _playerController.TakePunch(_punchDamage);
         Debug.Log("TakePunch");
         yield return NodeResult.Succes;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     IEnumerator RunTree()
@@ -158,6 +184,14 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
         else
         _punchCoolDownTimer = 0;
         return false;
+    }
+
+
+
+    private Vector3 GetRelativeVelocity()
+    {
+        Vector3 relativeVelocity = _transform.InverseTransformVector(_navMeshAgent.velocity);
+        return relativeVelocity / _navMeshAgent.speed;
     }
 
     private void TakeDamage(int damage)

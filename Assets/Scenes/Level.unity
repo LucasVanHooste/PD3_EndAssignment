@@ -29581,6 +29581,8 @@ MonoBehaviour:
   _crossHair: {fileID: 1146980089}
   _maxHealth: 100
   _punchCoolDown: 1.5
+  _punchDamage: 50
+  _punchRange: 2
   Triggers: []
 --- !u!95 &1139603848
 Animator:
@@ -36666,8 +36668,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1392051411}
-  - component: {fileID: 1392051412}
+  - component: {fileID: 1392051416}
   - component: {fileID: 1392051413}
+  - component: {fileID: 1392051412}
   - component: {fileID: 1392051414}
   m_Layer: 16
   m_Name: Enemy
@@ -36688,6 +36691,7 @@ Transform:
   m_Children:
   - {fileID: 2060890085}
   - {fileID: 1580740296}
+  - {fileID: 2126856764}
   m_Father: {fileID: 0}
   m_RootOrder: 15
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -36746,6 +36750,24 @@ CapsuleCollider:
   m_Height: 1.8
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}
+--- !u!95 &1392051416
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1392051410}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: 43c21cb3633ff7c409d82a4aa29c2fe8, type: 3}
+  m_Controller: {fileID: 9100000, guid: 583cd7b8642bc1746aa89935498b8460, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &1400327035
 GameObject:
   m_ObjectHideFlags: 0
@@ -38738,6 +38760,53 @@ Mesh:
   m_MeshMetrics[0]: 1
   m_MeshMetrics[1]: 1
   m_MeshOptimized: 0
+--- !u!1001 &1511975874
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 1392051411}
+    m_Modifications:
+    - target: {fileID: 400138, guid: 43c21cb3633ff7c409d82a4aa29c2fe8, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400138, guid: 43c21cb3633ff7c409d82a4aa29c2fe8, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400138, guid: 43c21cb3633ff7c409d82a4aa29c2fe8, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400138, guid: 43c21cb3633ff7c409d82a4aa29c2fe8, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400138, guid: 43c21cb3633ff7c409d82a4aa29c2fe8, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400138, guid: 43c21cb3633ff7c409d82a4aa29c2fe8, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400138, guid: 43c21cb3633ff7c409d82a4aa29c2fe8, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 400138, guid: 43c21cb3633ff7c409d82a4aa29c2fe8, type: 3}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 13700002, guid: 43c21cb3633ff7c409d82a4aa29c2fe8, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 6359ff839d3d133479bb41551af7ffc7, type: 2}
+    m_RemovedComponents:
+    - {fileID: 9500000, guid: 43c21cb3633ff7c409d82a4aa29c2fe8, type: 3}
+  m_SourcePrefab: {fileID: 100100000, guid: 43c21cb3633ff7c409d82a4aa29c2fe8, type: 3}
+  m_IsPrefabAsset: 0
 --- !u!1 &1515769651
 GameObject:
   m_ObjectHideFlags: 0
@@ -41194,7 +41263,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1580740296
 Transform:
   m_ObjectHideFlags: 0
@@ -50607,7 +50676,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2060890085
 Transform:
   m_ObjectHideFlags: 0
@@ -53182,3 +53251,8 @@ Mesh:
   m_MeshMetrics[0]: 1
   m_MeshMetrics[1]: 1
   m_MeshOptimized: 0
+--- !u!4 &2126856764 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400138, guid: 43c21cb3633ff7c409d82a4aa29c2fe8,
+    type: 3}
+  m_PrefabInternal: {fileID: 1511975874}
