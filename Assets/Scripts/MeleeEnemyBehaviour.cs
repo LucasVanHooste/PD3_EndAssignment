@@ -14,13 +14,26 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
     [SerializeField] private Transform _playerTransform;
     [SerializeField] private float FOV;
     [SerializeField] private LayerMask _canSeePlayerLayerMask;
+    [SerializeField] private float _minDistanceFromPlayer;
     [SerializeField] private float _punchReach;
     [SerializeField] private float _punchCoolDown;
+    [SerializeField] private int _punchDamage;
     private float _punchCoolDownTimer = 0;
+
+    [SerializeField] private int _maxHealth;
+    private int _health;
+    public int Health
+    {
+        get
+        {
+            return _health;
+        }
+    }
 
     private Vector3 _targetPosition;
     void Start()
     {
+        _health = _maxHealth;
         _transform = GetComponent<Transform>();
         _targetPosition = _transform.position;
         _navMeshAgent = GetComponent<NavMeshAgent>();
@@ -79,7 +92,7 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
 
     private IEnumerator<NodeResult> ChargeAtPlayer()
     {
-        if (Vector3.Magnitude(_playerTransform.position - _transform.position) > 1)
+        if (Vector3.Magnitude(_playerTransform.position - _transform.position) > _minDistanceFromPlayer)
             _navMeshAgent.SetDestination(_playerTransform.position);
         else _navMeshAgent.SetDestination(_transform.position);
 
@@ -89,7 +102,8 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
 
     private IEnumerator<NodeResult> PunchPlayer()
     {
-        _playerController.TakePunch();
+        if(_playerController.Health>0)
+        _playerController.TakePunch(_punchDamage);
         Debug.Log("TakePunch");
         yield return NodeResult.Succes;
     }
@@ -144,5 +158,34 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
         else
         _punchCoolDownTimer = 0;
         return false;
+    }
+
+    private void TakeDamage(int damage)
+    {
+        _health -= damage;
+        //_animationsController.SetHealth(_health);
+    }
+
+    public void TakePunch(int damage)
+    {
+        TakeDamage(damage);
+        //_animationsController.TakePunch();
+
+        Die();
+    }
+
+    public void GetShot(int damage)
+    {
+        TakeDamage(damage);
+
+        Die();
+    }
+
+    private void Die()
+    {
+        if (_health > 0) return;
+        GameObject.Destroy(gameObject);
+        //_state.Die();
+        //ToDeadState();
     }
 }

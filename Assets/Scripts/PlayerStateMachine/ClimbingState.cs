@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ClimbingState : IState
+public class ClimbingState : PlayerState
 {
     private Transform _playerTransform;
     private PhysicsController _physicsController;
@@ -29,6 +29,11 @@ public class ClimbingState : IState
         _animationsController.TopLadderIK.SetLadderScript(_ladderScript);
 
         Climb();
+    }
+
+    public override void Update()
+    {
+        
     }
 
     private void Climb()
@@ -125,22 +130,7 @@ public class ClimbingState : IState
         return direction;
     }
 
-    public void Update()
-    {
-
-    }
-
-    public void OnControllerColliderHit(ControllerColliderHit hit)
-    {
-
-    }
-
-    public void OnTriggerEnter(Collider other)
-    {
-        
-    }
-
-    public void OnTriggerExit(Collider other)
+    public override void OnTriggerExit(Collider other)
     {
         if (other.gameObject.tag == "Ladder" && !_physicsController.IsGrounded())
         {
@@ -149,10 +139,4 @@ public class ClimbingState : IState
             _animationsController.ClimbTopLadder();
         }
     }
-
-    public void PickUpGun()
-    {
-        
-    }
-
 }

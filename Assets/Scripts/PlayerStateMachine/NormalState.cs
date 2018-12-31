@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NormalState : IState
+public class NormalState : PlayerState
 {
     private Transform _playerTransform;
     private PhysicsController _physicsController;
@@ -12,6 +12,8 @@ public class NormalState : IState
     private List<Collider> _triggers;
     private GameObject _object;
 
+    private float _punchCoolDownTimer = 0;
+
     public NormalState(Transform playerTransform, PhysicsController physicsController,PlayerController playerController, AnimationsController animationsController)
     {
         _playerTransform = playerTransform;
@@ -19,9 +21,10 @@ public class NormalState : IState
         _playerController = playerController;
         _animationsController = animationsController;
         _triggers = _playerController.Triggers;
+
     }
 
-    public void Update()
+    public override void Update()
     {
         //Debug.Log(_physicsController.GetDistanceFromGround());
         if (Input.GetButtonDown("Jump") && _physicsController.IsGrounded())
@@ -36,8 +39,14 @@ public class NormalState : IState
 
         if (Input.GetButtonDown("Punch"))
         {
-            _animationsController.Punch();
+            if (_punchCoolDownTimer >= _playerController.PunchCoolDown)
+            {
+                _animationsController.Punch();
+                _punchCoolDownTimer = 0;
+            }
+
         }
+        _punchCoolDownTimer += Time.deltaTime;
 
         if (Input.GetButtonDown("Interact") && _physicsController.IsGrounded())
         {
@@ -90,21 +99,6 @@ public class NormalState : IState
     }
 
 
-    public void OnTriggerEnter(Collider other)
-    {
-        
-    }
-
-    public void OnTriggerExit(Collider other)
-    {
-        
-    }
-
-    public void OnControllerColliderHit(ControllerColliderHit hit)
-    {
-        
-    }
-
     private GameObject GetClosestTriggerObject()
     {
         Vector3 position = _playerTransform.position;
@@ -123,7 +117,7 @@ public class NormalState : IState
         return closest;
     }
 
-    public void PickUpGun()
+    public override void PickUpGun()
     {
         if (_object.GetComponent<GunScript>())
         {

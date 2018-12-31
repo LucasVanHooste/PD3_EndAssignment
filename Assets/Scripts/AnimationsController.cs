@@ -33,6 +33,7 @@ public class AnimationsController {
     private int _climbTopAnimationParameter = Animator.StringToHash("ClimbTopLadder");
 
     private int _takePunchAnimationParameter = Animator.StringToHash("TakePunch");
+    private int _playerHealthParameter = Animator.StringToHash("Health");
 
 
     private int _resetParameter = Animator.StringToHash("Reset");
@@ -47,6 +48,7 @@ public class AnimationsController {
         ClimbTopLadderAnimationBehaviour = _animator.GetBehaviour<ClimbTopLadderStateBehaviour>();
         TopLadderIK = _animator.GetBehaviour<TopLadderStateBehaviour>();
         ObstacleIK = _animator.GetBehaviour<PushObstacleStateBehaviour>();
+
     }
 
     public void Update()
@@ -101,6 +103,11 @@ public class AnimationsController {
     public void ClimbTopLadder()
     {
         _animator.SetTrigger(_climbTopAnimationParameter);
+    }
+
+    public void SetHealth(int health)
+    {
+        _animator.SetInteger(_playerHealthParameter,health);
     }
 
     public void SetLayerWeight(int layerIndex, float weight)

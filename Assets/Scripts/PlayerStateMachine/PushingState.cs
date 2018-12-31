@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PushingState : IState
+public class PushingState : PlayerState
 {
     private Transform _playerTransform;
     private PhysicsController _physicsController;
@@ -38,31 +38,19 @@ public class PushingState : IState
         InteractWithObstacle();
     }
 
-    public void Update()
+    public override void Update()
     {
-
+        
     }
 
-    public void OnTriggerEnter(Collider other)
+    public override void OnControllerColliderHit(ControllerColliderHit hit)
     {
-
-    }
-
-    public void OnTriggerExit(Collider other)
-    {
-
-    }
-
-    public void OnControllerColliderHit(ControllerColliderHit hit)
-    {
-        if (hit.gameObject == _obstacle && _hasHitObstacle == false)
+        if (hit.gameObject == _obstacle)
         {
-            //SetIK(hit.point, _playerController.LeftHand, _playerController.RightHand);
-            
-
             _hasHitObstacle = true;
         }
     }
+
     public void InteractWithObstacle()
     {
         _physicsController.StopMoving();
@@ -212,8 +200,4 @@ public class PushingState : IState
     //    _animationsController.ObstacleIK.SetObstacleScript(_obstacleScript);
     //}
 
-    public void PickUpGun()
-    {
-
-    }
 }

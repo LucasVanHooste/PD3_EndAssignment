@@ -19,8 +19,24 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private Transform _lookAtTransform;
     [SerializeField] private Transform _holsterGun1Hand;
     [SerializeField] private Transform _holsterGun2Hands;
+    [SerializeField] private GameObject _crossHair;
 
-    private bool _isAlive=true;
+    [SerializeField] private int _maxHealth;
+    private int _health;
+    public int Health {
+        get {
+            return _health;
+        }
+    }
+
+    [SerializeField] private float _punchCoolDown;
+    public float PunchCoolDown
+    {
+        get
+        {
+            return _punchCoolDown;
+        }
+    }
 
     private Transform _transform;
     private PhysicsController _physicsController;
@@ -39,6 +55,7 @@ public class PlayerController : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        _health = _maxHealth;
         _transform = transform;
         _physicsController = GetComponent<PhysicsController>();
         _animator = GetComponent<Animator>();
@@ -88,7 +105,6 @@ public class PlayerController : MonoBehaviour {
 
     public void ToNormalState()
     {
-        _isAlive = true;
         _state = new NormalState(_transform, _physicsController,_playerController, _animationsController);
         Debug.Log("ToNormalState");
     }
@@ -105,13 +121,12 @@ public class PlayerController : MonoBehaviour {
     }
     public void ToGunState(GameObject _gun)
     {
-        _state = new GunState(_transform, _physicsController, _playerController, _animationsController, _gun, _cameraController, _holsterGun1Hand, _holsterGun2Hands);
+        _state = new GunState(_transform, _physicsController, _playerController, _animationsController, _gun, _cameraController, _holsterGun1Hand, _holsterGun2Hands, _crossHair);
         Debug.Log("ToGunState");
     }
     public void ToDeadState()
     {
-        _isAlive = false;
-        _state = new DeadState(_transform, _physicsController, _playerController, _animationsController, _startPosition, _startRotation);
+        _state = new DeadState(_transform, _physicsController, _playerController, _animationsController);
         Debug.Log("ToDeadState");
     }
 
@@ -132,10 +147,34 @@ public class PlayerController : MonoBehaviour {
     //    _state.DropGun();
     //}
 
-    public void TakePunch()
+    private void TakeDamage(int damage)
     {
-        if (!_isAlive) return;
+        _health -= damage;
+        _animationsController.SetHealth(_health);
+    }
+
+    public void TakePunch(int damage)
+    {
+        TakeDamage(damage);       
         _animationsController.TakePunch();
+
+        Die();
+    }
+
+    private void Die()
+    {
+        if (_health > 0) return;
+
+        _state.Die();
         ToDeadState();
+    }
+
+    public void Respawn()
+    {
+        _transform.position = _startPosition;
+        _transform.rotation = _startRotation;
+        _animationsController.ResetAnimations();
+        _health = _maxHealth;
+        _playerController.ToNormalState();
     }
 }

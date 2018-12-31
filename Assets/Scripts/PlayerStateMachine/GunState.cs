@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GunState : IState
+public class GunState : PlayerState
 {
     private Transform _playerTransform;
     private PhysicsController _physicsController;
@@ -14,6 +14,7 @@ public class GunState : IState
     private CameraController _cameraController;
     private Transform _holsterGun1Hand;
     private Transform _holsterGun2Hands;
+    private GameObject _crossHair;
 
     private bool _isAiming;
     private bool _isShooting;
@@ -22,9 +23,10 @@ public class GunState : IState
 
     private float _dropGunTime = 1;
     private float _dropGunTimer=0;
+    private float _punchCoolDownTimer = 0;
 
     public GunState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, AnimationsController animationsController, GameObject gun, 
-        CameraController cameraController, Transform holsterGun1Hand, Transform holsterGun2Hands)
+        CameraController cameraController, Transform holsterGun1Hand, Transform holsterGun2Hands, GameObject crossHair)
     {
         _playerTransform = playerTransform;
         _physicsController = physicsController;
@@ -34,6 +36,7 @@ public class GunState : IState
         _cameraController = cameraController;
         _holsterGun1Hand = holsterGun1Hand;
         _holsterGun2Hands = holsterGun2Hands;
+        _crossHair = crossHair;
 
         if (gun == null)
         {
@@ -49,7 +52,7 @@ public class GunState : IState
         }
     }
 
-    public void Update()
+    public override void Update()
     {
         if (_gun == null)
         {
@@ -85,6 +88,17 @@ public class GunState : IState
         else _isShooting = false;
 
         ShootGun();
+
+        if (Input.GetButtonDown("Punch") && !_gunScript.IsTwoHanded && !_isAiming)
+        {
+            if (_punchCoolDownTimer >= _playerController.PunchCoolDown)
+            {
+                _animationsController.Punch();
+                _punchCoolDownTimer = 0;
+            }
+
+        }
+        _punchCoolDownTimer += Time.deltaTime;
 
         if (Input.GetButtonDown("Interact") && _physicsController.IsGrounded() && !_isAiming)
         {
@@ -145,6 +159,7 @@ public class GunState : IState
         _animationsController.AimGun(_isAiming);
         _animationsController.IsTwoHandedGun(_gunScript.IsTwoHanded);
 
+        _crossHair.SetActive(_isAiming);
         _cameraController.AimGun(_isAiming);
         _gunScript.AimGun(_isAiming);
     }
@@ -172,7 +187,7 @@ public class GunState : IState
         return closest;
     }
 
-    public void PickUpGun()
+    public override void PickUpGun()
     {
             if (_object.GetComponent<GunScript>())
             {
@@ -194,21 +209,6 @@ public class GunState : IState
             }
 
         }
-    }
-
-    public void OnControllerColliderHit(ControllerColliderHit hit)
-    {
-
-    }
-
-    public void OnTriggerEnter(Collider other)
-    {
-
-    }
-
-    public void OnTriggerExit(Collider other)
-    {
-
     }
 
     public void DropGun()
@@ -273,5 +273,10 @@ public class GunState : IState
 
         PickUpGun();
         _gun = _object;
+    }
+
+    public override void Die()
+    {
+        DropGun();
     }
 }

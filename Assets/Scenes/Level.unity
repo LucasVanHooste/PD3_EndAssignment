@@ -5875,7 +5875,7 @@ Prefab:
     - target: {fileID: 114686882027865686, guid: 93a4c4906f27739498ee07fb4d030708,
         type: 2}
       propertyPath: _bulletLayermask.m_Bits
-      value: 7479
+      value: 73015
       objectReference: {fileID: 0}
     - target: {fileID: 114686882027865686, guid: 93a4c4906f27739498ee07fb4d030708,
         type: 2}
@@ -5926,6 +5926,11 @@ Prefab:
     - target: {fileID: 1324163015139258, guid: 93a4c4906f27739498ee07fb4d030708, type: 2}
       propertyPath: m_Layer
       value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 114686882027865686, guid: 93a4c4906f27739498ee07fb4d030708,
+        type: 2}
+      propertyPath: _bulletDamage
+      value: 20
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 93a4c4906f27739498ee07fb4d030708, type: 2}
@@ -9464,7 +9469,7 @@ Prefab:
     - target: {fileID: 114054900583255406, guid: f308eb58599be5548873b2cace5f49f7,
         type: 2}
       propertyPath: _bulletLayermask.m_Bits
-      value: 7479
+      value: 73015
       objectReference: {fileID: 0}
     - target: {fileID: 114054900583255406, guid: f308eb58599be5548873b2cace5f49f7,
         type: 2}
@@ -9520,6 +9525,11 @@ Prefab:
         type: 2}
       propertyPath: m_Radius
       value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 114054900583255406, guid: f308eb58599be5548873b2cace5f49f7,
+        type: 2}
+      propertyPath: _bulletDamage
+      value: 20
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f308eb58599be5548873b2cace5f49f7, type: 2}
@@ -29278,7 +29288,7 @@ Prefab:
     - target: {fileID: 114690586496588396, guid: 11f5d171bc8c1b540b2b85535973a672,
         type: 2}
       propertyPath: _bulletLayermask.m_Bits
-      value: 7479
+      value: 73015
       objectReference: {fileID: 0}
     - target: {fileID: 65486221743325612, guid: 11f5d171bc8c1b540b2b85535973a672,
         type: 2}
@@ -29359,6 +29369,11 @@ Prefab:
     - target: {fileID: 1010823864542846, guid: 11f5d171bc8c1b540b2b85535973a672, type: 2}
       propertyPath: m_Layer
       value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 114690586496588396, guid: 11f5d171bc8c1b540b2b85535973a672,
+        type: 2}
+      propertyPath: _bulletDamage
+      value: 30
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 11f5d171bc8c1b540b2b85535973a672, type: 2}
@@ -29530,14 +29545,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mass: 75
-  MaxRunningSpeed: 8.333333
-  _acceleration: 50
+  MaxRunningSpeed: 10
+  _acceleration: 80
   _jumpHeight: 1
-  _dragOnGround: 10
+  _dragOnGround: 12
   _dragInAir: 1
   _dragWhileFalling: 1
   _walkingSpeedMultiplier: 0.4
-  _horizontalRotationSpeed: 120
+  _horizontalRotationSpeed: 130
   _verticalRotationSpeed: 100
   _mapLayerMask:
     serializedVersion: 2
@@ -29563,6 +29578,9 @@ MonoBehaviour:
   _lookAtTransform: {fileID: 1506469764}
   _holsterGun1Hand: {fileID: 1783931507}
   _holsterGun2Hands: {fileID: 265075289}
+  _crossHair: {fileID: 1146980089}
+  _maxHealth: 100
+  _punchCoolDown: 1.5
   Triggers: []
 --- !u!95 &1139603848
 Animator:
@@ -29617,7 +29635,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1146980090
 RectTransform:
   m_ObjectHideFlags: 0
@@ -36650,6 +36668,7 @@ GameObject:
   - component: {fileID: 1392051411}
   - component: {fileID: 1392051412}
   - component: {fileID: 1392051413}
+  - component: {fileID: 1392051414}
   m_Layer: 16
   m_Name: Enemy
   m_TagString: Untagged
@@ -36705,12 +36724,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerTransform: {fileID: 1139603844}
-  FOV: 120
+  FOV: 160
   _canSeePlayerLayerMask:
     serializedVersion: 2
     m_Bits: 26113
+  _minDistanceFromPlayer: 1
   _punchReach: 2
-  _punchCoolDown: 1
+  _punchCoolDown: 2
+  _punchDamage: 50
+  _maxHealth: 100
+--- !u!136 &1392051414
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1392051410}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 1.8
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.9, z: 0}
 --- !u!1 &1400327035
 GameObject:
   m_ObjectHideFlags: 0
@@ -41168,7 +41203,7 @@ Transform:
   m_GameObject: {fileID: 1580740295}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1.5, z: 0.5}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
+  m_LocalScale: {x: 0.2, y: 0.2, z: 0.6}
   m_Children: []
   m_Father: {fileID: 1392051411}
   m_RootOrder: 1
@@ -50580,7 +50615,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2060890084}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 0.9, z: 0}
   m_LocalScale: {x: 0.6, y: 1.8, z: 0.6}
   m_Children: []
   m_Father: {fileID: 1392051411}
@@ -50594,7 +50629,7 @@ BoxCollider:
   m_GameObject: {fileID: 2060890084}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}

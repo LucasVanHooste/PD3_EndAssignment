@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CinematicState : IState
+public class CinematicState : PlayerState
 {
     private Transform _playerTransform;
     private PhysicsController _physicsController;
@@ -27,26 +27,9 @@ public class CinematicState : IState
         PickupFirstGun();
     }
 
-    public void Update()
+    public override void Update()
     {
-        //_animationsController.SetFloat(_verticalVelocityAnimationParameter, _physicsController.Movement.z);
-        //_animationsController.SetFloat(_horizontalVelocityAnimationParameter, _physicsController.Movement.x);
-        //_animationsController.SetFloat(_horizontalRotationAnimationParameter, _physicsController.Aim.x);
-    }
 
-    public void OnControllerColliderHit(ControllerColliderHit hit)
-    {
-        
-    }
-
-    public void OnTriggerEnter(Collider other)
-    {
-        
-    }
-
-    public void OnTriggerExit(Collider other)
-    {
-        
     }
 
     private void PickupFirstGun()
@@ -93,7 +76,7 @@ public class CinematicState : IState
         _playerController.ToGunState(_object);
     }
 
-    public void PickUpGun()
+    public override void PickUpGun()
     {
         if (_object.GetComponent<GunScript>())
         {
@@ -117,8 +100,4 @@ public class CinematicState : IState
         }
     }
 
-    //public void DropGun()
-    //{
-    //    throw new System.NotImplementedException();
-    //}
 }

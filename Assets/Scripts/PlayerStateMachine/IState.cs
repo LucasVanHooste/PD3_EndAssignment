@@ -9,4 +9,5 @@ public interface IState {
     void OnTriggerExit(Collider other);
     void OnControllerColliderHit(ControllerColliderHit hit);
     void Update();
+    void Die();
 }

@@ -142,8 +142,18 @@ public class GunScript : MonoBehaviour {
     {
         Ray _centreScreenRay = _cam.ViewportPointToRay(new Vector3(.5f, .5f, 0));
         RaycastHit hit;
-        if (Physics.Raycast(_centreScreenRay, out hit,1000,_bulletLayermask))
+        if (Physics.Raycast(_centreScreenRay, out hit, 1000, _bulletLayermask))
+        {
             print("I'm looking at " + hit.transform.name);
+            if (hit.transform.gameObject.layer == 16)
+            {
+                if (hit.transform.GetComponent<MeleeEnemyBehaviour>())
+                    hit.transform.GetComponent<MeleeEnemyBehaviour>().GetShot(_bulletDamage);
+
+                //other enemies
+            }
+
+        }
         else
             print("I'm looking at nothing!");
     }
