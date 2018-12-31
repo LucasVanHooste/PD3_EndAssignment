@@ -36,7 +36,7 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
         }
     }
 
-    Vector3 _relativeVelocity;
+    private Vector3 _relativeVelocity;
     public Vector3 RelativeVelocity
     {
         get
@@ -45,7 +45,18 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
         }
     }
 
+    private float _rotationSpeed;
+    public float RotationSpeed
+    {
+        get
+        {
+            return _rotationSpeed;
+        }
+    }
+
     private Vector3 _targetPosition;
+    private Quaternion _previousRotation;
+
     void Start()
     {
         _health = _maxHealth;
@@ -56,7 +67,7 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
         _animator = GetComponent<Animator>();
         _animationsController = new EnemyAnimationsController(_transform, _meleeEnemyBehaviour, _animator, _navMeshAgent);
         _playerController = _playerTransform.GetComponent<PlayerController>();
-
+        _previousRotation = _transform.rotation;
         //#region test
 
         //INode idk = new SelectorNode(new ConditionNode(IsHungry), new ConditionNode(IsHungry), new ConditionNode(IsHungry));
@@ -93,7 +104,8 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
         Debug.Log("navmesh speed: " + _navMeshAgent.speed);
 
 
-        _relativeVelocity = GetRelativeVelocity();
+        _relativeVelocity = GetScaledRelativeVelocity();
+        _rotationSpeed = GetScaledRotationSpeed();
         _animationsController.Update();
     }
 
@@ -142,7 +154,7 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
 
     IEnumerator RunTree()
     {
-        while (Application.isPlaying)
+        while (_health>0)
         {
             yield return _rootNode.Tick();
         }
@@ -153,7 +165,7 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
         Vector3 directionPlayer = _playerTransform.position - _transform.position;
         if (Quaternion.Angle(_transform.rotation, Quaternion.LookRotation(directionPlayer)) < FOV / 2)
         {
-            Debug.Log("angle: " + Quaternion.Angle(_transform.rotation, Quaternion.LookRotation(directionPlayer)));
+            //Debug.Log("angle: " + Quaternion.Angle(_transform.rotation, Quaternion.LookRotation(directionPlayer)));
             RaycastHit hit;
             if(Physics.Raycast(_transform.position+new Vector3(0,1.6f,0),directionPlayer, out hit, 1000, _canSeePlayerLayerMask))
             {
@@ -188,10 +200,18 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
 
 
 
-    private Vector3 GetRelativeVelocity()
-    {
+    private Vector3 GetScaledRelativeVelocity()
+    { 
         Vector3 relativeVelocity = _transform.InverseTransformVector(_navMeshAgent.velocity);
         return relativeVelocity / _navMeshAgent.speed;
+    }
+
+    private float GetScaledRotationSpeed()
+    {
+        float angle = Quaternion.Angle(_previousRotation, _transform.rotation);
+        _previousRotation = _transform.rotation;
+        //Debug.Log("angle: " + (angle / Time.deltaTime) / _navMeshAgent.angularSpeed);
+        return (angle/Time.deltaTime)/_navMeshAgent.angularSpeed;
     }
 
     private void TakeDamage(int damage)

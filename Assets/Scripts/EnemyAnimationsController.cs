@@ -55,7 +55,7 @@ public class EnemyAnimationsController{
         //_animator.SetBool(_isGroundedAnimationParameter, _physicsController.IsGrounded());
         ////_animator.SetBool(_jumpingAnimationParameter, _physicsController.Jumping);
 
-        //_animator.SetFloat(_horizontalRotationAnimationParameter, _physicsController.Aim.x);
+        _animator.SetFloat(_horizontalRotationAnimationParameter, _enemyBehaviour.RotationSpeed);
         //_animator.SetFloat(_verticalVelocityAnimationParameter, _physicsController.GetVelocity().y);
 
         ////_animator.SetFloat(_timeInAirAnimationParameter, _physicsController.GetTimeInAir());
