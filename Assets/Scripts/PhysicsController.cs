@@ -62,7 +62,15 @@ public class PhysicsController : MonoBehaviour {
     private bool _hasGravity = true;
 
     [SerializeField] private float _horizontalRotationSpeed;
+    public float HorizontalRotationSpeed
+    {
+        get { return _horizontalRotationSpeed; }
+    }
     [SerializeField] private float _verticalRotationSpeed;
+    public float VerticalRotationSpeed
+    {
+        get { return _verticalRotationSpeed; }
+    }
     [SerializeField] private LayerMask _mapLayerMask;
 
     // Use this for initialization
@@ -240,5 +248,10 @@ public class PhysicsController : MonoBehaviour {
     public void HasGravity(bool hasGravity)
     {
         _hasGravity = hasGravity;
+    }
+
+    public void SetPosition(Vector3 position)
+    {
+        _playerTransform.position = position;
     }
 }

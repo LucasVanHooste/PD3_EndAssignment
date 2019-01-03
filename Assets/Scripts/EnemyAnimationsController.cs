@@ -52,14 +52,15 @@ public class EnemyAnimationsController{
     {
         _animator.SetFloat(_zMovementAnimationParameter, _enemyBehaviour.RelativeVelocity.z);
         _animator.SetFloat(_xMovementAnimationParameter, _enemyBehaviour.RelativeVelocity.x);
-        //_animator.SetBool(_isGroundedAnimationParameter, _physicsController.IsGrounded());
-        ////_animator.SetBool(_jumpingAnimationParameter, _physicsController.Jumping);
+        //_animator.SetBool(_isGroundedAnimationParameter, !_enemyBehaviour.IsOnOffMeshLink());
+        _animator.SetBool(_isGroundedAnimationParameter, _enemyBehaviour.IsGrounded());
 
+        //Debug.Log("Distance: "+_enemyBehaviour.GetDistanceFromGround());
         _animator.SetFloat(_horizontalRotationAnimationParameter, _enemyBehaviour.RotationSpeed);
-        //_animator.SetFloat(_verticalVelocityAnimationParameter, _physicsController.GetVelocity().y);
+        //Debug.Log("velocity: " + _enemyBehaviour.RelativeVelocity.y);
+        //_animator.SetFloat(_verticalVelocityAnimationParameter, _enemyBehaviour.RelativeVelocity.y);
 
-        ////_animator.SetFloat(_timeInAirAnimationParameter, _physicsController.GetTimeInAir());
-        //_animator.SetFloat(_distanceFromGroundParameter, _physicsController.GetDistanceFromGround());
+        _animator.SetFloat(_distanceFromGroundParameter, _enemyBehaviour.GetDistanceFromGround());
     }
 
     public void AimGun(bool aimGun)

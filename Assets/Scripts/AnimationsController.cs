@@ -10,6 +10,7 @@ public class AnimationsController {
     public readonly ClimbTopLadderStateBehaviour ClimbTopLadderAnimationBehaviour;
     public readonly TopLadderStateBehaviour TopLadderIK;
     public readonly PushObstacleStateBehaviour ObstacleIK;
+    public readonly HoldTurretStateBehaviour TurretIK;
 
     private Animator _animator;
     private PhysicsController _physicsController;
@@ -48,6 +49,7 @@ public class AnimationsController {
         ClimbTopLadderAnimationBehaviour = _animator.GetBehaviour<ClimbTopLadderStateBehaviour>();
         TopLadderIK = _animator.GetBehaviour<TopLadderStateBehaviour>();
         ObstacleIK = _animator.GetBehaviour<PushObstacleStateBehaviour>();
+        TurretIK = _animator.GetBehaviour<HoldTurretStateBehaviour>();
 
     }
 

@@ -154,6 +154,12 @@ public class PlayerController : MonoBehaviour {
         Debug.Log("ToClimbingState");
     }
 
+    public void ToTurretState(GameObject _turret)
+    {
+        _state = new TurretState(_transform, _physicsController, _playerController, _animationsController, _turret, _cameraController, _crossHair);
+        Debug.Log("ToTurretState");
+    }
+
     public void PickUpGun()
     {
         _state.PickUpGun();

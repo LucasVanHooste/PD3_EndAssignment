@@ -84,7 +84,7 @@ public class ClimbingState : PlayerState
             yield return null;
         }
 
-        _physicsController.Movement = Vector3.zero;
+        _physicsController.StopMoving();
         ClimbLadder();
 
     }

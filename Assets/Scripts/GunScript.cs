@@ -118,7 +118,7 @@ public class GunScript : MonoBehaviour {
         }
     }
 
-    public void ShootGun(bool isShooting)
+    public void FireGun(bool isShooting)
     {
         if (isShooting)
         {

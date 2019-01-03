@@ -18,6 +18,7 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
     private PlayerController _playerController;
 
     [SerializeField] private Transform _playerTransform;
+    [SerializeField] private LayerMask _mapLayerMask;
     [SerializeField] private float FOV;
     [SerializeField] private LayerMask _canSeePlayerLayerMask;
     [SerializeField] private float _minDistanceFromPlayer;
@@ -98,10 +99,10 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
     void Update()
     {
         //Debug.Log("rigidbody: " + _rigidBody.velocity);
-        Debug.Log("navmesh: " + _navMeshAgent.velocity);
+        //Debug.Log("navmesh: " + _navMeshAgent.velocity);
 
-        Debug.Log("navmesh desired: " + _navMeshAgent.desiredVelocity);
-        Debug.Log("navmesh speed: " + _navMeshAgent.speed);
+        //Debug.Log("navmesh desired: " + _navMeshAgent.desiredVelocity);
+        //Debug.Log("navmesh speed: " + _navMeshAgent.speed);
 
 
         _relativeVelocity = GetScaledRelativeVelocity();
@@ -169,7 +170,7 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
             RaycastHit hit;
             if(Physics.Raycast(_transform.position+new Vector3(0,1.6f,0),directionPlayer, out hit, 1000, _canSeePlayerLayerMask))
             {
-                Debug.Log(hit.transform.name);
+                //Debug.Log(hit.transform.name);
                 if (hit.transform.gameObject.layer == 9)
                 {
                     Debug.Log("I see player");
@@ -241,5 +242,35 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
         GameObject.Destroy(gameObject);
         //_state.Die();
         //ToDeadState();
+    }
+
+    public bool IsOnOffMeshLink()
+    {
+        return _navMeshAgent.isOnOffMeshLink;
+    }
+
+    public float GetDistanceFromGround()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(_transform.position+ new Vector3(0,1f,0), Vector3.down, out hit, 1000, _mapLayerMask))
+        {
+            //print("I'm looking at " + hit.transform.name);
+            return (hit.point - _transform.position).magnitude;
+        }
+        //print("I'm looking at nothing!");
+        return 1000;
+    }
+
+    public bool IsGrounded()
+    {
+        if (GetDistanceFromGround() > .1f)
+            return false;
+
+                return true;
+    }
+
+    public void ToDeadState()
+    {
+        //die
     }
 }

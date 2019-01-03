@@ -22,6 +22,7 @@ public class NormalState : PlayerState
         _animationsController = animationsController;
         _triggers = _playerController.Triggers;
 
+        _punchCoolDownTimer = _playerController.PunchCoolDown;
     }
 
     public override void Update()
@@ -95,6 +96,10 @@ public class NormalState : PlayerState
                     _playerController.ToClimbingState(_object);
                 }
                 break;
+            case "Turret":
+                {
+                    _playerController.ToTurretState(_object);
+                }break;
         }
     }
 

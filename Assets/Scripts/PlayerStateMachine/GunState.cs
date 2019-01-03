@@ -50,6 +50,8 @@ public class GunState : PlayerState
             _gun = gun;
             _gunScript = _gun.GetComponent<GunScript>();
         }
+
+        _punchCoolDownTimer = _playerController.PunchCoolDown;
     }
 
     public override void Update()
@@ -87,7 +89,7 @@ public class GunState : PlayerState
         }
         else _isShooting = false;
 
-        ShootGun();
+        FireGun();
 
         if (Input.GetButtonDown("Punch") && !_gunScript.IsTwoHanded && !_isAiming)
         {
@@ -116,6 +118,8 @@ public class GunState : PlayerState
 
         if (_dropGunTimer >= _dropGunTime)
         {
+            _isAiming = false;
+            AimGun();
             DropGun();
         }
 
@@ -164,9 +168,9 @@ public class GunState : PlayerState
         _gunScript.AimGun(_isAiming);
     }
 
-    private void ShootGun()
+    private void FireGun()
     {
-        _gunScript.ShootGun(_isShooting);
+        _gunScript.FireGun(_isShooting);
     }
 
     private GameObject GetClosestTriggerObject()
