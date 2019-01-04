@@ -65,10 +65,7 @@ public class TurretState : PlayerState
 
         if (Input.GetButton("Interact"))
         {
-            SetTurretIK(null);
-            _cameraController.HoldTurret(null, null, null);
-            _isAiming = false;
-            AimTurret();
+            OnStateExit();
             _playerController.ToNormalState();
             return;
         }
@@ -211,5 +208,18 @@ public class TurretState : PlayerState
         //Vector3 lerp = Vector3.Lerp(_playerTransform.position, turretPosition, 1.6f) - _playerTransform.position;
         //Vector3 direction = turretPosition - _playerTransform.position;
         //_physicsController.Movement = _playerTransform.InverseTransformVector(lerp * 2f);
+    }
+
+    private void OnStateExit()
+    {
+        SetTurretIK(null);
+        _cameraController.HoldTurret(null, null, null);
+        _isAiming = false;
+        AimTurret();
+    }
+
+    public override void Die()
+    {
+        OnStateExit();
     }
 }

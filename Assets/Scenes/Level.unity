@@ -18379,7 +18379,7 @@ MonoBehaviour:
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.16666667
+  m_VoxelSize: 0.13333334
   m_BuildHeightMesh: 0
   m_NavMeshData: {fileID: 23800000, guid: 98c3439a890013445a1eb4990da9dfaa, type: 2}
 --- !u!4 &755702618
@@ -35992,8 +35992,9 @@ MonoBehaviour:
   _canSeePlayerLayerMask:
     serializedVersion: 2
     m_Bits: 26113
-  _minDistanceFromPlayer: 1
-  _punchReach: 2
+  _minDistanceFromPlayer: 1.2
+  _horizontalPunchReach: 2
+  _verticalPunchReach: 1
   _punchCoolDown: 2
   _punchDamage: 50
   _maxHealth: 100

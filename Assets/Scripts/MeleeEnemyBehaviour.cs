@@ -22,7 +22,8 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
     [SerializeField] private float FOV;
     [SerializeField] private LayerMask _canSeePlayerLayerMask;
     [SerializeField] private float _minDistanceFromPlayer;
-    [SerializeField] private float _punchReach;
+    [SerializeField] private float _horizontalPunchReach;
+    [SerializeField] private float _verticalPunchReach;
     [SerializeField] private float _punchCoolDown;
     [SerializeField] private int _punchDamage;
     private float _punchCoolDownTimer = 0;
@@ -61,7 +62,7 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
     void Start()
     {
         _health = _maxHealth;
-        _transform = GetComponent<Transform>();
+        _transform = transform;
         _targetPosition = _transform.position;
         _navMeshAgent = GetComponent<NavMeshAgent>();
         _meleeEnemyBehaviour = GetComponent<MeleeEnemyBehaviour>();
@@ -137,8 +138,12 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
 
     private IEnumerator<NodeResult> ChargeAtPlayer()
     {
-        if (Vector3.Magnitude(_playerTransform.position - _transform.position) > _minDistanceFromPlayer)
+        Debug.Log(Vector3.Scale(_playerTransform.position - _transform.position, new Vector3(1, 0, 1)).magnitude);
+        Debug.Log(Vector3.Scale(_playerTransform.position - _transform.position, new Vector3(1, 0, 1)));
+        if (Vector3.Scale(_playerTransform.position - _transform.position, new Vector3(1, 0, 1)).magnitude > _minDistanceFromPlayer)
+        {
             _navMeshAgent.SetDestination(_playerTransform.position);
+        }
         else _navMeshAgent.SetDestination(_transform.position);
 
         Debug.Log("Charging");
@@ -168,7 +173,7 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
         {
             //Debug.Log("angle: " + Quaternion.Angle(_transform.rotation, Quaternion.LookRotation(directionPlayer)));
             RaycastHit hit;
-            if(Physics.Raycast(_transform.position+new Vector3(0,1.6f,0),directionPlayer, out hit, 1000, _canSeePlayerLayerMask))
+            if(Physics.Raycast(_transform.position+new Vector3(0,1.4f,0),directionPlayer, out hit, 1000, _canSeePlayerLayerMask))
             {
                 //Debug.Log(hit.transform.name);
                 if (hit.transform.gameObject.layer == 9)
@@ -184,7 +189,8 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
 
     bool CanPunchPlayer()
     {
-        if (Vector3.Magnitude(_playerTransform.position - _transform.position) <= _punchReach)
+        if (Vector3.Magnitude(Vector3.Scale(_playerTransform.position - _transform.position, new Vector3(1,0,1))) <= _horizontalPunchReach
+            && _playerTransform.position.y - _transform.position.y <= _verticalPunchReach)
         {
             if (_punchCoolDownTimer > _punchCoolDown)
             {

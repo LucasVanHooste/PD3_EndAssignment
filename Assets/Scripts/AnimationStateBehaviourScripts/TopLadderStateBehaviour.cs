@@ -34,7 +34,7 @@ public class TopLadderStateBehaviour : StateMachineBehaviour {
     override public void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         if (_ladderScript == null) return;
-        Debug.Log(_ladderScript.gameObject.name);
+        //Debug.Log(_ladderScript.gameObject.name);
 
         //if(Mathf.Approximately(_iKWeight,1))
         //    _hasMaxed = true;

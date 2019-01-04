@@ -13,7 +13,8 @@ public class ClimbingState : PlayerState
     private GameObject _ladder;
     private LadderScript _ladderScript;
 
-    float _ladderPaddingDistance = 0.15f;
+    private float _ladderPaddingDistance = 0.15f;
+    private Coroutine _rotateToLadder, _moveToLadder;
 
     public ClimbingState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, AnimationsController animationsController, GameObject ladder)
     {
@@ -41,7 +42,7 @@ public class ClimbingState : PlayerState
         _physicsController.Aim = Vector3.zero;
         _physicsController.StopMoving();
 
-        _playerController.StartCoroutine(RotateToLadder());
+        _rotateToLadder= _playerController.StartCoroutine(RotateToLadder());
 
 
         //_animationsController.ApplyRootMotion(true);
@@ -57,7 +58,7 @@ public class ClimbingState : PlayerState
     {
         Vector3 direction = GetDirection();
 
-        while (Quaternion.Angle(_playerTransform.rotation, Quaternion.LookRotation(direction)) > 1)
+        while (Quaternion.Angle(_playerTransform.rotation, Quaternion.LookRotation(direction)) > 2)
         {
             //direction = Vector3.Scale((_ladder.transform.position - _playerTransform.position), new Vector3(1, 0, 1));
             Debug.Log("rotate");
@@ -71,7 +72,7 @@ public class ClimbingState : PlayerState
 
         Debug.Log("finish rotation");
         _physicsController.Aim = Vector3.zero;
-        _playerController.StartCoroutine(MoveToLadder());
+        _moveToLadder= _playerController.StartCoroutine(MoveToLadder());
     }
 
     private IEnumerator MoveToLadder()
@@ -89,25 +90,25 @@ public class ClimbingState : PlayerState
 
     }
 
-    private IEnumerator RotateToClimbDirection()
-    {
-        Vector3 direction = GetDirection();
+    //private IEnumerator RotateToClimbDirection()
+    //{
+    //    Vector3 direction = GetDirection();
 
-        while (Quaternion.Angle(_playerTransform.rotation, Quaternion.LookRotation(direction)) > 1)
-        {
-            Debug.Log("rotate");
-            Vector3 newDir = Vector3.RotateTowards(_playerTransform.forward, direction, .05f, 0.0f);
+    //    while (Quaternion.Angle(_playerTransform.rotation, Quaternion.LookRotation(direction)) > 2)
+    //    {
+    //        Debug.Log("rotate");
+    //        Vector3 newDir = Vector3.RotateTowards(_playerTransform.forward, direction, .05f, 0.0f);
 
-            float angle = Vector3.SignedAngle(_playerTransform.forward, newDir, Vector3.up);
-            _physicsController.Aim = new Vector3(angle / Mathf.Abs(angle), _physicsController.Aim.y, _physicsController.Aim.z);
+    //        float angle = Vector3.SignedAngle(_playerTransform.forward, newDir, Vector3.up);
+    //        _physicsController.Aim = new Vector3(angle / Mathf.Abs(angle), _physicsController.Aim.y, _physicsController.Aim.z);
 
-            yield return null;
-        }
+    //        yield return null;
+    //    }
 
-        Debug.Log("finish rotation");
-        _physicsController.Aim = Vector3.zero;
-        ClimbLadder();
-    }
+    //    Debug.Log("finish rotation");
+    //    _physicsController.Aim = Vector3.zero;
+    //    ClimbLadder();
+    //}
 
     private void ClimbLadder()
     {
@@ -138,5 +139,18 @@ public class ClimbingState : PlayerState
 
             _animationsController.ClimbTopLadder();
         }
+    }
+
+    public override void Die()
+    {
+        if(_rotateToLadder!=null)
+        _playerController.StopCoroutine(_rotateToLadder);
+        if(_moveToLadder!=null)
+        _playerController.StopCoroutine(_moveToLadder);
+
+        _physicsController.HasGravity(true);
+        _animationsController.Climb(false);
+        _animationsController.ApplyRootMotion(false);
+        _playerController.gameObject.layer = 9;
     }
 }
