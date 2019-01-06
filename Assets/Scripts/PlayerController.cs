@@ -80,9 +80,9 @@ public class PlayerController : MonoBehaviour {
         _playerController = GetComponent<PlayerController>();
         _animationsController = new AnimationsController(_animator, _physicsController);
 
-        _animationsController.HoldGunIK.SetPlayer(_transform);
+        _animationsController.HoldGunIK.Player=_transform;
         //_animationsController.PickUpGunIK.SetPlayer(_transform);
-        _animationsController.LookAtIK.SetLookAtPosition(_lookAtTransform);
+        _animationsController.LookAtIK.LookAtPosition=_lookAtTransform;
         //_animationsController.ClimbTopLadderAnimationBehaviour.SetBehaviour(_playerController, _physicsController, _animationsController);
 
         _cameraController = GetComponent<CameraController>();
@@ -144,7 +144,7 @@ public class PlayerController : MonoBehaviour {
     }
     public void ToDeadState()
     {
-        _state = new DeadState(_transform, _physicsController, _playerController, _animationsController);
+        _state = new DeadState(_physicsController, _playerController);
         Debug.Log("ToDeadState");
     }
 

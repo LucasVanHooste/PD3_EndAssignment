@@ -20,7 +20,6 @@ public class PushingState : PlayerState
     Vector3 direction;
     bool _hasHitObstacle = false;
     private Vector3 _pushStartPosition;
-    private bool _isFacingObstacle = false;
 
     public PushingState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, AnimationsController animationsController, 
         GameObject obstacle, Transform obstacleIKLeftHand, Transform obstacleIKRightHand)
@@ -65,13 +64,13 @@ public class PushingState : PlayerState
     private IEnumerator RotateToObstacle()
     {
 
-        while(Quaternion.Angle(_playerTransform.rotation, Quaternion.LookRotation(direction)) > 1)
+        while(Quaternion.Angle(_playerTransform.rotation, Quaternion.LookRotation(direction)) > 1f)
         {
             Debug.Log("rotate");
             Vector3 newDir = Vector3.RotateTowards(_playerTransform.forward, direction, .05f, 0.0f);
 
             float angle = Vector3.SignedAngle(_playerTransform.forward, newDir, Vector3.up);
-            _physicsController.Aim = new Vector3(angle / Mathf.Abs(angle), _physicsController.Aim.y, _physicsController.Aim.z);
+            _physicsController.Aim = new Vector3(Mathf.Rad2Deg * angle / _physicsController.HorizontalRotationSpeed, _physicsController.Aim.y, _physicsController.Aim.z);
 
             yield return true;
         }
@@ -139,7 +138,6 @@ public class PushingState : PlayerState
         _obstacleScript.SetConstraints(RigidbodyConstraints.FreezeAll);
         _animationsController.Push(false);
         _hasHitObstacle = false;
-        _isFacingObstacle = false;
 
         //if obstacle is above pit, drop
         if (_obstacleCollisionChecker.GetComponent<ObstacleCollisionCheckerScript>().GetHasGravity())

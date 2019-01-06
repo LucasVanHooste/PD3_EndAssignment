@@ -9,6 +9,22 @@ public class CameraController : MonoBehaviour {
     [SerializeField] private Transform _cameraDefaultTransform;
     [SerializeField] private Transform _camaraAimTransform;
 
+    public Vector3 CameraPosition
+    {
+        get
+        {
+            return _cameraTransform.position;
+        }
+    }
+
+    public Quaternion CameraRotation
+    {
+        get
+        {
+            return _cameraTransform.rotation;
+        }
+    }
+
     private Transform _turretDefaultTransform = null;
     private Transform _turretAimTransform = null;
 
@@ -16,6 +32,7 @@ public class CameraController : MonoBehaviour {
     [SerializeField] private float _minCamAngle;
     [SerializeField] private float _maxCamAngle;
 
+    public bool PauseUpdate { get; set; }
 
     private bool _isAimingGun = false;
     private bool _isAimingTurret = false;
@@ -25,6 +42,8 @@ public class CameraController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        if (PauseUpdate) return;
+
         if(_turretAimTransform!=null && _turretDefaultTransform != null)
         {
             if (_isAimingTurret)
@@ -44,12 +63,13 @@ public class CameraController : MonoBehaviour {
         {
             _cameraTransform.position = Vector3.Lerp(_cameraTransform.position, _camaraAimTransform.position, .2f);
             _cameraTransform.rotation = Quaternion.Lerp(_cameraTransform.rotation, _camaraAimTransform.rotation, .2f);
+            return;
         }
-        else
-        {
+
+
             _cameraTransform.position = Vector3.Lerp(_cameraTransform.position, _cameraDefaultTransform.position, .2f);
             _cameraTransform.rotation = Quaternion.Lerp(_cameraTransform.rotation, _cameraDefaultTransform.rotation, .2f);
-        }
+
     }
 
     public void RotateVertically(float angle)
@@ -85,5 +105,20 @@ public class CameraController : MonoBehaviour {
     public void AimTurret(bool isAiming)
     {
         _isAimingTurret = isAiming;
+    }
+
+    public void MoveTowards(Vector3 targetPosition, float speed)
+    {
+        _cameraTransform.position=Vector3.MoveTowards(_cameraTransform.position, targetPosition, speed);
+    }
+    public void RotateTowards(Quaternion targetRotation, float speed)
+    {
+        _cameraTransform.rotation = Quaternion.RotateTowards(_cameraTransform.rotation, targetRotation, speed);
+    }
+
+    public void SetPositionAndRotation(Vector3 position, Quaternion rotation)
+    {
+        _cameraTransform.position = position;
+        _cameraTransform.rotation = rotation;
     }
 }

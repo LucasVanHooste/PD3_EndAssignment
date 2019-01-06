@@ -7,8 +7,8 @@ public class EnemyAnimationsController{
 
     public readonly HoldGunStateBehaviour HoldGunIK;
     public readonly LookAtStateBehaviour LookAtIK;
-    public readonly ClimbTopLadderStateBehaviour ClimbTopLadderAnimationBehaviour;
-    public readonly TopLadderStateBehaviour TopLadderIK;
+    public readonly ClimbTopLadderPart2StateBehaviour ClimbTopLadderAnimationBehaviour;
+    public readonly ClimbTopLadderPart1StateBehaviour TopLadderIK;
 
     private Transform _enemyTransform;
     private Animator _animator;
@@ -44,8 +44,8 @@ public class EnemyAnimationsController{
 
         HoldGunIK = _animator.GetBehaviour<HoldGunStateBehaviour>();
         LookAtIK = _animator.GetBehaviour<LookAtStateBehaviour>();
-        ClimbTopLadderAnimationBehaviour = _animator.GetBehaviour<ClimbTopLadderStateBehaviour>();
-        TopLadderIK = _animator.GetBehaviour<TopLadderStateBehaviour>();
+        ClimbTopLadderAnimationBehaviour = _animator.GetBehaviour<ClimbTopLadderPart2StateBehaviour>();
+        TopLadderIK = _animator.GetBehaviour<ClimbTopLadderPart1StateBehaviour>();
     }
 
     public void Update()
@@ -65,7 +65,7 @@ public class EnemyAnimationsController{
 
     public void AimGun(bool aimGun)
     {
-        HoldGunIK.SetIsAiming(aimGun);
+        HoldGunIK.IsAiming=aimGun;
         _animator.SetBool(_isAimingGunParameter, aimGun);
     }
 

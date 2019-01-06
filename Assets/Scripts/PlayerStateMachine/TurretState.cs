@@ -9,7 +9,7 @@ public class TurretState : PlayerState
     private PhysicsController _physicsController;
     private PlayerController _playerController;
     private AnimationsController _animationsController;
-    private List<Collider> _triggers;
+
     private GameObject _object;
     private CameraController _cameraController;
     private GameObject _crossHair;
@@ -30,7 +30,7 @@ public class TurretState : PlayerState
         _physicsController = physicsController;
         _playerController = playerController;
         _animationsController = animationsController;
-        _triggers = _playerController.Triggers;
+
         _cameraController = cameraController;
         _crossHair = crossHair;
 
@@ -85,17 +85,16 @@ public class TurretState : PlayerState
 
     private IEnumerator RotateToTurret()
     {
-        Vector3 direction = GetDirection();
+        Vector3 direction = Vector3.Scale((_turret.transform.position - _playerTransform.position), new Vector3(1, 0, 1));
 
-        while (Quaternion.Angle(_playerTransform.rotation, Quaternion.LookRotation(direction)) >2)
+        while (Quaternion.Angle(_playerTransform.rotation, Quaternion.LookRotation(direction)) >1f)
         {
             //direction = Vector3.Scale((_ladder.transform.position - _playerTransform.position), new Vector3(1, 0, 1));
             Debug.Log("rotate1");
             Vector3 newDir = Vector3.RotateTowards(_playerTransform.forward, direction, .05f, 0.0f);
 
             float angle = Vector3.SignedAngle(_playerTransform.forward, newDir, Vector3.up);
-            _physicsController.Aim = new Vector3(angle / Mathf.Abs(angle), _physicsController.Aim.y, _physicsController.Aim.z);
-
+            _physicsController.Aim = new Vector3(Mathf.Rad2Deg * angle / _physicsController.HorizontalRotationSpeed, _physicsController.Aim.y, _physicsController.Aim.z);
             yield return null;
         }
 
@@ -125,13 +124,13 @@ public class TurretState : PlayerState
     {
         Vector3 direction = _turretScript.GetHorizontalDirection();
 
-        while (Quaternion.Angle(_playerTransform.rotation, Quaternion.LookRotation(direction)) > 2)
+        while (Quaternion.Angle(_playerTransform.rotation, Quaternion.LookRotation(direction)) > 1f)
         {
             Debug.Log("rotate2");
             Vector3 newDir = Vector3.RotateTowards(_playerTransform.forward, direction, .05f, 0.0f);
 
             float angle = Vector3.SignedAngle(_playerTransform.forward, newDir, Vector3.up);
-            _physicsController.Aim = new Vector3(angle / Mathf.Abs(angle), _physicsController.Aim.y, _physicsController.Aim.z);
+            _physicsController.Aim = new Vector3(Mathf.Rad2Deg*angle/_physicsController.HorizontalRotationSpeed, _physicsController.Aim.y, _physicsController.Aim.z);
 
             yield return null;
         }
@@ -145,7 +144,7 @@ public class TurretState : PlayerState
 
     private void SetTurretIK(TurretScript turretScript)
     {
-        _animationsController.TurretIK.SetTurretScript(turretScript);
+        _animationsController.TurretIK.Turretscript=turretScript;
     }
 
     private void UseTurret()
@@ -154,25 +153,11 @@ public class TurretState : PlayerState
         _cameraController.HoldTurret(_turretScript.CamDefaultTransform, _turretScript.CamAimingTransform, _turretScript.VerticalAnchorTransform);
     }
 
-    //private void ClimbLadder()
-    //{
-    //    _animationsController.ApplyRootMotion(true);
-    //    _physicsController.HasGravity(false);
-    //    _animationsController.Climb(true);
-    //}
-
-    private Vector3 GetDirection()
+    private void ClimbLadder()
     {
-        Vector3 direction = Vector3.Scale((_turret.transform.position - _playerTransform.position), new Vector3(1, 0, 1));
-        //if (Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
-        //{
-        //    direction.z = 0;
-        //}
-        //else
-        //{
-        //    direction.x = 0;
-        //}
-        return direction;
+        _animationsController.ApplyRootMotion(true);
+        _physicsController.HasGravity(false);
+        _animationsController.Climb(true);
     }
 
     private void FireTurret()
@@ -200,7 +185,6 @@ public class TurretState : PlayerState
     private void FollowTurret()
     {
         _playerTransform.rotation = Quaternion.LookRotation(_turretScript.GetHorizontalDirection(), Vector3.up);
-        
 
         Vector3 turretPosition = new Vector3(_turretScript.PlayerPosition.position.x, _playerTransform.position.y, _turretScript.PlayerPosition.position.z);
         _physicsController.SetPosition(turretPosition);

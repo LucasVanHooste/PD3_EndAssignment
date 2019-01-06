@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class TurretScript : MonoBehaviour {
 
-    private Transform _transform;
     [SerializeField]private Transform _horizontalAnchorTransform;
     [SerializeField] private Transform _verticalAnchorTransform;
     public Transform LeftHandIK;
@@ -56,7 +55,6 @@ public class TurretScript : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        _transform = transform;
         _fireTimer = _fireRate;
         _cam = Camera.main;
     }

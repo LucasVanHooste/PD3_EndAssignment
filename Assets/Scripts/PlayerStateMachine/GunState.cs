@@ -101,7 +101,6 @@ public class GunState : PlayerState
 
         }
         _punchCoolDownTimer += Time.deltaTime;
-
         if (Input.GetButtonDown("Interact") && _physicsController.IsGrounded() && !_isAiming)
         {
             InteractWithObject();
@@ -144,13 +143,13 @@ public class GunState : PlayerState
         {
             case "Gun":
                 {
+                    //drop current gun
                     _gunScript.DropGun();
 
+                    //pick up new gun
                     PickUpGun();
                     RemoveTriggersFromList(_object.GetComponents<Collider>());
                     _gun = _object;
-                    //_gunScript = _gun.GetComponent<GunScript>();
-
                 }
                 break;
         }
@@ -196,9 +195,9 @@ public class GunState : PlayerState
             if (_object.GetComponent<GunScript>())
             {
                 _gunScript = _object.GetComponent<GunScript>();
-                    _gunScript.TakeGun(_playerController.gameObject.layer, _playerController.RightHand, _playerController.CameraRoot/*, _animationsController.HoldGunIK*/);
+                    _gunScript.TakeGun(_playerController.gameObject.layer, _playerController.RightHand, _playerController.CameraRoot);
 
-            _animationsController.HoldGunIK.SetGun(_object.transform);
+            _animationsController.HoldGunIK.Gun=_object.transform;
         }
     }
 
@@ -219,7 +218,7 @@ public class GunState : PlayerState
     {
         _gunScript.DropGun();
 
-        _animationsController.HoldGunIK.SetGun(null);
+        _animationsController.HoldGunIK.Gun=null;
 
         _playerController.ToNormalState();
     }
@@ -242,7 +241,7 @@ public class GunState : PlayerState
             _gun.transform.rotation = _holsterGun1Hand.rotation;
         }
 
-        _animationsController.HoldGunIK.SetGun(null);
+        _animationsController.HoldGunIK.Gun=null;
 
 
         if (tempGun!=null)

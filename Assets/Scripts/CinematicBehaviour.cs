@@ -5,24 +5,28 @@ using UnityEngine;
 [System.Serializable]
 public struct CinematicScene
 {
-    public string _name;
-    public Transform _cameraTransform;
-    public Transform _targetPosition;
+    public string Name;
+    public Transform StartPosition;
+    public Transform TargetPosition;
+    public float TimeInSeconds;
 }
 
 public class CinematicBehaviour : MonoBehaviour {
 
     private bool _isSceneFinished=true;
+    public bool IsSceneFinished
+    {
+        get
+        {
+            return _isSceneFinished;
 
+        }
+    }
+
+    [SerializeField] private CameraController _cameraController;
     [SerializeField] private List<CinematicScene> _cinematicScenes;
 
-    private bool _hasFinished = false;
     private CinematicScene _currentScene;
-
-    private Vector3 _camStartPos;
-    private Quaternion _camStartRotation;
-
-    private bool _isInPosition = false;
 
     // Use this for initialization
     void Start () {
@@ -30,79 +34,62 @@ public class CinematicBehaviour : MonoBehaviour {
     }
 	
 	// Update is called once per frame
-	void Update () {
-        if (_isInPosition)
-        {
-            _currentScene._cameraTransform.position = _currentScene._targetPosition.position;
-            _currentScene._cameraTransform.rotation = _currentScene._targetPosition.rotation;
-        }
-    }
+	//void Update () {
+
+ //   }
 
     public void PlayCinematicScene(string sceneName)
     {
         _isSceneFinished = false;
         Debug.Log("Play cinematic");
-        //_currentScene= _cinematicScenes[0];
+
+        //get scene from list
         foreach (CinematicScene scene in _cinematicScenes)
         {
-            if (scene._name == sceneName)
+            if (scene.Name == sceneName)
             {
                 _currentScene = scene;
                 break;
             }
         }
 
-        _camStartPos = _currentScene._cameraTransform.position;
-        _camStartRotation  = _currentScene._cameraTransform.rotation;
-
+        _cameraController.PauseUpdate=true;
+        _cameraController.SetPositionAndRotation(_currentScene.StartPosition.position, _currentScene.StartPosition.rotation);
         StartCoroutine(MoveCameraToTargetPosition());
     }
 
     private IEnumerator MoveCameraToTargetPosition()
     {
-        Vector3 distance = _currentScene._cameraTransform.position - _currentScene._targetPosition.position;
-        float angle = Quaternion.Angle(_currentScene._cameraTransform.rotation, _currentScene._targetPosition.rotation);
+        //while cam isnt in position, lerp
 
-        while (distance.magnitude > .1f || Mathf.Abs(angle) > 2)
+        while ((_cameraController.CameraPosition - _currentScene.TargetPosition.position).magnitude > .1f || 
+            Mathf.Abs(Quaternion.Angle(_cameraController.CameraRotation, _currentScene.TargetPosition.rotation)) > 2)
         {
-            _currentScene._cameraTransform.position = Vector3.MoveTowards(_currentScene._cameraTransform.position, _currentScene._targetPosition.position, .1f);
-            _currentScene._cameraTransform.rotation= Quaternion.RotateTowards(_currentScene._cameraTransform.rotation, _currentScene._targetPosition.rotation, 3f);
-            Debug.Log("angle: " + Quaternion.Angle(_currentScene._cameraTransform.rotation, _currentScene._targetPosition.rotation));
-            Debug.Log("cam: " + _currentScene._cameraTransform.eulerAngles);
-            Debug.Log("tar: " + _currentScene._targetPosition.eulerAngles);
-
-            distance = _currentScene._cameraTransform.position - _currentScene._targetPosition.position;
-            angle = Quaternion.Angle(_currentScene._cameraTransform.rotation, _currentScene._targetPosition.rotation);
+            LerpCameraToPosition(_currentScene.TargetPosition.position, _currentScene.TargetPosition.rotation);
             yield return null;
         }
 
-        _isInPosition = true;
-        yield return new WaitForSeconds(4);
-        _isInPosition = false;
+        yield return new WaitForSeconds(_currentScene.TimeInSeconds);
         StartCoroutine(MoveCameraToStartPosition());
     }
 
     private IEnumerator MoveCameraToStartPosition()
     {
-        Vector3 distance = _currentScene._cameraTransform.position - _camStartPos;
-        float angle = Quaternion.Angle(_currentScene._cameraTransform.rotation, _camStartRotation);
-
-        while (distance.magnitude > .1f || Mathf.Abs(angle)>2)
+        //while cam isnt in position, lerp
+        while ((_currentScene.StartPosition.position - _cameraController.CameraPosition).magnitude > .1f || 
+            Mathf.Abs(Quaternion.Angle(_cameraController.CameraRotation, _currentScene.StartPosition.rotation)) >2)
         {
-            _currentScene._cameraTransform.position = Vector3.MoveTowards(_currentScene._cameraTransform.position, _camStartPos, .1f);
-            _currentScene._cameraTransform.rotation = Quaternion.RotateTowards(_currentScene._cameraTransform.rotation, _camStartRotation, 3f);
-            Debug.Log("cam: " + _currentScene._cameraTransform.eulerAngles);
-            Debug.Log("tar: " + _currentScene._targetPosition.eulerAngles);
-            distance = _currentScene._cameraTransform.position - _camStartPos;
-            angle = Quaternion.Angle(_currentScene._cameraTransform.rotation, _camStartRotation);
+            LerpCameraToPosition(_currentScene.StartPosition.position, _currentScene.StartPosition.rotation);
             yield return null;
         }
 
+        _cameraController.PauseUpdate = false;
         _isSceneFinished = true;
     }
 
-    public bool GetIsSceneFinished()
+    private void LerpCameraToPosition(Vector3 position, Quaternion rotation)
     {
-        return _isSceneFinished;
+        _cameraController.MoveTowards(position, .1f);
+        _cameraController.RotateTowards(rotation, 3f);
     }
 }

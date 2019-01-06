@@ -9,7 +9,7 @@ public class ClimbingState : PlayerState
     private PhysicsController _physicsController;
     private PlayerController _playerController;
     private AnimationsController _animationsController;
-    private List<Collider> _triggers;
+
     private GameObject _ladder;
     private LadderScript _ladderScript;
 
@@ -24,10 +24,9 @@ public class ClimbingState : PlayerState
         _animationsController = animationsController;
         _ladder = ladder;
         _ladderScript = _ladder.GetComponent<LadderScript>();
-        _triggers = _playerController.Triggers;
 
         _animationsController.ClimbTopLadderAnimationBehaviour.SetBehaviour(_playerController, _physicsController, _animationsController);
-        _animationsController.TopLadderIK.SetLadderScript(_ladderScript);
+        _animationsController.TopLadderIK.Ladderscript=_ladderScript;
 
         Climb();
     }
@@ -56,17 +55,16 @@ public class ClimbingState : PlayerState
 
     private IEnumerator RotateToLadder()
     {
-        Vector3 direction = GetDirection();
+        Vector3 direction = -_ladder.transform.forward;
 
-        while (Quaternion.Angle(_playerTransform.rotation, Quaternion.LookRotation(direction)) > 2)
+        while (Quaternion.Angle(_playerTransform.rotation, Quaternion.LookRotation(direction)) > 1)
         {
             //direction = Vector3.Scale((_ladder.transform.position - _playerTransform.position), new Vector3(1, 0, 1));
             Debug.Log("rotate");
             Vector3 newDir = Vector3.RotateTowards(_playerTransform.forward, direction, .05f, 0.0f);
 
             float angle = Vector3.SignedAngle(_playerTransform.forward, newDir, Vector3.up);
-            _physicsController.Aim = new Vector3(angle / Mathf.Abs(angle), _physicsController.Aim.y, _physicsController.Aim.z);
-
+            _physicsController.Aim = new Vector3(Mathf.Rad2Deg * angle / _physicsController.HorizontalRotationSpeed, _physicsController.Aim.y, _physicsController.Aim.z);
             yield return null;
         }
 
@@ -90,45 +88,12 @@ public class ClimbingState : PlayerState
 
     }
 
-    //private IEnumerator RotateToClimbDirection()
-    //{
-    //    Vector3 direction = GetDirection();
-
-    //    while (Quaternion.Angle(_playerTransform.rotation, Quaternion.LookRotation(direction)) > 2)
-    //    {
-    //        Debug.Log("rotate");
-    //        Vector3 newDir = Vector3.RotateTowards(_playerTransform.forward, direction, .05f, 0.0f);
-
-    //        float angle = Vector3.SignedAngle(_playerTransform.forward, newDir, Vector3.up);
-    //        _physicsController.Aim = new Vector3(angle / Mathf.Abs(angle), _physicsController.Aim.y, _physicsController.Aim.z);
-
-    //        yield return null;
-    //    }
-
-    //    Debug.Log("finish rotation");
-    //    _physicsController.Aim = Vector3.zero;
-    //    ClimbLadder();
-    //}
 
     private void ClimbLadder()
     {
         _animationsController.ApplyRootMotion(true);
         _physicsController.HasGravity(false);
         _animationsController.Climb(true);
-    }
-
-    private Vector3 GetDirection()
-    {
-        Vector3 direction = Vector3.Scale((_ladder.transform.position - _playerTransform.position), new Vector3(1, 0, 1));
-        if (Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
-        {
-            direction.z = 0;
-        }
-        else
-        {
-            direction.x = 0;
-        }
-        return direction;
     }
 
     public override void OnTriggerExit(Collider other)

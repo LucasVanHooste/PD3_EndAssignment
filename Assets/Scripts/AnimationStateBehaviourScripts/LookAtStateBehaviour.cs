@@ -5,6 +5,13 @@ using UnityEngine;
 public class LookAtStateBehaviour : StateMachineBehaviour {
 
     private Transform _lookAtPosition;
+    public Transform LookAtPosition
+    {
+        set
+        {
+            _lookAtPosition = value;
+        }
+    }
 
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     //override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
@@ -35,10 +42,5 @@ public class LookAtStateBehaviour : StateMachineBehaviour {
             animator.SetLookAtWeight(1);
         }
 
-    }
-
-    public void SetLookAtPosition(Transform lookAtPosition)
-    {
-        _lookAtPosition = lookAtPosition;
     }
 }

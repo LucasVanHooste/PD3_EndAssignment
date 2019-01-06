@@ -2,18 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TopLadderStateBehaviour : StateMachineBehaviour {
+public class ClimbTopLadderPart1StateBehaviour : StateMachineBehaviour {
 
     private float _iKWeight = 1f;
     private LadderScript _ladderScript;
-
-    private bool _hasMaxed = false;
+    public LadderScript Ladderscript
+    {
+        set
+        {
+            _ladderScript = value;
+        }
+    }
 
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
-    override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    {
-        _hasMaxed = false;
-    }
+    //override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    //{
+
+    //}
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
     //override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
@@ -92,8 +97,4 @@ public class TopLadderStateBehaviour : StateMachineBehaviour {
         }
     }
 
-    public void SetLadderScript(LadderScript ladderScript)
-    {
-        _ladderScript = ladderScript;
-    }
 }

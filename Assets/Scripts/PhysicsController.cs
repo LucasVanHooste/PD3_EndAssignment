@@ -58,7 +58,6 @@ public class PhysicsController : MonoBehaviour {
     private Vector3 _velocity = Vector3.zero;
     private float _timeInAir = 0;
     private float _skinWidth;
-    private float _prevPosY;
     private bool _hasGravity = true;
 
     [SerializeField] private float _horizontalRotationSpeed;
@@ -82,11 +81,6 @@ public class PhysicsController : MonoBehaviour {
         _skinWidth = _characterController.skinWidth;
     }
 
-    private void Update()
-    {
-
-    }
-
     // Update is called once per frame
     void FixedUpdate() {
         ApplyGround();
@@ -102,17 +96,15 @@ public class PhysicsController : MonoBehaviour {
 
         LimitMaximumRunningSpeed();
 
-        _prevPosY = _playerTransform.position.y;
         _characterController.Move(_velocity * Time.deltaTime);
-        //Debug.Log("Velocity: "+_velocity);
     }
 
     private void ApplyMovement()
     {
         if (_characterController.isGrounded)
         {
-            Vector3 relativeMovement = RelativeDirection(Movement);
-            _velocity += relativeMovement * _acceleration * Time.deltaTime; // F(= m.a) [m/s^2] * t [s]
+                Vector3 relativeMovement = RelativeDirection(Movement);
+                _velocity += relativeMovement * _acceleration * Time.deltaTime; // F(= m.a) [m/s^2] * t [s]
         }
     }
 

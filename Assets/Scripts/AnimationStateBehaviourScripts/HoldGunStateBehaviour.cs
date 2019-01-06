@@ -5,8 +5,29 @@ using UnityEngine;
 public class HoldGunStateBehaviour : StateMachineBehaviour {
 
     private Transform _player;
+    public Transform Player
+    {
+        set
+        {
+            _player = value;
+        }
+    }
     private Transform _gun;
+    public Transform Gun
+    {
+        set
+        {
+            _gun = value;
+        }
+    }
     private bool _isAiming = false;
+    public bool IsAiming
+    {
+        set
+        {
+            _isAiming=value;
+        }
+    }
 
     private float _iKWeight=0;
     private GunScript _gunScript;
@@ -45,7 +66,8 @@ public class HoldGunStateBehaviour : StateMachineBehaviour {
         //IK first pistol
         if (_gun.tag == "FirstGun")
         {
-            _iKWeight = Mathf.Lerp(_iKWeight, 1, .01f);
+            _iKWeight += Time.deltaTime * .3f;
+
 
             animator.SetIKPosition(AvatarIKGoal.RightHand, _gun.position);
             animator.SetIKRotation(AvatarIKGoal.RightHand, _player.rotation);
@@ -90,16 +112,4 @@ public class HoldGunStateBehaviour : StateMachineBehaviour {
         
     }
 
-    public void SetGun(Transform gun)
-    {
-        _gun = gun;
-    }
-    public void SetPlayer(Transform player)
-    {
-        _player = player;
-    }
-    public void SetIsAiming(bool isAiming)
-    {
-        _isAiming = isAiming;
-    }
 }

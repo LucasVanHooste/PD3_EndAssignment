@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ClimbTopLadderStateBehaviour : StateMachineBehaviour {
+public class ClimbTopLadderPart2StateBehaviour : StateMachineBehaviour {
 
     private PhysicsController _physicsController;
     private PlayerController _playerController;

@@ -127,9 +127,9 @@ public class NormalState : PlayerState
         if (_object.GetComponent<GunScript>())
         {
             GunScript _gunScript = _object.GetComponent<GunScript>();
-                _gunScript.TakeGun(_playerController.gameObject.layer, _playerController.RightHand, _playerController.CameraRoot/*, _animationsController.HoldGunIK*/);
+                _gunScript.TakeGun(_playerController.gameObject.layer, _playerController.RightHand, _playerController.CameraRoot);
 
-            _animationsController.HoldGunIK.SetGun(_object.transform);
+            _animationsController.HoldGunIK.Gun=_object.transform;
         }
     }
 

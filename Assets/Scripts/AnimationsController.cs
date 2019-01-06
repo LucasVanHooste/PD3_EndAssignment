@@ -7,8 +7,8 @@ public class AnimationsController {
 
     public readonly HoldGunStateBehaviour HoldGunIK;
     public readonly LookAtStateBehaviour LookAtIK;
-    public readonly ClimbTopLadderStateBehaviour ClimbTopLadderAnimationBehaviour;
-    public readonly TopLadderStateBehaviour TopLadderIK;
+    public readonly ClimbTopLadderPart2StateBehaviour ClimbTopLadderAnimationBehaviour;
+    public readonly ClimbTopLadderPart1StateBehaviour TopLadderIK;
     public readonly PushObstacleStateBehaviour ObstacleIK;
     public readonly HoldTurretStateBehaviour TurretIK;
 
@@ -46,8 +46,8 @@ public class AnimationsController {
 
         HoldGunIK = _animator.GetBehaviour<HoldGunStateBehaviour>();
         LookAtIK = _animator.GetBehaviour<LookAtStateBehaviour>();
-        ClimbTopLadderAnimationBehaviour = _animator.GetBehaviour<ClimbTopLadderStateBehaviour>();
-        TopLadderIK = _animator.GetBehaviour<TopLadderStateBehaviour>();
+        ClimbTopLadderAnimationBehaviour = _animator.GetBehaviour<ClimbTopLadderPart2StateBehaviour>();
+        TopLadderIK = _animator.GetBehaviour<ClimbTopLadderPart1StateBehaviour>();
         ObstacleIK = _animator.GetBehaviour<PushObstacleStateBehaviour>();
         TurretIK = _animator.GetBehaviour<HoldTurretStateBehaviour>();
 
@@ -79,7 +79,7 @@ public class AnimationsController {
 
     public void AimGun(bool aimGun)
     {
-        HoldGunIK.SetIsAiming(aimGun);
+        HoldGunIK.IsAiming=aimGun;
         _animator.SetBool(_isAimingGunParameter, aimGun);
     }
 

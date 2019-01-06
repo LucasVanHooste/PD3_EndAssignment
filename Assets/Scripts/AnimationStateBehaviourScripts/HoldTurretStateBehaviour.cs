@@ -5,7 +5,13 @@ using UnityEngine;
 public class HoldTurretStateBehaviour : StateMachineBehaviour {
 
     private TurretScript _turretScript;
-    private bool _isAiming = false;
+    public TurretScript Turretscript
+    {
+        set
+        {
+            _turretScript = value;
+        }
+    }
 
     private float _iKWeight = 0;
 
@@ -43,7 +49,7 @@ public class HoldTurretStateBehaviour : StateMachineBehaviour {
         }
         //Debug.Log(_gun.gameObject.name);
 
-            _iKWeight = Mathf.Lerp(_iKWeight, 1, .03f);
+            _iKWeight +=Time.deltaTime*2f;
 
         //IK all other guns
         if (_turretScript.RightHandIK)
@@ -75,10 +81,5 @@ public class HoldTurretStateBehaviour : StateMachineBehaviour {
         //    animator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, .5f);
         //}
 
-    }
-
-    public void SetTurretScript(TurretScript turretScript)
-    {
-        _turretScript = turretScript;
     }
 }

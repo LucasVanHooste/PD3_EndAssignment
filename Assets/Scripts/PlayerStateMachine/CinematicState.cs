@@ -45,13 +45,13 @@ public class CinematicState : PlayerState
     {
         Vector3 direction = Vector3.Scale((_object.transform.position - _playerTransform.position), new Vector3(1, 0, 1));
 
-        while (Quaternion.Angle(_playerTransform.rotation, Quaternion.LookRotation(direction)) > 1)
+        while (Quaternion.Angle(_playerTransform.rotation, Quaternion.LookRotation(direction)) > 1f)
         {
             Debug.Log("rotate");
             Vector3 newDir = Vector3.RotateTowards(_playerTransform.forward, direction, .05f, 0.0f);
 
             float angle = Vector3.SignedAngle(_playerTransform.forward, newDir, Vector3.up);
-            _physicsController.Aim = new Vector3(angle / Mathf.Abs(angle), _physicsController.Aim.y, _physicsController.Aim.z);
+            _physicsController.Aim = new Vector3(Mathf.Rad2Deg * angle / _physicsController.HorizontalRotationSpeed, _physicsController.Aim.y, _physicsController.Aim.z);
 
             yield return null;
         }
@@ -64,14 +64,14 @@ public class CinematicState : PlayerState
 
     private IEnumerator PickUpFirstGun()
     {
-        _animationsController.HoldGunIK.SetGun(_object.transform);
+        _animationsController.HoldGunIK.Gun=_object.transform;
         _cinematicBehaviour.PlayCinematicScene("PickUpFirstGun");
         yield return new WaitForSeconds(1);
 
         _animationsController.PickUpGun(true);
 
-        yield return new WaitUntil(_cinematicBehaviour.GetIsSceneFinished);
-
+        yield return new WaitUntil(() => _cinematicBehaviour.IsSceneFinished);
+        Debug.Log("cinematic finished");
         _animationsController.PickUpGun(false);
         _playerController.ToGunState(_object);
     }
