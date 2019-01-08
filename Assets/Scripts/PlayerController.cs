@@ -4,7 +4,6 @@ using UnityEngine;
 
 [RequireComponent(typeof(PhysicsController))]
 [RequireComponent(typeof(Animator))]
-[RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(CameraController))]
 
 public class PlayerController : MonoBehaviour {
@@ -60,7 +59,6 @@ public class PlayerController : MonoBehaviour {
     private PhysicsController _physicsController;
     private Animator _animator;
     private PlayerController _playerController;
-    private CharacterController _characterController;
     private IState _state;
     private AnimationsController _animationsController;
     private CameraController _cameraController;

@@ -4,20 +4,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-[RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(Animator))]
-public class MeleeEnemyBehaviour : MonoBehaviour {
+[RequireComponent(typeof(NavMeshAgentController))]
+public class MeleeEnemyBehaviour : MonoBehaviour
+{
 
-    private INode _rootNode;
+    private INode _behaviourTree;
     private Transform _transform;
+    private NavMeshAgentController _navMeshAgentController;
     private MeleeEnemyBehaviour _meleeEnemyBehaviour;
     private Animator _animator;
     private EnemyAnimationsController _animationsController;
-    private NavMeshAgent _navMeshAgent;
-
+    private Transform _playerTransform;
     private PlayerController _playerController;
 
-    [SerializeField] private Transform _playerTransform;
     [SerializeField] private LayerMask _mapLayerMask;
     [SerializeField] private float FOV;
     [SerializeField] private LayerMask _canSeePlayerLayerMask;
@@ -27,6 +27,22 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
     [SerializeField] private float _punchCoolDown;
     [SerializeField] private int _punchDamage;
     private float _punchCoolDownTimer = 0;
+    [SerializeField] private float _forgetAboutPlayerTime;
+    private float _forgetAboutPlayerTimer = 0;
+    [SerializeField] private float _hearingDistance;
+
+    [SerializeField] private Vector2 _roamingTimeRange;
+    private float _roamingTime;
+    private float _roamingTimer = 0;
+    private bool _hasBeenAttacked = false;
+
+    [SerializeField] private Transform _gun;
+    private GunScript _gunScript;
+    private bool _fireGun = false;
+    private bool _aimGun = false;
+    [SerializeField] private Transform _anchorPoint;
+    [SerializeField] private Transform _rightHandTransform;
+    [SerializeField] private Transform _lookAtPosition;
 
     [SerializeField] private int _maxHealth;
     private int _health;
@@ -38,60 +54,71 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
         }
     }
 
-    private Vector3 _relativeVelocity;
-    public Vector3 RelativeVelocity
-    {
-        get
-        {
-            return _relativeVelocity;
-        }
-    }
-
-    private float _rotationSpeed;
-    public float RotationSpeed
-    {
-        get
-        {
-            return _rotationSpeed;
-        }
-    }
-
-    private Vector3 _targetPosition;
-    private Quaternion _previousRotation;
 
     void Start()
     {
         _health = _maxHealth;
         _transform = transform;
-        _targetPosition = _transform.position;
-        _navMeshAgent = GetComponent<NavMeshAgent>();
+        _navMeshAgentController = GetComponent<NavMeshAgentController>();
         _meleeEnemyBehaviour = GetComponent<MeleeEnemyBehaviour>();
         _animator = GetComponent<Animator>();
-        _animationsController = new EnemyAnimationsController(_transform, _meleeEnemyBehaviour, _animator, _navMeshAgent);
+        _animationsController = new EnemyAnimationsController(_transform, _meleeEnemyBehaviour, _animator, _navMeshAgentController);
+        _animationsController.HoldGunIK.Player = _transform;
+        _animationsController.LookAtIK.LookAtPosition = _lookAtPosition;
+        _playerTransform = _navMeshAgentController.PlayerTransform;
         _playerController = _playerTransform.GetComponent<PlayerController>();
-        _previousRotation = _transform.rotation;
-        //#region test
 
-        //INode idk = new SelectorNode(new ConditionNode(IsHungry), new ConditionNode(IsHungry), new ConditionNode(IsHungry));
-        //INode selectorNode = new SelectorNode(idk);
-        //#endregion
+        _forgetAboutPlayerTimer = _forgetAboutPlayerTime;
+        _roamingTime = UnityEngine.Random.Range(_roamingTimeRange.x, _roamingTimeRange.y);
 
-        //ConditionNode.Condition hungryCondition = IsHungry;
+        PickUpGun(_gun);
+        //_behaviourTree = new SelectorNode(
 
-        //ConditionNode IsHungrCondition = new ConditionNode(hungryCondition);
+        //    new SequenceNode(
+        //        new ConditionNode(SeesPlayer),
+        //        new ParallelNode(
+        //            OneSuccesIsSuccesAccumulator.Factory,
+        //            new SequenceNode(
+        //                new ConditionNode(IsCloseToPlayer), 
+        //                new ActionNode(PunchPlayer)), 
+        //            new ActionNode(SetPlayerPositionAsTarget))),
+        //    new SequenceNode(
+        //        new ConditionNode(HasBeenAttacked), 
+        //        new ActionNode(SetPlayerPositionAsTarget)),
+
+        //    new SequenceNode(
+        //        new ConditionNode(HasSeenPlayerRecently), 
+        //        new ActionNode(LookForPlayer)),
+
+        //    new ActionNode(Roam));
+
+        _behaviourTree = new SelectorNode(
+new SelectorNode(
+    new SequenceNode(
+        new ConditionNode(SeesPlayer),
+        new SelectorNode(
+            new SequenceNode(
+                new ConditionNode(HasGun),
+                new ActionNode(FireGunAtPlayer)),
+            new ParallelNode(
+                OneSuccesIsSuccesAccumulator.Factory,
+                new SequenceNode(
+                    new ConditionNode(IsCloseToPlayer),
+                    new ActionNode(PunchPlayer)),
+                new ActionNode(SetPlayerPositionAsTarget))
+            )),
+    new SequenceNode(
+        new ConditionNode(HasBeenAttacked),
+        new ActionNode(SetPlayerPositionAsTarget)),
+
+    new SequenceNode(
+        new ConditionNode(HasSeenPlayerRecently),
+        new ActionNode(LookForPlayer)),
+
+    new ActionNode(Roam))
+        );
 
 
-        INode punchPlayerAI = new SequenceNode(new ConditionNode(CanPunchPlayer), new ActionNode(PunchPlayer));
-        INode followPlayerAI = new SequenceNode(new ConditionNode(SeesPlayer), new SequenceNode(new ActionNode(ChargeAtPlayer), punchPlayerAI));
-        //INode sleepyyAI = new SequenceNode(new ConditionNode(IsCloseToPlayer), new ActionNode(Sleep));
-
-        //INode SelectorRootNode = new SelectorNode(hungryAI, sleepyyAI, new ActionNode(Roam));
-
-        //INode ParallelRootNode = new ParallelNode(ParallelAwaysSuccesPolicy, SelectorRootNode, new ActionNode(Blaah));
-        //_rootNode = new ParallelNode(NSuccesIsSuccesAccumulator.Factory, SelectorRootNode, new ActionNode(Blaah));
-
-        _rootNode = new ParallelNode(NSuccesIsSuccesAccumulator.Factory, followPlayerAI);
-        //_rootNode = new SelectorNode(followPlayerAI);
 
         StartCoroutine(RunTree());
     }
@@ -105,65 +132,125 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
         //Debug.Log("navmesh desired: " + _navMeshAgent.desiredVelocity);
         //Debug.Log("navmesh speed: " + _navMeshAgent.speed);
 
+        if (_gun != null)
+        {
+            FireGun(_fireGun);
+            AimGun(_aimGun);
+        }
+        _fireGun = false;
+        _aimGun = false;
 
-        _relativeVelocity = GetScaledRelativeVelocity();
-        _rotationSpeed = GetScaledRotationSpeed();
         _animationsController.Update();
+
+        _punchCoolDownTimer += Time.deltaTime;
+        _forgetAboutPlayerTimer += Time.deltaTime;
+        _roamingTimer += Time.deltaTime;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawRay(transform.position + Vector3.up, transform.forward * 2);
+
+    }
+
+    IEnumerator RunTree()
+    {
+        while (_health > 0)
+        {
+            yield return _behaviourTree.Tick();
+        }
     }
 
     private IEnumerator<NodeResult> Roam()
     {
         Debug.Log("Roaming");
-        yield return NodeResult.Succes;
-    }
-
-    private IEnumerator<NodeResult> Blaah()
-    {
-        Debug.Log("Blaaaaah");
-        yield return NodeResult.Succes;
-    }
-
-    private IEnumerator<NodeResult> Sleep()
-    {
-
-        for (int i = 0; i < 10; i++)
+        if (_roamingTimer >= _roamingTime)
         {
-            Debug.Log("Sleeping: " + i);
-            yield return NodeResult.Running;
+            _roamingTime = UnityEngine.Random.Range(_roamingTimeRange.x, _roamingTimeRange.y);
+            _roamingTimer = 0;
+            _navMeshAgentController.Walk();
+            _navMeshAgentController.SetDestination(_navMeshAgentController.RandomNavSphere(_transform.position, 3, -1));
+        }
+        yield return NodeResult.Succes;
+    }
+
+    private IEnumerator<NodeResult> LookForPlayer()
+    {
+        Debug.Log("LookForPlayer");
+        if (!_navMeshAgentController.UpdateTransformToNavmesh)
+        {
+            _navMeshAgentController.Warp(_transform.position);
+            _navMeshAgentController.UpdateTransformToNavmesh = true;
+
         }
 
-        Debug.Log("Done Sleeping");
+        if (_navMeshAgentController.HasNavMeshReachedDestination())
+        {
+            if ((_playerTransform.position - _transform.position).sqrMagnitude < _hearingDistance * _hearingDistance)
+                _navMeshAgentController.SetDestination(_navMeshAgentController.RandomNavSphere(_playerTransform.position, 4, -1));
+        }
         yield return NodeResult.Succes;
     }
 
-    private IEnumerator<NodeResult> ChargeAtPlayer()
+    private IEnumerator<NodeResult> SetPlayerPositionAsTarget()
     {
-        Debug.Log(Vector3.Scale(_playerTransform.position - _transform.position, new Vector3(1, 0, 1)).magnitude);
-        Debug.Log(Vector3.Scale(_playerTransform.position - _transform.position, new Vector3(1, 0, 1)));
         if (Vector3.Scale(_playerTransform.position - _transform.position, new Vector3(1, 0, 1)).magnitude > _minDistanceFromPlayer)
         {
-            _navMeshAgent.SetDestination(_playerTransform.position);
-        }
-        else _navMeshAgent.SetDestination(_transform.position);
+            //_navMeshAgent.isStopped = false;
+            _navMeshAgentController.Run();
 
-        Debug.Log("Charging");
+            if (!_navMeshAgentController.UpdateTransformToNavmesh)
+            {
+                _navMeshAgentController.Warp(_transform.position);
+                _navMeshAgentController.UpdateTransformToNavmesh = true;
+            }
+        }
+        else
+        {
+            _navMeshAgentController.UpdateTransformToNavmesh = false;
+            _navMeshAgentController.RotateToPlayer();
+
+            //_navMeshAgent.SetDestination(_playerTransform.position);
+            //_navMeshAgent.updatePosition = false;
+        }
+
+        _navMeshAgentController.SetDestination(_playerTransform.position);
+
+        Debug.Log("SetPlayerposAsTarget");
         yield return NodeResult.Succes;
     }
 
     private IEnumerator<NodeResult> PunchPlayer()
     {
-        if(_playerController.Health>0)
-        _playerController.TakePunch(_punchDamage);
-        Debug.Log("TakePunch");
+        if (_punchCoolDownTimer > _punchCoolDown)
+        {
+            if (_playerController.Health > 0)
+            {
+                _playerController.TakePunch(_punchDamage);
+                Debug.Log("punch");
+                _punchCoolDownTimer = 0;
+                _animationsController.Punch();
+            }
+        }
+
+        Debug.Log("TryPunch");
         yield return NodeResult.Succes;
     }
 
-    IEnumerator RunTree()
+    private IEnumerator<NodeResult> FireGunAtPlayer()
     {
-        while (_health>0)
+        _navMeshAgentController.UpdateTransformToNavmesh = false;
+        _navMeshAgentController.RotateToPlayer();
+
+        if (!_navMeshAgentController.IsOnOffMeshLink())
         {
-            yield return _rootNode.Tick();
+            _aimGun=true;
+            _fireGun = true;
         }
+
+        Debug.Log("Fire gun");
+        yield return NodeResult.Succes;
     }
 
     bool SeesPlayer()
@@ -173,73 +260,114 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
         {
             //Debug.Log("angle: " + Quaternion.Angle(_transform.rotation, Quaternion.LookRotation(directionPlayer)));
             RaycastHit hit;
-            if(Physics.Raycast(_transform.position+new Vector3(0,1.4f,0),directionPlayer, out hit, 1000, _canSeePlayerLayerMask))
+            if (Physics.Raycast(_transform.position + new Vector3(0, 1.4f, 0), directionPlayer, out hit, 1000, _canSeePlayerLayerMask))
             {
                 //Debug.Log(hit.transform.name);
                 if (hit.transform.gameObject.layer == 9)
                 {
                     Debug.Log("I see player");
+                    _forgetAboutPlayerTimer = 0;
+                    _hasBeenAttacked = false;
+                    //if (_gun != null && !_navMeshAgentController.IsOnOffMeshLink())
+                    //{
+                    //    AimGun(true);
+                    //}
+
                     return true;
                 }
             }
         }
 
+        //if (_gun != null|| _navMeshAgentController.IsOnOffMeshLink())
+        //{
+        //    AimGun(false);
+        //}
         return false;
     }
 
-    bool CanPunchPlayer()
+    private bool HasSeenPlayerRecently()
     {
-        if (Vector3.Magnitude(Vector3.Scale(_playerTransform.position - _transform.position, new Vector3(1,0,1))) <= _horizontalPunchReach
+        if (_forgetAboutPlayerTimer < _forgetAboutPlayerTime)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    private bool IsCloseToPlayer()
+    {
+        if (Vector3.Magnitude(Vector3.Scale(_playerTransform.position - _transform.position, new Vector3(1, 0, 1))) <= _horizontalPunchReach
             && _playerTransform.position.y - _transform.position.y <= _verticalPunchReach)
         {
-            if (_punchCoolDownTimer > _punchCoolDown)
-            {
-                Debug.Log("punch");
-                _punchCoolDownTimer = 0;
-                return true;
-            }
-            _punchCoolDownTimer += Time.deltaTime;
+            return true;
         }
         else
-        _punchCoolDownTimer = 0;
+            return false;
+    }
+
+    private bool HasBeenAttacked()
+    {
+        if (_hasBeenAttacked)
+        {
+            return true;
+        }
         return false;
     }
 
-
-
-    private Vector3 GetScaledRelativeVelocity()
-    { 
-        Vector3 relativeVelocity = _transform.InverseTransformVector(_navMeshAgent.velocity);
-        return relativeVelocity / _navMeshAgent.speed;
+    private bool HasGun()
+    {
+        if (_gun != null)
+        {
+            return true;
+        }
+        return false;
     }
 
-    private float GetScaledRotationSpeed()
+    private void PickUpGun(Transform gun)
     {
-        float angle = Quaternion.Angle(_previousRotation, _transform.rotation);
-        _previousRotation = _transform.rotation;
-        //Debug.Log("angle: " + (angle / Time.deltaTime) / _navMeshAgent.angularSpeed);
-        return (angle/Time.deltaTime)/_navMeshAgent.angularSpeed;
+        if (gun != null && gun.GetComponent<GunScript>())
+        {
+            _gun = gun;
+            _gunScript = _gun.GetComponent<GunScript>();
+            _gunScript.TakeGun(gameObject.layer, _rightHandTransform, _anchorPoint);
+            _animationsController.HoldGunIK.Gun = _gun.transform;
+            _animationsController.IsTwoHandedGun(_gunScript.IsTwoHanded);
+        }
+        else
+        {
+            _gun = null;
+        }
+    }
+
+    private void AimGun(bool aim)
+    {
+        _animationsController.AimGun(aim);
+        _gunScript.AimGun(aim);
+    }
+
+    private void FireGun(bool fire)
+    {
+        _gunScript.FireGun(fire);
     }
 
     private void TakeDamage(int damage)
     {
         _health -= damage;
         //_animationsController.SetHealth(_health);
+        Die();
     }
 
     public void TakePunch(int damage)
     {
+        _hasBeenAttacked = true;
         TakeDamage(damage);
-        //_animationsController.TakePunch();
-
-        Die();
+        _animationsController.TakePunch();
     }
 
     public void GetShot(int damage)
     {
+        _hasBeenAttacked = true;
         TakeDamage(damage);
-
-        Die();
     }
 
     private void Die()
@@ -250,15 +378,10 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
         //ToDeadState();
     }
 
-    public bool IsOnOffMeshLink()
-    {
-        return _navMeshAgent.isOnOffMeshLink;
-    }
-
     public float GetDistanceFromGround()
     {
         RaycastHit hit;
-        if (Physics.Raycast(_transform.position+ new Vector3(0,1f,0), Vector3.down, out hit, 1000, _mapLayerMask))
+        if (Physics.Raycast(_transform.position + new Vector3(0, 1f, 0), Vector3.down, out hit, 1000, _mapLayerMask))
         {
             //print("I'm looking at " + hit.transform.name);
             return (hit.point - _transform.position).magnitude;
@@ -272,11 +395,12 @@ public class MeleeEnemyBehaviour : MonoBehaviour {
         if (GetDistanceFromGround() > .1f)
             return false;
 
-                return true;
+        return true;
     }
 
     public void ToDeadState()
     {
         //die
     }
+
 }

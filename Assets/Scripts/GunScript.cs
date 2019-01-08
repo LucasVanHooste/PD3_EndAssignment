@@ -52,7 +52,7 @@ public class GunScript : MonoBehaviour {
     {
         GameObject.Destroy(_gunCollisionChecker.gameObject);
 
-        gameObject.layer = 9;
+        gameObject.layer = layerIndex;
         gameObject.tag = "Gun";
         //_transform.parent = parent;
         if (IsTwoHanded)
@@ -75,7 +75,7 @@ public class GunScript : MonoBehaviour {
         if(_gunCollisionChecker)
         GameObject.Destroy(_gunCollisionChecker.gameObject);
 
-        gameObject.layer = 9;
+        gameObject.layer = layerIndex;
         if (IsTwoHanded)
         {
             _transform.parent = CameraRootTransform;

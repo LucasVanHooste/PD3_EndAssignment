@@ -59,7 +59,6 @@ public class AnimationsController {
         _animator.SetFloat(_xMovementAnimationParameter, _physicsController.Movement.x);
         _animator.SetBool(_isGroundedAnimationParameter, _physicsController.IsGrounded());
         //_animator.SetBool(_jumpingAnimationParameter, _physicsController.Jumping);
-
         _animator.SetFloat(_horizontalRotationAnimationParameter, _physicsController.Aim.x);
         _animator.SetFloat(_verticalVelocityAnimationParameter, _physicsController.GetVelocity().y);
 

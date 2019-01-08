@@ -40,11 +40,10 @@ public class HoldGunStateBehaviour : StateMachineBehaviour {
     //}
 
     //OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
-    override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    {
-        if(_gun!=null)
-        _gunScript = _gun.GetComponent<GunScript>();
-    }
+    //override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    //{
+
+    //}
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     //override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
@@ -62,6 +61,8 @@ public class HoldGunStateBehaviour : StateMachineBehaviour {
     {
         if (_gun == null || _player == null) return;
         //Debug.Log(_gun.gameObject.name);
+
+            _gunScript = _gun.GetComponent<GunScript>();
 
         //IK first pistol
         if (_gun.tag == "FirstGun")

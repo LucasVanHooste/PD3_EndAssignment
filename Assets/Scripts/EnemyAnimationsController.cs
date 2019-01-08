@@ -12,7 +12,7 @@ public class EnemyAnimationsController{
 
     private Transform _enemyTransform;
     private Animator _animator;
-    private NavMeshAgent _navMeshAgent;
+    private NavMeshAgentController _navMeshAgentController;
     private MeleeEnemyBehaviour _enemyBehaviour;
 
     private int _zMovementAnimationParameter = Animator.StringToHash("ZMovement");
@@ -36,10 +36,10 @@ public class EnemyAnimationsController{
 
     private int _resetParameter = Animator.StringToHash("Reset");
 
-    public EnemyAnimationsController(Transform enemyTransform, MeleeEnemyBehaviour enemyBehaviour, Animator animator, NavMeshAgent navMeshAgent)
+    public EnemyAnimationsController(Transform enemyTransform, MeleeEnemyBehaviour enemyBehaviour, Animator animator, NavMeshAgentController navMeshAgentController)
     {
         _animator = animator;
-        _navMeshAgent= navMeshAgent;
+        _navMeshAgentController= navMeshAgentController;
         _enemyBehaviour = enemyBehaviour;
 
         HoldGunIK = _animator.GetBehaviour<HoldGunStateBehaviour>();
@@ -50,17 +50,21 @@ public class EnemyAnimationsController{
 
     public void Update()
     {
-        _animator.SetFloat(_zMovementAnimationParameter, _enemyBehaviour.RelativeVelocity.z);
-        _animator.SetFloat(_xMovementAnimationParameter, _enemyBehaviour.RelativeVelocity.x);
+        _animator.SetFloat(_zMovementAnimationParameter, _navMeshAgentController.RelativeVelocity.z);
+        _animator.SetFloat(_xMovementAnimationParameter, _navMeshAgentController.RelativeVelocity.x);
         //_animator.SetBool(_isGroundedAnimationParameter, !_enemyBehaviour.IsOnOffMeshLink());
         _animator.SetBool(_isGroundedAnimationParameter, _enemyBehaviour.IsGrounded());
 
         //Debug.Log("Distance: "+_enemyBehaviour.GetDistanceFromGround());
-        _animator.SetFloat(_horizontalRotationAnimationParameter, _enemyBehaviour.RotationSpeed);
+        _animator.SetFloat(_horizontalRotationAnimationParameter, _navMeshAgentController.RotationSpeed);
         //Debug.Log("velocity: " + _enemyBehaviour.RelativeVelocity.y);
         //_animator.SetFloat(_verticalVelocityAnimationParameter, _enemyBehaviour.RelativeVelocity.y);
 
         _animator.SetFloat(_distanceFromGroundParameter, _enemyBehaviour.GetDistanceFromGround());
+        //Debug.Log("velocity z: " + _enemyBehaviour.RelativeVelocity.z);
+        //Debug.Log("velocity x: " + _enemyBehaviour.RelativeVelocity.x);
+        //Debug.Log("animation angle: " + _navMeshAgentController.RotationSpeed);
+
     }
 
     public void AimGun(bool aimGun)

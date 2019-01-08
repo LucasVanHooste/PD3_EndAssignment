@@ -8,17 +8,17 @@ public interface ParallelNodePolicyAccumulator
     NodeResult Policy(NodeResult result);
 }
 
-public class NSuccesIsSuccesAccumulator:ParallelNodePolicyAccumulator
+public class OneSuccesIsSuccesAccumulator:ParallelNodePolicyAccumulator
 {
     public static ParallelNodePolicyAccumulator Factory()
     {
-        return new NSuccesIsSuccesAccumulator(2);
+        return new OneSuccesIsSuccesAccumulator();
     }
 
     private readonly int _n;
     private int _count = 0;
 
-    public NSuccesIsSuccesAccumulator(int n = 1)
+    public OneSuccesIsSuccesAccumulator(int n = 1)
     {
         _n = n;
     }
@@ -29,5 +29,29 @@ public class NSuccesIsSuccesAccumulator:ParallelNodePolicyAccumulator
             _count++;
 
         return (_count >= _n) ? NodeResult.Succes : NodeResult.Failure; 
+    }
+}
+
+public class TwoSuccesIsSuccesAccumulator : ParallelNodePolicyAccumulator
+{
+    public static ParallelNodePolicyAccumulator Factory()
+    {
+        return new TwoSuccesIsSuccesAccumulator(2);
+    }
+
+    private readonly int _n;
+    private int _count = 0;
+
+    public TwoSuccesIsSuccesAccumulator(int n = 1)
+    {
+        _n = n;
+    }
+
+    public NodeResult Policy(NodeResult result)
+    {
+        if (result == NodeResult.Succes)
+            _count++;
+
+        return (_count >= _n) ? NodeResult.Succes : NodeResult.Failure;
     }
 }

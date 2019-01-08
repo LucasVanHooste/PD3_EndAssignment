@@ -154,18 +154,6 @@ AnimatorController:
     m_SyncedLayerAffectsTiming: 0
     m_Controller: {fileID: 9100000}
   - serializedVersion: 5
-    m_Name: Punch
-    m_StateMachine: {fileID: 1107445494527712348}
-    m_Mask: {fileID: 31900000, guid: 0be6072daf4726c45aab0d56264520fd, type: 2}
-    m_Motions: []
-    m_Behaviours: []
-    m_BlendingMode: 0
-    m_SyncedLayerIndex: -1
-    m_DefaultWeight: 1
-    m_IKPass: 0
-    m_SyncedLayerAffectsTiming: 0
-    m_Controller: {fileID: 9100000}
-  - serializedVersion: 5
     m_Name: AimGun
     m_StateMachine: {fileID: 1107031181371434172}
     m_Mask: {fileID: 31900000, guid: 18123e05a3b896c42a5f75a0f3013d58, type: 2}
@@ -193,6 +181,18 @@ AnimatorController:
     m_Name: TakePunch
     m_StateMachine: {fileID: 1107112094078234432}
     m_Mask: {fileID: 31900000, guid: d03d9fa5d0811ef429d33a249c963cf3, type: 2}
+    m_Motions: []
+    m_Behaviours: []
+    m_BlendingMode: 0
+    m_SyncedLayerIndex: -1
+    m_DefaultWeight: 1
+    m_IKPass: 0
+    m_SyncedLayerAffectsTiming: 0
+    m_Controller: {fileID: 9100000}
+  - serializedVersion: 5
+    m_Name: Punch
+    m_StateMachine: {fileID: 1107445494527712348}
+    m_Mask: {fileID: 31900000, guid: 0be6072daf4726c45aab0d56264520fd, type: 2}
     m_Motions: []
     m_Behaviours: []
     m_BlendingMode: 0
@@ -527,7 +527,7 @@ BlendTree:
     m_Mirror: 1
   - serializedVersion: 2
     m_Motion: {fileID: 7400000, guid: 235c1913a72918e458681734c9a00d36, type: 3}
-    m_Threshold: 0.5
+    m_Threshold: 0.11111112
     m_Position: {x: -0.5, y: 0}
     m_TimeScale: 1.2
     m_CycleOffset: 0
@@ -535,16 +535,32 @@ BlendTree:
     m_Mirror: 0
   - serializedVersion: 2
     m_Motion: {fileID: 7400000, guid: 1e5c6da466941c64895773b9c6971035, type: 3}
-    m_Threshold: 1
+    m_Threshold: 0.22222224
     m_Position: {x: 0, y: 0}
     m_TimeScale: 1
     m_CycleOffset: 0
     m_DirectBlendParameter: HorizontalVelocity
     m_Mirror: 0
+  - serializedVersion: 2
+    m_Motion: {fileID: 7400000, guid: 235c1913a72918e458681734c9a00d36, type: 3}
+    m_Threshold: 0.33333337
+    m_Position: {x: 2, y: 0}
+    m_TimeScale: 1.7
+    m_CycleOffset: 0.5
+    m_DirectBlendParameter: XMovement
+    m_Mirror: 1
+  - serializedVersion: 2
+    m_Motion: {fileID: 7400000, guid: 235c1913a72918e458681734c9a00d36, type: 3}
+    m_Threshold: 0.44444448
+    m_Position: {x: -2, y: 0}
+    m_TimeScale: 1.7
+    m_CycleOffset: 0
+    m_DirectBlendParameter: XMovement
+    m_Mirror: 0
   m_BlendParameter: HorizontalRotation
   m_BlendParameterY: HorizontalRotation
   m_MinThreshold: 0
-  m_MaxThreshold: 1
+  m_MaxThreshold: 0.44444448
   m_UseAutomaticThresholds: 1
   m_NormalizedBlendValues: 0
   m_BlendType: 2
