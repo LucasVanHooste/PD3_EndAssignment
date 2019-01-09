@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AnimationsController {
+public class PlayerAnimationsController {
 
     public readonly HoldGunStateBehaviour HoldGunIK;
     public readonly LookAtStateBehaviour LookAtIK;
@@ -33,13 +33,13 @@ public class AnimationsController {
     private int _climbingAnimationParameter = Animator.StringToHash("Climbing");
     private int _climbTopAnimationParameter = Animator.StringToHash("ClimbTopLadder");
 
-    private int _takePunchAnimationParameter = Animator.StringToHash("TakePunch");
+    private int _takeDamageAnimationParameter = Animator.StringToHash("TakeDamage");
     private int _playerHealthParameter = Animator.StringToHash("Health");
 
 
     private int _resetParameter = Animator.StringToHash("Reset");
 
-    public AnimationsController(Animator animator, PhysicsController physicsController)
+    public PlayerAnimationsController(Animator animator, PhysicsController physicsController)
     {
         _animator = animator;
         _physicsController = physicsController;
@@ -92,9 +92,9 @@ public class AnimationsController {
         _animator.SetTrigger(_punchParameter);
     }
 
-    public void TakePunch()
+    public void TakeDamage()
     {
-        _animator.SetTrigger(_takePunchAnimationParameter);
+        _animator.SetTrigger(_takeDamageAnimationParameter);
     }
 
     public void Climb(bool climb)

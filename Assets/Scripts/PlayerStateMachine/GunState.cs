@@ -8,7 +8,7 @@ public class GunState : PlayerState
     private Transform _playerTransform;
     private PhysicsController _physicsController;
     private PlayerController _playerController;
-    private AnimationsController _animationsController;
+    private PlayerAnimationsController _animationsController;
     private List<Collider> _triggers;
     private GameObject _object;
     private CameraController _cameraController;
@@ -25,7 +25,7 @@ public class GunState : PlayerState
     private float _dropGunTimer=0;
     private float _punchCoolDownTimer = 0;
 
-    public GunState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, AnimationsController animationsController, GameObject gun, 
+    public GunState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, PlayerAnimationsController animationsController, GameObject gun, 
         CameraController cameraController, Transform holsterGun1Hand, Transform holsterGun2Hands, GameObject crossHair)
     {
         _playerTransform = playerTransform;
@@ -117,8 +117,6 @@ public class GunState : PlayerState
 
         if (_dropGunTimer >= _dropGunTime)
         {
-            _isAiming = false;
-            AimGun();
             DropGun();
         }
 
@@ -169,7 +167,7 @@ public class GunState : PlayerState
 
     private void FireGun()
     {
-        _gunScript.FireGun(_isShooting);
+        _gunScript.PlayerFireGun(_isShooting, _cameraController.PlayerCamera);
     }
 
     private GameObject GetClosestTriggerObject()
@@ -195,7 +193,7 @@ public class GunState : PlayerState
             if (_object.GetComponent<GunScript>())
             {
                 _gunScript = _object.GetComponent<GunScript>();
-                    _gunScript.TakeGun(_playerController.gameObject.layer, _playerController.RightHand, _playerController.CameraRoot);
+                    _gunScript.TakeGun(_playerController.RightHand, _playerController.CameraRoot);
 
             _animationsController.HoldGunIK.Gun=_object.transform;
         }
@@ -216,6 +214,9 @@ public class GunState : PlayerState
 
     public void DropGun()
     {
+        _isAiming = false;
+        AimGun();
+
         _gunScript.DropGun();
 
         _animationsController.HoldGunIK.Gun=null;

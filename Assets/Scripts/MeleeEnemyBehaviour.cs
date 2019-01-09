@@ -40,9 +40,11 @@ public class MeleeEnemyBehaviour : MonoBehaviour
     private GunScript _gunScript;
     private bool _fireGun = false;
     private bool _aimGun = false;
+    [SerializeField] float _missingShotRange;
     [SerializeField] private Transform _anchorPoint;
     [SerializeField] private Transform _rightHandTransform;
     [SerializeField] private Transform _lookAtPosition;
+    [SerializeField] private Transform _headTransform;
 
     [SerializeField] private int _maxHealth;
     private int _health;
@@ -240,11 +242,11 @@ new SelectorNode(
 
     private IEnumerator<NodeResult> FireGunAtPlayer()
     {
-        _navMeshAgentController.UpdateTransformToNavmesh = false;
-        _navMeshAgentController.RotateToPlayer();
-
         if (!_navMeshAgentController.IsOnOffMeshLink())
         {
+            _navMeshAgentController.UpdateTransformToNavmesh = false;
+            _navMeshAgentController.RotateToPlayer();
+
             _aimGun=true;
             _fireGun = true;
         }
@@ -260,7 +262,7 @@ new SelectorNode(
         {
             //Debug.Log("angle: " + Quaternion.Angle(_transform.rotation, Quaternion.LookRotation(directionPlayer)));
             RaycastHit hit;
-            if (Physics.Raycast(_transform.position + new Vector3(0, 1.4f, 0), directionPlayer, out hit, 1000, _canSeePlayerLayerMask))
+            if (Physics.Raycast(_headTransform.position, directionPlayer, out hit, 1000, _canSeePlayerLayerMask))
             {
                 //Debug.Log(hit.transform.name);
                 if (hit.transform.gameObject.layer == 9)
@@ -329,7 +331,7 @@ new SelectorNode(
         {
             _gun = gun;
             _gunScript = _gun.GetComponent<GunScript>();
-            _gunScript.TakeGun(gameObject.layer, _rightHandTransform, _anchorPoint);
+            _gunScript.TakeGun(_rightHandTransform, _anchorPoint);
             _animationsController.HoldGunIK.Gun = _gun.transform;
             _animationsController.IsTwoHandedGun(_gunScript.IsTwoHanded);
         }
@@ -347,12 +349,15 @@ new SelectorNode(
 
     private void FireGun(bool fire)
     {
-        _gunScript.FireGun(fire);
+        Vector3 randomPosition = UnityEngine.Random.insideUnitSphere * _missingShotRange;
+
+        _gunScript.EnemyFireGun(fire, _anchorPoint.position, (_playerTransform.position+randomPosition)-_transform.position);
     }
 
     private void TakeDamage(int damage)
     {
         _health -= damage;
+        _animationsController.TakeDamage();
         //_animationsController.SetHealth(_health);
         Die();
     }
@@ -361,7 +366,6 @@ new SelectorNode(
     {
         _hasBeenAttacked = true;
         TakeDamage(damage);
-        _animationsController.TakePunch();
     }
 
     public void GetShot(int damage)

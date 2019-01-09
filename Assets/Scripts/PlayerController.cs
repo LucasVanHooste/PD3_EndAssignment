@@ -60,7 +60,7 @@ public class PlayerController : MonoBehaviour {
     private Animator _animator;
     private PlayerController _playerController;
     private IState _state;
-    private AnimationsController _animationsController;
+    private PlayerAnimationsController _animationsController;
     private CameraController _cameraController;
 
     //private GameObject _gun;
@@ -76,7 +76,7 @@ public class PlayerController : MonoBehaviour {
         _physicsController = GetComponent<PhysicsController>();
         _animator = GetComponent<Animator>();
         _playerController = GetComponent<PlayerController>();
-        _animationsController = new AnimationsController(_animator, _physicsController);
+        _animationsController = new PlayerAnimationsController(_animator, _physicsController);
 
         _animationsController.HoldGunIK.Player=_transform;
         //_animationsController.PickUpGunIK.SetPlayer(_transform);
@@ -172,13 +172,23 @@ public class PlayerController : MonoBehaviour {
     private void TakeDamage(int damage)
     {
         _health -= damage;
+        _animationsController.TakeDamage();
         _animationsController.SetHealth(_health);
     }
 
     public void TakePunch(int damage)
     {
+        if (_health <= 0) return;
         TakeDamage(damage);       
-        _animationsController.TakePunch();
+
+        Die();
+    }
+
+    public void GetShot(int damage)
+    {
+        if (_health <= 0) return;
+
+        TakeDamage(damage);
 
         Die();
     }

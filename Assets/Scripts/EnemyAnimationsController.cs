@@ -30,7 +30,7 @@ public class EnemyAnimationsController{
     private int _climbingAnimationParameter = Animator.StringToHash("Climbing");
     private int _climbTopAnimationParameter = Animator.StringToHash("ClimbTopLadder");
 
-    private int _takePunchAnimationParameter = Animator.StringToHash("TakePunch");
+    private int _takeDamageAnimationParameter = Animator.StringToHash("TakeDamage");
     private int _enemyHealthParameter = Animator.StringToHash("Health");
 
 
@@ -83,9 +83,9 @@ public class EnemyAnimationsController{
         _animator.SetTrigger(_punchParameter);
     }
 
-    public void TakePunch()
+    public void TakeDamage()
     {
-        _animator.SetTrigger(_takePunchAnimationParameter);
+        _animator.SetTrigger(_takeDamageAnimationParameter);
     }
 
     public void Climb(bool climb)

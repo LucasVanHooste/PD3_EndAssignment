@@ -9,8 +9,11 @@ public class GunScript : MonoBehaviour {
     public Transform LeftHandIK;
     public Transform LeftElbowIK;
     public Transform RightElbowIK;
+    [SerializeField] private GameObject _fireGunEffect;
+    private Coroutine _showFireEffect;
     [SerializeField] private Transform _gunCollisionCheckerPrefab;
     private Transform _gunCollisionChecker;
+    private Collider _trigger;
 
     public Vector3 LocalPositionOnPlayer;
     public Vector3 LocalRotationOnPlayer;
@@ -28,15 +31,15 @@ public class GunScript : MonoBehaviour {
     private float _fireTimer;
 
     [SerializeField] private int _bulletDamage;
-    [SerializeField] private LayerMask _bulletLayermask;
-    private Camera _cam;
+    [SerializeField] private LayerMask _playerBulletLayermask;
+    [SerializeField] private LayerMask _enemyBulletLayermask;
 
     private void Start()
     {
         _transform = transform;
         _fireTimer = _fireRate;
-        _cam = Camera.main;
         _gunCollisionChecker = GameObject.Instantiate(_gunCollisionCheckerPrefab, _transform.position, _transform.rotation);
+        _trigger = GetComponent<Collider>();
     }
 
     private void Update()
@@ -48,11 +51,12 @@ public class GunScript : MonoBehaviour {
         }
     }
 
-    public void TakeFirstGun(int layerIndex, Transform RightHand, Transform CameraRootTransform)
+    public void TakeFirstGun(Transform RightHand, Transform CameraRootTransform)
     {
         GameObject.Destroy(_gunCollisionChecker.gameObject);
 
-        gameObject.layer = layerIndex;
+        _trigger.enabled = false;
+        //gameObject.layer = layerIndex;
         gameObject.tag = "Gun";
         //_transform.parent = parent;
         if (IsTwoHanded)
@@ -70,12 +74,14 @@ public class GunScript : MonoBehaviour {
         _cameraRootTransform = CameraRootTransform;
     }
 
-    public void TakeGun(int layerIndex, Transform RightHand, Transform CameraRootTransform/*, HoldGunStateBehaviour holdGunIK*/)
+    public void TakeGun(Transform RightHand, Transform CameraRootTransform/*, HoldGunStateBehaviour holdGunIK*/)
     {
         if(_gunCollisionChecker)
         GameObject.Destroy(_gunCollisionChecker.gameObject);
 
-        gameObject.layer = layerIndex;
+        _trigger.enabled = false;
+        //gameObject.layer = layerIndex;
+
         if (IsTwoHanded)
         {
             _transform.parent = CameraRootTransform;
@@ -96,6 +102,7 @@ public class GunScript : MonoBehaviour {
     public void DropGun()
     {
         _transform.parent = null;
+        _trigger.enabled = true;
         gameObject.layer = 14;
         _gunCollisionChecker = GameObject.Instantiate(_gunCollisionCheckerPrefab, _transform.position, _transform.rotation);
     }
@@ -118,14 +125,14 @@ public class GunScript : MonoBehaviour {
         }
     }
 
-    public void FireGun(bool isShooting)
+    public void PlayerFireGun(bool isShooting, Camera cam)
     {
         if (isShooting)
         {
             if (_fireTimer >= _fireRate)
             {
                 _fireTimer = 0;
-                FireBullet();
+                PlayerFireBullet(cam);
             }
             else
             {
@@ -138,23 +145,82 @@ public class GunScript : MonoBehaviour {
         }
     }
 
-    private void FireBullet()
+    public void EnemyFireGun(bool isShooting, Vector3 origin, Vector3 direction)
     {
-        Ray _centreScreenRay = _cam.ViewportPointToRay(new Vector3(.5f, .5f, 0));
+        if (isShooting)
+        {
+            if (_fireTimer >= _fireRate)
+            {
+                _fireTimer = 0;
+                EnemyFireBullet(origin, direction);
+            }
+            else
+            {
+                _fireTimer += Time.deltaTime;
+            }
+        }
+        else
+        {
+            _fireTimer = _fireRate;
+        }
+    }
+
+    private void PlayerFireBullet(Camera cam)
+    {
+        Ray _centreScreenRay = cam.ViewportPointToRay(new Vector3(.5f, .5f, 0));
         RaycastHit hit;
-        if (Physics.Raycast(_centreScreenRay, out hit, 1000, _bulletLayermask))
+        if (Physics.Raycast(_centreScreenRay, out hit, 1000, _playerBulletLayermask))
         {
             print("I'm looking at " + hit.transform.name);
-            if (hit.transform.gameObject.layer == 16)
+            if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Enemy"))
             {
                 if (hit.transform.GetComponent<MeleeEnemyBehaviour>())
                     hit.transform.GetComponent<MeleeEnemyBehaviour>().GetShot(_bulletDamage);
-
-                //other enemies
             }
 
         }
         else
             print("I'm looking at nothing!");
+
+        //fire effect
+        PlayEffect();
+    }
+
+    private void EnemyFireBullet(Vector3 origin, Vector3 direction)
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(origin, direction, out hit, 1000, _enemyBulletLayermask))
+        {
+            print("I'm looking at " + hit.transform.name);
+            if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Player"))
+            {
+                if (hit.transform.GetComponent<PlayerController>())
+                    hit.transform.GetComponent<PlayerController>().GetShot(_bulletDamage);
+            }
+
+        }
+        else
+            print("I'm looking at nothing!");
+
+        //fire effect
+        PlayEffect();
+    }
+
+    private void PlayEffect()
+    {
+        if (_showFireEffect == null)
+            _showFireEffect = StartCoroutine(ShowFireEffect());
+        else
+        {
+            StopCoroutine(_showFireEffect);
+            _showFireEffect = StartCoroutine(ShowFireEffect());
+        }
+    }
+
+    private IEnumerator ShowFireEffect()
+    {
+        _fireGunEffect.SetActive(true);
+        yield return new WaitForSeconds(.1f);
+        _fireGunEffect.SetActive(false);
     }
 }

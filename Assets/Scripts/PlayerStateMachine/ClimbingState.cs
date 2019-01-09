@@ -8,7 +8,7 @@ public class ClimbingState : PlayerState
     private Transform _playerTransform;
     private PhysicsController _physicsController;
     private PlayerController _playerController;
-    private AnimationsController _animationsController;
+    private PlayerAnimationsController _animationsController;
 
     private GameObject _ladder;
     private LadderScript _ladderScript;
@@ -16,7 +16,7 @@ public class ClimbingState : PlayerState
     private float _ladderPaddingDistance = 0.15f;
     private Coroutine _rotateToLadder, _moveToLadder;
 
-    public ClimbingState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, AnimationsController animationsController, GameObject ladder)
+    public ClimbingState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, PlayerAnimationsController animationsController, GameObject ladder)
     {
         _playerTransform = playerTransform;
         _physicsController = physicsController;

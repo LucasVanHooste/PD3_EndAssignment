@@ -41,6 +41,9 @@ public class TurretScript : MonoBehaviour {
     [SerializeField] private float _fireRate;
     private float _fireTimer;
 
+    [SerializeField] private GameObject _fireTurretEffect;
+    private Coroutine _showFireEffect;
+
     [SerializeField] private int _bulletDamage;
     [SerializeField] private LayerMask _bulletLayermask;
     private Camera _cam;
@@ -102,6 +105,8 @@ public class TurretScript : MonoBehaviour {
         }
         else
             print("I'm looking at nothing!");
+
+        PlayEffect();
     }
 
     public Vector3 GetDirection()
@@ -128,5 +133,23 @@ public class TurretScript : MonoBehaviour {
         _verticalRotation = Mathf.Clamp(_verticalRotation, _minVerticalAngle, _maxVerticalAngle); //clamp vertical rotation
 
         _verticalAnchorTransform.eulerAngles = new Vector3(_verticalRotation, _verticalAnchorTransform.eulerAngles.y, _verticalAnchorTransform.eulerAngles.z);
+    }
+
+    private void PlayEffect()
+    {
+        if (_showFireEffect == null)
+            _showFireEffect = StartCoroutine(ShowFireEffect());
+        else
+        {
+            StopCoroutine(_showFireEffect);
+            _showFireEffect = StartCoroutine(ShowFireEffect());
+        }
+    }
+
+    private IEnumerator ShowFireEffect()
+    {
+        _fireTurretEffect.SetActive(true);
+        yield return new WaitForSeconds(.05f);
+        _fireTurretEffect.SetActive(false);
     }
 }

@@ -8,7 +8,7 @@ public class TurretState : PlayerState
     private Transform _playerTransform;
     private PhysicsController _physicsController;
     private PlayerController _playerController;
-    private AnimationsController _animationsController;
+    private PlayerAnimationsController _animationsController;
 
     private GameObject _object;
     private CameraController _cameraController;
@@ -23,7 +23,7 @@ public class TurretState : PlayerState
 
     float _turretPaddingDistance = 0.15f;
 
-    public TurretState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, AnimationsController animationsController, GameObject turret,
+    public TurretState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, PlayerAnimationsController animationsController, GameObject turret,
         CameraController cameraController, GameObject crossHair)
     {
         _playerTransform = playerTransform;

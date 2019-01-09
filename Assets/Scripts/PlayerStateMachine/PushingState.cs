@@ -8,7 +8,7 @@ public class PushingState : PlayerState
     private Transform _playerTransform;
     private PhysicsController _physicsController;
     private PlayerController _playerController;
-    private AnimationsController _animationsController;
+    private PlayerAnimationsController _animationsController;
 
     private List<Collider> _triggers;
     private GameObject _obstacle;
@@ -21,7 +21,7 @@ public class PushingState : PlayerState
     bool _hasHitObstacle = false;
     private Vector3 _pushStartPosition;
 
-    public PushingState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, AnimationsController animationsController, 
+    public PushingState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, PlayerAnimationsController animationsController, 
         GameObject obstacle, Transform obstacleIKLeftHand, Transform obstacleIKRightHand)
     {
         _playerTransform = playerTransform;

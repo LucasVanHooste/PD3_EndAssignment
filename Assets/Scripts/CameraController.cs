@@ -4,10 +4,19 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour {
 
+    [SerializeField] private Camera _camera;
     [SerializeField] private Transform _cameraTransform;
     [SerializeField] private Transform _cameraRootTransform;
     [SerializeField] private Transform _cameraDefaultTransform;
     [SerializeField] private Transform _camaraAimTransform;
+
+    public Camera PlayerCamera
+    {
+        get
+        {
+            return _camera;
+        }
+    }
 
     public Vector3 CameraPosition
     {

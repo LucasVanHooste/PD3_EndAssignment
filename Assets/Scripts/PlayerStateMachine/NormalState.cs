@@ -8,13 +8,13 @@ public class NormalState : PlayerState
     private Transform _playerTransform;
     private PhysicsController _physicsController;
     private PlayerController _playerController;
-    private AnimationsController _animationsController;
+    private PlayerAnimationsController _animationsController;
     private List<Collider> _triggers;
     private GameObject _object;
 
     private float _punchCoolDownTimer = 0;
 
-    public NormalState(Transform playerTransform, PhysicsController physicsController,PlayerController playerController, AnimationsController animationsController)
+    public NormalState(Transform playerTransform, PhysicsController physicsController,PlayerController playerController, PlayerAnimationsController animationsController)
     {
         _playerTransform = playerTransform;
         _physicsController = physicsController;
@@ -127,7 +127,7 @@ public class NormalState : PlayerState
         if (_object.GetComponent<GunScript>())
         {
             GunScript _gunScript = _object.GetComponent<GunScript>();
-                _gunScript.TakeGun(_playerController.gameObject.layer, _playerController.RightHand, _playerController.CameraRoot);
+                _gunScript.TakeGun(_playerController.RightHand, _playerController.CameraRoot);
 
             _animationsController.HoldGunIK.Gun=_object.transform;
         }
