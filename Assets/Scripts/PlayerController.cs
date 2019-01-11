@@ -79,9 +79,9 @@ public class PlayerController : MonoBehaviour {
         _animationsController = new PlayerAnimationsController(_animator, _physicsController);
 
         _animationsController.HoldGunIK.Player=_transform;
-        //_animationsController.PickUpGunIK.SetPlayer(_transform);
         _animationsController.LookAtIK.LookAtPosition=_lookAtTransform;
-        //_animationsController.ClimbTopLadderAnimationBehaviour.SetBehaviour(_playerController, _physicsController, _animationsController);
+        _animationsController.ClimbBottomLadderIK.LeftHand = LeftHand;
+        _animationsController.ClimbBottomLadderIK.RightHand = RightHand;
 
         _cameraController = GetComponent<CameraController>();
         _startPosition= _transform.position;

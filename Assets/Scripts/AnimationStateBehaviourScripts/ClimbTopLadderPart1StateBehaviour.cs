@@ -56,19 +56,19 @@ public class ClimbTopLadderPart1StateBehaviour : StateMachineBehaviour {
             //IK
             animator.SetBoneLocalRotation(HumanBodyBones.Spine, Quaternion.Euler(new Vector3(20, 0, 0)));
 
-            if (_ladderScript.RightHandIK2)
+            if (_ladderScript.TopLadderRightHandIK2)
             {
-                animator.SetIKPosition(AvatarIKGoal.RightHand, _ladderScript.RightHandIK2.position);
-                animator.SetIKRotation(AvatarIKGoal.RightHand, _ladderScript.RightHandIK2.rotation);
+                animator.SetIKPosition(AvatarIKGoal.RightHand, _ladderScript.TopLadderRightHandIK2.position);
+                animator.SetIKRotation(AvatarIKGoal.RightHand, _ladderScript.TopLadderRightHandIK2.rotation);
 
                 animator.SetIKPositionWeight(AvatarIKGoal.RightHand, _iKWeight);
                 animator.SetIKRotationWeight(AvatarIKGoal.RightHand, _iKWeight);
             }
 
-            if (_ladderScript.LeftHandIK2)
+            if (_ladderScript.TopLadderLeftHandIK2)
             {
-                animator.SetIKPosition(AvatarIKGoal.LeftHand, _ladderScript.LeftHandIK2.position);
-                animator.SetIKRotation(AvatarIKGoal.LeftHand, _ladderScript.LeftHandIK2.rotation);
+                animator.SetIKPosition(AvatarIKGoal.LeftHand, _ladderScript.TopLadderLeftHandIK2.position);
+                animator.SetIKRotation(AvatarIKGoal.LeftHand, _ladderScript.TopLadderLeftHandIK2.rotation);
                 animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, _iKWeight);
                 animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, _iKWeight);
             }
@@ -79,19 +79,19 @@ public class ClimbTopLadderPart1StateBehaviour : StateMachineBehaviour {
         //IK
         animator.SetBoneLocalRotation(HumanBodyBones.Spine, Quaternion.Euler(new Vector3(20, 0, 0)));
 
-        if (_ladderScript.RightHandIK)
+        if (_ladderScript.TopLadderRightHandIK)
         {
-            animator.SetIKPosition(AvatarIKGoal.RightHand, _ladderScript.RightHandIK.position);
-            animator.SetIKRotation(AvatarIKGoal.RightHand, _ladderScript.RightHandIK.rotation);
+            animator.SetIKPosition(AvatarIKGoal.RightHand, _ladderScript.TopLadderRightHandIK.position);
+            animator.SetIKRotation(AvatarIKGoal.RightHand, _ladderScript.TopLadderRightHandIK.rotation);
 
             animator.SetIKPositionWeight(AvatarIKGoal.RightHand, _iKWeight);
             animator.SetIKRotationWeight(AvatarIKGoal.RightHand, _iKWeight);
         }
 
-        if (_ladderScript.LeftHandIK)
+        if (_ladderScript.TopLadderLeftHandIK)
         {
-            animator.SetIKPosition(AvatarIKGoal.LeftHand, _ladderScript.LeftHandIK.position);
-            animator.SetIKRotation(AvatarIKGoal.LeftHand, _ladderScript.LeftHandIK.rotation);
+            animator.SetIKPosition(AvatarIKGoal.LeftHand, _ladderScript.TopLadderLeftHandIK.position);
+            animator.SetIKRotation(AvatarIKGoal.LeftHand, _ladderScript.TopLadderLeftHandIK.rotation);
             animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, _iKWeight);
             animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, _iKWeight);
         }

@@ -5,18 +5,10 @@ using UnityEngine;
 public class LadderScript : MonoBehaviour {
 
     public Transform TakeOfPoint;
-    public Transform LeftHandIK;
-    public Transform RightHandIK;
-    public Transform LeftHandIK2;
-    public Transform RightHandIK2;
+    public Transform TopLadderLeftHandIK;
+    public Transform TopLadderRightHandIK;
+    public Transform TopLadderLeftHandIK2;
+    public Transform TopLadderRightHandIK2;
 
-    // Use this for initialization
-    void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    public Transform[] BottomLadderIKHands;
 }

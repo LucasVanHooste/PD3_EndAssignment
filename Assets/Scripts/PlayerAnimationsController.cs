@@ -7,8 +7,9 @@ public class PlayerAnimationsController {
 
     public readonly HoldGunStateBehaviour HoldGunIK;
     public readonly LookAtStateBehaviour LookAtIK;
-    public readonly ClimbTopLadderPart2StateBehaviour ClimbTopLadderAnimationBehaviour;
-    public readonly ClimbTopLadderPart1StateBehaviour TopLadderIK;
+    public readonly ClimbBottomLadderStateBehaviour ClimbBottomLadderIK;
+    public readonly ClimbTopLadderPart2StateBehaviour ClimbTopLadderPart2IK;
+    public readonly ClimbTopLadderPart1StateBehaviour ClimbTopLadderPart1IK;
     public readonly PushObstacleStateBehaviour ObstacleIK;
     public readonly HoldTurretStateBehaviour TurretIK;
 
@@ -46,8 +47,9 @@ public class PlayerAnimationsController {
 
         HoldGunIK = _animator.GetBehaviour<HoldGunStateBehaviour>();
         LookAtIK = _animator.GetBehaviour<LookAtStateBehaviour>();
-        ClimbTopLadderAnimationBehaviour = _animator.GetBehaviour<ClimbTopLadderPart2StateBehaviour>();
-        TopLadderIK = _animator.GetBehaviour<ClimbTopLadderPart1StateBehaviour>();
+        ClimbBottomLadderIK = _animator.GetBehaviour<ClimbBottomLadderStateBehaviour>();
+        ClimbTopLadderPart2IK = _animator.GetBehaviour<ClimbTopLadderPart2StateBehaviour>();
+        ClimbTopLadderPart1IK = _animator.GetBehaviour<ClimbTopLadderPart1StateBehaviour>();
         ObstacleIK = _animator.GetBehaviour<PushObstacleStateBehaviour>();
         TurretIK = _animator.GetBehaviour<HoldTurretStateBehaviour>();
 

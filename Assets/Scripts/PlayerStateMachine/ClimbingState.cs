@@ -25,8 +25,9 @@ public class ClimbingState : PlayerState
         _ladder = ladder;
         _ladderScript = _ladder.GetComponent<LadderScript>();
 
-        _animationsController.ClimbTopLadderAnimationBehaviour.SetBehaviour(_playerController, _physicsController, _animationsController);
-        _animationsController.TopLadderIK.Ladderscript=_ladderScript;
+        _animationsController.ClimbBottomLadderIK.LadderIKHands = _ladderScript.BottomLadderIKHands;
+        _animationsController.ClimbTopLadderPart2IK.SetBehaviour(_playerController, _physicsController, _animationsController);
+        _animationsController.ClimbTopLadderPart1IK.Ladderscript=_ladderScript;
 
         Climb();
     }
