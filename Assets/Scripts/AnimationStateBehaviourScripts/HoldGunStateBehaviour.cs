@@ -67,7 +67,7 @@ public class HoldGunStateBehaviour : StateMachineBehaviour {
         //IK first pistol
         if (_gun.tag == "FirstGun")
         {
-            _iKWeight += Time.deltaTime * .3f;
+            _iKWeight = animator.GetFloat("IKWeight");
 
 
             animator.SetIKPosition(AvatarIKGoal.RightHand, _gun.position);

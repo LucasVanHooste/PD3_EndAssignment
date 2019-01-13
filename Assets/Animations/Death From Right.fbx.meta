@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: fdba4abc6754dca48b9fac19e8e0cb13
+guid: 393b286217d956741a5dedd69d153bdd
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
@@ -139,7 +139,7 @@ ModelImporter:
     400130: mixamorig:Spine1
     400132: mixamorig:Spine2
     400134: //RootNode
-    7400000: falling back death
+    7400000: Death From Right
     9500000: //RootNode
   externalObjects: {}
   materials:
@@ -170,10 +170,10 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: falling back death
+      name: Death From Right
       takeName: mixamo.com
       firstFrame: 0
-      lastFrame: 66
+      lastFrame: 99
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

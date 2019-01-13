@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CinematicState : PlayerState
+public class CinematicState : BasePlayerState
 {
     private Transform _playerTransform;
     private PhysicsController _physicsController;
     private PlayerController _playerController;
-    private PlayerAnimationsController _animationsController;
+    private AnimationsController _animationsController;
     private List<Collider> _triggers;
     private GameObject _object;
 
     private CinematicBehaviour _cinematicBehaviour;
 
-    public CinematicState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, PlayerAnimationsController animationsController, GameObject triggerObject, CinematicBehaviour cinematicBehaviour)
+    public CinematicState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, AnimationsController animationsController, GameObject triggerObject, CinematicBehaviour cinematicBehaviour)
     {
         _playerTransform = playerTransform;
         _physicsController = physicsController;

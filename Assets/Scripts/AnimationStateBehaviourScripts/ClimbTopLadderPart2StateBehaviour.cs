@@ -6,7 +6,7 @@ public class ClimbTopLadderPart2StateBehaviour : StateMachineBehaviour {
 
     private PhysicsController _physicsController;
     private PlayerController _playerController;
-    private PlayerAnimationsController _animationsController;
+    private AnimationsController _animationsController;
 
 
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
@@ -40,7 +40,7 @@ public class ClimbTopLadderPart2StateBehaviour : StateMachineBehaviour {
 
     //}
 
-    public void SetBehaviour(PlayerController playerController, PhysicsController physicsController, PlayerAnimationsController animationsController)
+    public void SetBehaviour(PlayerController playerController, PhysicsController physicsController, AnimationsController animationsController)
     {
         _playerController = playerController;
         _physicsController = physicsController;

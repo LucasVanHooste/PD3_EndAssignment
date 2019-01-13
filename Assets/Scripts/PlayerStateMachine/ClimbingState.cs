@@ -3,12 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ClimbingState : PlayerState
+public class ClimbingState : BasePlayerState
 {
     private Transform _playerTransform;
     private PhysicsController _physicsController;
     private PlayerController _playerController;
-    private PlayerAnimationsController _animationsController;
+    private AnimationsController _animationsController;
 
     private GameObject _ladder;
     private LadderScript _ladderScript;
@@ -16,7 +16,7 @@ public class ClimbingState : PlayerState
     private float _ladderPaddingDistance = 0.15f;
     private Coroutine _rotateToLadder, _moveToLadder;
 
-    public ClimbingState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, PlayerAnimationsController animationsController, GameObject ladder)
+    public ClimbingState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, AnimationsController animationsController, GameObject ladder)
     {
         _playerTransform = playerTransform;
         _physicsController = physicsController;

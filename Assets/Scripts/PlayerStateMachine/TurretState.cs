@@ -3,12 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TurretState : PlayerState
+public class TurretState : BasePlayerState
 {
     private Transform _playerTransform;
     private PhysicsController _physicsController;
     private PlayerController _playerController;
-    private PlayerAnimationsController _animationsController;
+    private AnimationsController _animationsController;
 
     private GameObject _object;
     private CameraController _cameraController;
@@ -23,7 +23,7 @@ public class TurretState : PlayerState
 
     float _turretPaddingDistance = 0.15f;
 
-    public TurretState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, PlayerAnimationsController animationsController, GameObject turret,
+    public TurretState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, AnimationsController animationsController, GameObject turret,
         CameraController cameraController, GameObject crossHair)
     {
         _playerTransform = playerTransform;

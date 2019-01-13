@@ -3,12 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GunState : PlayerState
+public class GunState : BasePlayerState
 {
     private Transform _playerTransform;
     private PhysicsController _physicsController;
     private PlayerController _playerController;
-    private PlayerAnimationsController _animationsController;
+    private AnimationsController _animationsController;
     private List<Collider> _triggers;
     private GameObject _object;
     private CameraController _cameraController;
@@ -25,7 +25,7 @@ public class GunState : PlayerState
     private float _dropGunTimer=0;
     private float _punchCoolDownTimer = 0;
 
-    public GunState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, PlayerAnimationsController animationsController, GameObject gun, 
+    public GunState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, AnimationsController animationsController, GameObject gun, 
         CameraController cameraController, Transform holsterGun1Hand, Transform holsterGun2Hands, GameObject crossHair)
     {
         _playerTransform = playerTransform;

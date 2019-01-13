@@ -6,19 +6,18 @@ using UnityEngine.AI;
 
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(NavMeshAgentController))]
-public class MeleeEnemyBehaviour : MonoBehaviour
+public class EnemyBehaviour : MonoBehaviour
 {
 
     private INode _behaviourTree;
     private Transform _transform;
     private NavMeshAgentController _navMeshAgentController;
-    private MeleeEnemyBehaviour _meleeEnemyBehaviour;
+    private EnemyBehaviour _meleeEnemyBehaviour;
     private Animator _animator;
-    private EnemyAnimationsController _animationsController;
+    private AnimationsController _animationsController;
     private Transform _playerTransform;
     private PlayerController _playerController;
 
-    [SerializeField] private LayerMask _mapLayerMask;
     [SerializeField] private float FOV;
     [SerializeField] private LayerMask _canSeePlayerLayerMask;
     [SerializeField] private float _minDistanceFromPlayer;
@@ -56,15 +55,14 @@ public class MeleeEnemyBehaviour : MonoBehaviour
         }
     }
 
-
     void Start()
     {
         _health = _maxHealth;
         _transform = transform;
         _navMeshAgentController = GetComponent<NavMeshAgentController>();
-        _meleeEnemyBehaviour = GetComponent<MeleeEnemyBehaviour>();
+        _meleeEnemyBehaviour = GetComponent<EnemyBehaviour>();
         _animator = GetComponent<Animator>();
-        _animationsController = new EnemyAnimationsController(_transform, _meleeEnemyBehaviour, _animator, _navMeshAgentController);
+        _animationsController = new AnimationsController(_animator, _navMeshAgentController);
         _animationsController.HoldGunIK.Player = _transform;
         _animationsController.LookAtIK.LookAtPosition = _lookAtPosition;
         _playerTransform = _navMeshAgentController.PlayerTransform;
@@ -180,10 +178,10 @@ new SelectorNode(
     private IEnumerator<NodeResult> LookForPlayer()
     {
         Debug.Log("LookForPlayer");
-        if (!_navMeshAgentController.UpdateTransformToNavmesh)
+        if (!_navMeshAgentController.UpdateNavmesh)
         {
             _navMeshAgentController.Warp(_transform.position);
-            _navMeshAgentController.UpdateTransformToNavmesh = true;
+            _navMeshAgentController.UpdateNavmesh = true;
 
         }
 
@@ -197,27 +195,30 @@ new SelectorNode(
 
     private IEnumerator<NodeResult> SetPlayerPositionAsTarget()
     {
-        if (Vector3.Scale(_playerTransform.position - _transform.position, new Vector3(1, 0, 1)).magnitude > _minDistanceFromPlayer)
+        if (_playerController.Health > 0)
         {
-            //_navMeshAgent.isStopped = false;
-            _navMeshAgentController.Run();
-
-            if (!_navMeshAgentController.UpdateTransformToNavmesh)
+            if (Vector3.Scale(_playerTransform.position - _transform.position, new Vector3(1, 0, 1)).magnitude > _minDistanceFromPlayer)
             {
-                _navMeshAgentController.Warp(_transform.position);
-                _navMeshAgentController.UpdateTransformToNavmesh = true;
+                //_navMeshAgent.isStopped = false;
+                _navMeshAgentController.Run();
+
+                if (!_navMeshAgentController.UpdateNavmesh)
+                {
+                    _navMeshAgentController.Warp(_transform.position);
+                    _navMeshAgentController.UpdateNavmesh = true;
+                }
             }
-        }
-        else
-        {
-            _navMeshAgentController.UpdateTransformToNavmesh = false;
-            _navMeshAgentController.RotateToPlayer();
+            else
+            {
+                _navMeshAgentController.UpdateNavmesh = false;
+                _navMeshAgentController.RotateToPlayer();
 
-            //_navMeshAgent.SetDestination(_playerTransform.position);
-            //_navMeshAgent.updatePosition = false;
-        }
+                //_navMeshAgent.SetDestination(_playerTransform.position);
+                //_navMeshAgent.updatePosition = false;
+            }
 
-        _navMeshAgentController.SetDestination(_playerTransform.position);
+            _navMeshAgentController.SetDestination(_playerTransform.position);
+        }
 
         Debug.Log("SetPlayerposAsTarget");
         yield return NodeResult.Succes;
@@ -229,7 +230,7 @@ new SelectorNode(
         {
             if (_playerController.Health > 0)
             {
-                _playerController.TakePunch(_punchDamage);
+                _playerController.TakePunch(_punchDamage, _transform.position);
                 Debug.Log("punch");
                 _punchCoolDownTimer = 0;
                 _animationsController.Punch();
@@ -244,11 +245,14 @@ new SelectorNode(
     {
         if (!_navMeshAgentController.IsOnOffMeshLink())
         {
-            _navMeshAgentController.UpdateTransformToNavmesh = false;
+            _navMeshAgentController.UpdateNavmesh = false;
             _navMeshAgentController.RotateToPlayer();
 
-            _aimGun=true;
-            _fireGun = true;
+            if (_playerController.Health > 0)
+            {
+                _aimGun = true;
+                _fireGun = true;
+            }
         }
 
         Debug.Log("Fire gun");
@@ -354,52 +358,54 @@ new SelectorNode(
         _gunScript.EnemyFireGun(fire, _anchorPoint.position, (_playerTransform.position+randomPosition)-_transform.position);
     }
 
-    private void TakeDamage(int damage)
+    private void TakeDamage(int damage, Vector3 originOfDamage)
     {
         _health -= damage;
         _animationsController.TakeDamage();
         //_animationsController.SetHealth(_health);
-        Die();
+        Die(originOfDamage);
     }
 
-    public void TakePunch(int damage)
+    public void TakePunch(int damage, Vector3 originOfDamage)
     {
         _hasBeenAttacked = true;
-        TakeDamage(damage);
+        TakeDamage(damage, originOfDamage);
     }
 
-    public void GetShot(int damage)
+    public void GetShot(int damage, Vector3 originOfDamage)
     {
         _hasBeenAttacked = true;
-        TakeDamage(damage);
+        TakeDamage(damage, originOfDamage);
     }
 
-    private void Die()
+    private void Die(Vector3 originOfDamage)
     {
         if (_health > 0) return;
-        GameObject.Destroy(gameObject);
-        //_state.Die();
-        //ToDeadState();
+        //GameObject.Destroy(gameObject);
+
+        Vector3 transformedOrigin = GetTransformedOrigin(originOfDamage);
+
+        _animationsController.Die(transformedOrigin.x, transformedOrigin.z);
+        _navMeshAgentController.Stop(true);
+        gameObject.layer = LayerMask.NameToLayer("NoCollisionWithPlayer");
     }
 
-    public float GetDistanceFromGround()
+    private Vector3 GetTransformedOrigin(Vector3 origin)
     {
-        RaycastHit hit;
-        if (Physics.Raycast(_transform.position + new Vector3(0, 1f, 0), Vector3.down, out hit, 1000, _mapLayerMask))
+        Vector3 transformedOrigin = _transform.InverseTransformPoint(origin);
+
+        if (Mathf.Abs(transformedOrigin.x) > Mathf.Abs(transformedOrigin.z))
         {
-            //print("I'm looking at " + hit.transform.name);
-            return (hit.point - _transform.position).magnitude;
+            transformedOrigin.x = transformedOrigin.x / Mathf.Abs(transformedOrigin.x);
+            transformedOrigin.z = 0;
         }
-        //print("I'm looking at nothing!");
-        return 1000;
-    }
+        else
+        {
+            transformedOrigin.z = transformedOrigin.z / Mathf.Abs(transformedOrigin.z);
+            transformedOrigin.x = 0;
+        }
 
-    public bool IsGrounded()
-    {
-        if (GetDistanceFromGround() > .1f)
-            return false;
-
-        return true;
+        return transformedOrigin;
     }
 
     public void ToDeadState()

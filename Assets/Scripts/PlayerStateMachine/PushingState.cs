@@ -3,12 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PushingState : PlayerState
+public class PushingState : BasePlayerState
 {
     private Transform _playerTransform;
     private PhysicsController _physicsController;
     private PlayerController _playerController;
-    private PlayerAnimationsController _animationsController;
+    private AnimationsController _animationsController;
 
     private List<Collider> _triggers;
     private GameObject _obstacle;
@@ -21,7 +21,7 @@ public class PushingState : PlayerState
     bool _hasHitObstacle = false;
     private Vector3 _pushStartPosition;
 
-    public PushingState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, PlayerAnimationsController animationsController, 
+    public PushingState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, AnimationsController animationsController, 
         GameObject obstacle, Transform obstacleIKLeftHand, Transform obstacleIKRightHand)
     {
         _playerTransform = playerTransform;

@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerAnimationsController {
+public class AnimationsController {
 
     public readonly HoldGunStateBehaviour HoldGunIK;
     public readonly LookAtStateBehaviour LookAtIK;
@@ -15,35 +14,37 @@ public class PlayerAnimationsController {
 
     private Animator _animator;
     private PhysicsController _physicsController;
+    private NavMeshAgentController _navMeshAgentController;
 
     private int _zMovementAnimationParameter = Animator.StringToHash("ZMovement");
     private int _xMovementAnimationParameter = Animator.StringToHash("XMovement");
 
     private int _isGroundedAnimationParameter = Animator.StringToHash("IsGrounded");
-    //private int _jumpingAnimationParameter = Animator.StringToHash("JumpingTrigger");
+    private int _distanceFromGroundParameter = Animator.StringToHash("DistanceFromGround");
 
     private int _horizontalRotationAnimationParameter = Animator.StringToHash("HorizontalRotation");
     private int _verticalVelocityAnimationParameter = Animator.StringToHash("VerticalVelocity");
-    //private int _timeInAirAnimationParameter = Animator.StringToHash("TimeInAir");
+
     private int _pushingAnimationParameter = Animator.StringToHash("Pushing");
     private int _pickingUpGunParameter = Animator.StringToHash("PickingUpGun");
+
     private int _punchParameter = Animator.StringToHash("Punch");
     private int _isAimingGunParameter = Animator.StringToHash("IsAiming");
     private int _isTwoHandedGunParameter = Animator.StringToHash("IsTwoHandedGun");
-    private int _distanceFromGroundParameter = Animator.StringToHash("DistanceFromGround");
+
     private int _climbingAnimationParameter = Animator.StringToHash("Climbing");
     private int _climbTopAnimationParameter = Animator.StringToHash("ClimbTopLadder");
 
     private int _takeDamageAnimationParameter = Animator.StringToHash("TakeDamage");
-    private int _playerHealthParameter = Animator.StringToHash("Health");
-
+    private int _hitOriginXParameter = Animator.StringToHash("HitOriginX");
+    private int _hitOriginZParameter = Animator.StringToHash("HitOriginZ");
+    private int _deathParameter = Animator.StringToHash("Die");
 
     private int _resetParameter = Animator.StringToHash("Reset");
 
-    public PlayerAnimationsController(Animator animator, PhysicsController physicsController)
+    private AnimationsController(Animator animator)
     {
         _animator = animator;
-        _physicsController = physicsController;
 
         HoldGunIK = _animator.GetBehaviour<HoldGunStateBehaviour>();
         LookAtIK = _animator.GetBehaviour<LookAtStateBehaviour>();
@@ -52,20 +53,39 @@ public class PlayerAnimationsController {
         ClimbTopLadderPart1IK = _animator.GetBehaviour<ClimbTopLadderPart1StateBehaviour>();
         ObstacleIK = _animator.GetBehaviour<PushObstacleStateBehaviour>();
         TurretIK = _animator.GetBehaviour<HoldTurretStateBehaviour>();
+    }
 
+    public AnimationsController(Animator animator, NavMeshAgentController navMeshAgentController) : this(animator)
+    {       
+        _navMeshAgentController = navMeshAgentController;
+    }
+    public AnimationsController(Animator animator, PhysicsController physicsController) : this(animator)
+    {
+        _physicsController = physicsController;
     }
 
     public void Update()
     {
-        _animator.SetFloat(_zMovementAnimationParameter, _physicsController.Movement.z);
-        _animator.SetFloat(_xMovementAnimationParameter, _physicsController.Movement.x);
-        _animator.SetBool(_isGroundedAnimationParameter, _physicsController.IsGrounded());
-        //_animator.SetBool(_jumpingAnimationParameter, _physicsController.Jumping);
-        _animator.SetFloat(_horizontalRotationAnimationParameter, _physicsController.Aim.x);
-        _animator.SetFloat(_verticalVelocityAnimationParameter, _physicsController.GetVelocity().y);
+        if (_physicsController != null)
+        {
+            _animator.SetFloat(_zMovementAnimationParameter, _physicsController.Movement.z);
+            _animator.SetFloat(_xMovementAnimationParameter, _physicsController.Movement.x);
+            _animator.SetFloat(_horizontalRotationAnimationParameter, _physicsController.Aim.x);
 
-        //_animator.SetFloat(_timeInAirAnimationParameter, _physicsController.GetTimeInAir());
-        _animator.SetFloat(_distanceFromGroundParameter, _physicsController.GetDistanceFromGround());
+            _animator.SetBool(_isGroundedAnimationParameter, _physicsController.IsGrounded());
+            _animator.SetFloat(_distanceFromGroundParameter, _physicsController.GetDistanceFromGround());
+            _animator.SetFloat(_verticalVelocityAnimationParameter, _physicsController.GetVelocity().y);
+        }
+        if (_navMeshAgentController != null)
+        {
+            _animator.SetFloat(_zMovementAnimationParameter, _navMeshAgentController.RelativeVelocity.z);
+            _animator.SetFloat(_xMovementAnimationParameter, _navMeshAgentController.RelativeVelocity.x);
+            _animator.SetFloat(_horizontalRotationAnimationParameter, _navMeshAgentController.RotationSpeed);
+
+            //_animator.SetFloat(_verticalVelocityAnimationParameter, _enemyBehaviour.RelativeVelocity.y);
+            _animator.SetBool(_isGroundedAnimationParameter, _navMeshAgentController.IsGrounded());
+            _animator.SetFloat(_distanceFromGroundParameter, _navMeshAgentController.DistanceFromGround);
+        }
     }
 
     public void Push(bool push)
@@ -80,7 +100,7 @@ public class PlayerAnimationsController {
 
     public void AimGun(bool aimGun)
     {
-        HoldGunIK.IsAiming=aimGun;
+        HoldGunIK.IsAiming = aimGun;
         _animator.SetBool(_isAimingGunParameter, aimGun);
     }
 
@@ -99,6 +119,16 @@ public class PlayerAnimationsController {
         _animator.SetTrigger(_takeDamageAnimationParameter);
     }
 
+    public void Die(float localXCoordinate, float localZCoordinate)
+    {
+        Debug.Log("DieX: " + localXCoordinate);
+        Debug.Log("DieZ: " + localZCoordinate);
+
+        _animator.SetFloat(_hitOriginXParameter, localXCoordinate);
+        _animator.SetFloat(_hitOriginZParameter, localZCoordinate);
+        _animator.SetTrigger(_deathParameter);
+    }
+
     public void Climb(bool climb)
     {
         _animator.SetBool(_climbingAnimationParameter, climb);
@@ -106,11 +136,6 @@ public class PlayerAnimationsController {
     public void ClimbTopLadder()
     {
         _animator.SetTrigger(_climbTopAnimationParameter);
-    }
-
-    public void SetHealth(int health)
-    {
-        _animator.SetInteger(_playerHealthParameter,health);
     }
 
     public void SetLayerWeight(int layerIndex, float weight)
@@ -130,7 +155,7 @@ public class PlayerAnimationsController {
         //_animator.SetBool(_jumpingAnimationParameter, true);
         //_animator.SetBool(_pushingAnimationParameter, false);
         //_animator.SetBool(_pickingUpGunParameter, false);
-        _animator.SetBool(_punchParameter, false);
+        //_animator.SetBool(_punchParameter, false);
         _animator.SetBool(_isAimingGunParameter, false);
         _animator.SetTrigger(_resetParameter);
     }

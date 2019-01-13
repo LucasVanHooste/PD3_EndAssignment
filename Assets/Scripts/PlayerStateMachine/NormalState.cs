@@ -3,18 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NormalState : PlayerState
+public class NormalState : BasePlayerState
 {
     private Transform _playerTransform;
     private PhysicsController _physicsController;
     private PlayerController _playerController;
-    private PlayerAnimationsController _animationsController;
+    private AnimationsController _animationsController;
     private List<Collider> _triggers;
     private GameObject _object;
 
     private float _punchCoolDownTimer = 0;
 
-    public NormalState(Transform playerTransform, PhysicsController physicsController,PlayerController playerController, PlayerAnimationsController animationsController)
+    public NormalState(Transform playerTransform, PhysicsController physicsController,PlayerController playerController, AnimationsController animationsController)
     {
         _playerTransform = playerTransform;
         _physicsController = physicsController;
@@ -154,8 +154,8 @@ public class NormalState : PlayerState
         {
             if (hit.transform.gameObject.layer == 16)
             {
-                if (hit.transform.GetComponent<MeleeEnemyBehaviour>())
-                    hit.transform.GetComponent<MeleeEnemyBehaviour>().TakePunch(_playerController.PunchDamage);
+                if (hit.transform.GetComponent<EnemyBehaviour>())
+                    hit.transform.GetComponent<EnemyBehaviour>().TakePunch(_playerController.PunchDamage, _playerTransform.position);
             }
         }
     }

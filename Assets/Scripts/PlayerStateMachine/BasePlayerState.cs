@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class PlayerState : IState
+public abstract class BasePlayerState : IState
 {
     public virtual void Die()
     {

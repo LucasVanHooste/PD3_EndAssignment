@@ -60,7 +60,7 @@ public class PlayerController : MonoBehaviour {
     private Animator _animator;
     private PlayerController _playerController;
     private IState _state;
-    private PlayerAnimationsController _animationsController;
+    private AnimationsController _animationsController;
     private CameraController _cameraController;
 
     //private GameObject _gun;
@@ -76,7 +76,7 @@ public class PlayerController : MonoBehaviour {
         _physicsController = GetComponent<PhysicsController>();
         _animator = GetComponent<Animator>();
         _playerController = GetComponent<PlayerController>();
-        _animationsController = new PlayerAnimationsController(_animator, _physicsController);
+        _animationsController = new AnimationsController(_animator, _physicsController);
 
         _animationsController.HoldGunIK.Player=_transform;
         _animationsController.LookAtIK.LookAtPosition=_lookAtTransform;
@@ -169,37 +169,63 @@ public class PlayerController : MonoBehaviour {
     //    _state.DropGun();
     //}
 
-    private void TakeDamage(int damage)
+    private void TakeDamage(int damage, Vector3 originOfDamage)
     {
         _health -= damage;
         _animationsController.TakeDamage();
-        _animationsController.SetHealth(_health);
+
+        Die(originOfDamage);
     }
 
-    public void TakePunch(int damage)
+    public void TakePunch(int damage, Vector3 originOfDamage)
     {
         if (_health <= 0) return;
-        TakeDamage(damage);       
-
-        Die();
+        TakeDamage(damage, originOfDamage);       
     }
 
-    public void GetShot(int damage)
+    public void GetShot(int damage, Vector3 originOfDamage)
     {
         if (_health <= 0) return;
-
-        TakeDamage(damage);
-
-        Die();
+        TakeDamage(damage, originOfDamage);
     }
 
-    private void Die()
+    private void Die(Vector3 originOfDamage)
     {
         if (_health > 0) return;
+
+        Vector3 transformedOrigin = GetTransformedOrigin(originOfDamage);
+
+        _animationsController.Die(transformedOrigin.x, transformedOrigin.z);
 
         _state.Die();
         ToDeadState();
     }
+
+    private Vector3 GetTransformedOrigin(Vector3 origin)
+    {
+        Vector3 transformedOrigin = _transform.InverseTransformPoint(origin);
+
+        if (Mathf.Abs(transformedOrigin.x) > Mathf.Abs(transformedOrigin.z))
+        {
+            transformedOrigin.x = transformedOrigin.x / Mathf.Abs(transformedOrigin.x);
+            transformedOrigin.z = 0;
+        }
+        else
+        {
+            transformedOrigin.z = transformedOrigin.z / Mathf.Abs(transformedOrigin.z);
+            transformedOrigin.x = 0;
+        }
+
+        return transformedOrigin;
+    }
+
+    //private bool IsOriginInFrontOfPlayer(Vector3 originOfDamage)
+    //{
+    //    if (_transform.InverseTransformPoint(originOfDamage).z < 0)
+    //        return false;
+
+    //    return true;
+    //}
 
     public void Respawn()
     {

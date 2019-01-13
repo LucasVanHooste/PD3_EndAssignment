@@ -174,8 +174,8 @@ public class GunScript : MonoBehaviour {
             print("I'm looking at " + hit.transform.name);
             if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Enemy"))
             {
-                if (hit.transform.GetComponent<MeleeEnemyBehaviour>())
-                    hit.transform.GetComponent<MeleeEnemyBehaviour>().GetShot(_bulletDamage);
+                if (hit.transform.GetComponent<EnemyBehaviour>())
+                    hit.transform.GetComponent<EnemyBehaviour>().GetShot(_bulletDamage,hit.point);
             }
 
         }
@@ -195,7 +195,7 @@ public class GunScript : MonoBehaviour {
             if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Player"))
             {
                 if (hit.transform.GetComponent<PlayerController>())
-                    hit.transform.GetComponent<PlayerController>().GetShot(_bulletDamage);
+                    hit.transform.GetComponent<PlayerController>().GetShot(_bulletDamage, hit.point);
             }
 
         }

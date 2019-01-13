@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DeadState : PlayerState
+public class DeadState : BasePlayerState
 {
     private PhysicsController _physicsController;
     private PlayerController _playerController;
@@ -23,7 +23,7 @@ public class DeadState : PlayerState
         _physicsController.Aim = Vector3.zero;
         _physicsController.Movement = Vector3.zero;
 
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(4);
         _playerController.Respawn();
     }
 

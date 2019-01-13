@@ -94,10 +94,10 @@ public class TurretScript : MonoBehaviour {
         if (Physics.Raycast(_centreScreenRay, out hit, 1000, _bulletLayermask))
         {
             print("I'm looking at " + hit.transform.name);
-            if (hit.transform.gameObject.layer == 16)
+            if (hit.transform.gameObject.layer == LayerMask.NameToLayer("Enemy"))
             {
-                if (hit.transform.GetComponent<MeleeEnemyBehaviour>())
-                    hit.transform.GetComponent<MeleeEnemyBehaviour>().GetShot(_bulletDamage);
+                if (hit.transform.GetComponent<EnemyBehaviour>())
+                    hit.transform.GetComponent<EnemyBehaviour>().GetShot(_bulletDamage,_verticalAnchorTransform.position);
 
                 //other enemies
             }

@@ -35,7 +35,7 @@ override public void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, i
         if (_leftHandIK==null || _rightHandIK==null) return;
 
         _iKWeight += Time.deltaTime * 1.5f;
-
+        
         animator.SetIKPosition(AvatarIKGoal.RightHand, _rightHandIK.position);
             animator.SetIKRotation(AvatarIKGoal.RightHand, _rightHandIK.rotation);
 

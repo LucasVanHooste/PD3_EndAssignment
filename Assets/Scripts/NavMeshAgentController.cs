@@ -18,6 +18,16 @@ public class NavMeshAgentController : MonoBehaviour {
     private Vector3 _previousForward;
     private Vector3 _previousPlayerPosition;
 
+    [SerializeField] private LayerMask _mapLayerMask;
+    private float _distanceFromGround = 0;
+    public float DistanceFromGround
+    {
+        get
+        {
+            return _distanceFromGround;
+        }
+    }
+
     private Vector3 _relativeVelocity;
     public Vector3 RelativeVelocity
     {
@@ -37,7 +47,7 @@ public class NavMeshAgentController : MonoBehaviour {
     }
 
     private bool _updateTransformToNavmesh=true;
-    public bool UpdateTransformToNavmesh
+    public bool UpdateNavmesh
     {
         get
         {
@@ -64,8 +74,29 @@ public class NavMeshAgentController : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
+        _distanceFromGround = GetDistanceFromGround();
         _relativeVelocity = GetScaledRelativeVelocity();
         _rotationSpeed = GetScaledRotationSpeed();
+    }
+
+    private float GetDistanceFromGround()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(_transform.position + new Vector3(0, 1f, 0), Vector3.down, out hit, 100, _mapLayerMask))
+        {
+            //print("I'm looking at " + hit.transform.name);
+            return (hit.point - _transform.position).magnitude;
+        }
+        //print("I'm looking at nothing!");
+        return 100;
+    }
+
+    public bool IsGrounded()
+    {
+        if (_distanceFromGround > .1f)
+            return false;
+
+        return true;
     }
 
     public void Walk()
@@ -102,7 +133,7 @@ public class NavMeshAgentController : MonoBehaviour {
     {
         float angle = Vector3.SignedAngle(_previousForward, _transform.forward, Vector3.up);
 
-        if (!UpdateTransformToNavmesh)
+        if (!UpdateNavmesh)
         {
             if (angle == 0)
             {
@@ -148,6 +179,11 @@ public class NavMeshAgentController : MonoBehaviour {
     public bool IsOnOffMeshLink()
     {
         return _navMeshAgent.isOnOffMeshLink;
+    }
+
+    public void Stop(bool stop)
+    {
+        _navMeshAgent.isStopped = stop;
     }
 
     public Vector3 RandomNavSphere(Vector3 origin, float range, int layermask)

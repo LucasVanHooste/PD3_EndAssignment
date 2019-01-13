@@ -11227,7 +11227,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 4010126182098336, guid: ac5eae4ee151913489c82c210b1f2983, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 41
+      value: 38
       objectReference: {fileID: 0}
     - target: {fileID: 4010126182098336, guid: ac5eae4ee151913489c82c210b1f2983, type: 2}
       propertyPath: m_LocalPosition.y
@@ -11235,7 +11235,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4010126182098336, guid: ac5eae4ee151913489c82c210b1f2983, type: 2}
       propertyPath: m_LocalPosition.z
-      value: 12
+      value: -10
       objectReference: {fileID: 0}
     - target: {fileID: 4010126182098336, guid: ac5eae4ee151913489c82c210b1f2983, type: 2}
       propertyPath: m_LocalRotation.x
@@ -11310,7 +11310,7 @@ Prefab:
     - target: {fileID: 114751527524649496, guid: ac5eae4ee151913489c82c210b1f2983,
         type: 2}
       propertyPath: _punchDamage
-      value: 50
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 114552990448111940, guid: ac5eae4ee151913489c82c210b1f2983,
         type: 2}
@@ -12115,11 +12115,6 @@ Mesh:
   m_MeshMetrics[0]: 1
   m_MeshMetrics[1]: 1
   m_MeshOptimized: 0
---- !u!4 &598437835 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4029506120772300, guid: 11f5d171bc8c1b540b2b85535973a672,
-    type: 2}
-  m_PrefabInternal: {fileID: 2044325759}
 --- !u!1001 &621385904
 Prefab:
   m_ObjectHideFlags: 0
@@ -31446,12 +31441,21 @@ Prefab:
         type: 2}
       propertyPath: _gun
       value: 
-      objectReference: {fileID: 598437835}
+      objectReference: {fileID: 0}
     - target: {fileID: 114229926324148474, guid: 60242953f32507344b2e6dfed2177a6c,
         type: 2}
       propertyPath: PlayerTransform
       value: 
       objectReference: {fileID: 1139603844}
+    - target: {fileID: 1585486145818626, guid: 60242953f32507344b2e6dfed2177a6c, type: 2}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114229926324148474, guid: 60242953f32507344b2e6dfed2177a6c,
+        type: 2}
+      propertyPath: _mapLayerMask.m_Bits
+      value: 1537
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 60242953f32507344b2e6dfed2177a6c, type: 2}
   m_IsPrefabAsset: 0
