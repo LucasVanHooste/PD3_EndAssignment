@@ -82,7 +82,7 @@ public class AnimationsController {
             _animator.SetFloat(_xMovementAnimationParameter, _navMeshAgentController.RelativeVelocity.x);
             _animator.SetFloat(_horizontalRotationAnimationParameter, _navMeshAgentController.RotationSpeed);
 
-            //_animator.SetFloat(_verticalVelocityAnimationParameter, _enemyBehaviour.RelativeVelocity.y);
+            _animator.SetFloat(_verticalVelocityAnimationParameter, _navMeshAgentController.RelativeVelocity.y);
             _animator.SetBool(_isGroundedAnimationParameter, _navMeshAgentController.IsGrounded());
             _animator.SetFloat(_distanceFromGroundParameter, _navMeshAgentController.DistanceFromGround);
         }

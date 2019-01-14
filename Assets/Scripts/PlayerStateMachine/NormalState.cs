@@ -65,7 +65,7 @@ public class NormalState : BasePlayerState
     {
         Debug.Log(_triggers.Count);
 
-        if (_triggers.Count == 0) return;
+        if (_triggers.Count <= 0) return;
 
         _object = GetClosestTriggerObject();
 

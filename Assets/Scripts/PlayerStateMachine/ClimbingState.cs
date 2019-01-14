@@ -14,7 +14,7 @@ public class ClimbingState : BasePlayerState
     private LadderScript _ladderScript;
 
     private float _ladderPaddingDistance = 0.15f;
-    private Coroutine _rotateToLadder, _moveToLadder;
+    private Coroutine _climbLadder;
 
     public ClimbingState(Transform playerTransform, PhysicsController physicsController, PlayerController playerController, AnimationsController animationsController, GameObject ladder)
     {
@@ -26,8 +26,8 @@ public class ClimbingState : BasePlayerState
         _ladderScript = _ladder.GetComponent<LadderScript>();
 
         _animationsController.ClimbBottomLadderIK.LadderIKHands = _ladderScript.BottomLadderIKHands;
+        _animationsController.ClimbTopLadderPart1IK.Ladderscript = _ladderScript;
         _animationsController.ClimbTopLadderPart2IK.SetBehaviour(_playerController, _physicsController, _animationsController);
-        _animationsController.ClimbTopLadderPart1IK.Ladderscript=_ladderScript;
 
         Climb();
     }
@@ -39,10 +39,13 @@ public class ClimbingState : BasePlayerState
 
     private void Climb()
     {
+        if (_ladderScript.IsPersonClimbing) return;
+
         _physicsController.Aim = Vector3.zero;
         _physicsController.StopMoving();
 
-        _rotateToLadder= _playerController.StartCoroutine(RotateToLadder());
+        _ladderScript.IsPersonClimbing = true;
+        _climbLadder= _playerController.StartCoroutine(RotateToLadder());
 
 
         //_animationsController.ApplyRootMotion(true);
@@ -71,7 +74,7 @@ public class ClimbingState : BasePlayerState
 
         Debug.Log("finish rotation");
         _physicsController.Aim = Vector3.zero;
-        _moveToLadder= _playerController.StartCoroutine(MoveToLadder());
+        _climbLadder= _playerController.StartCoroutine(MoveToLadder());
     }
 
     private IEnumerator MoveToLadder()
@@ -99,9 +102,9 @@ public class ClimbingState : BasePlayerState
 
     public override void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.tag == "Ladder" && !_physicsController.IsGrounded())
+        if (_playerController.Health>0 && other.gameObject.tag == "Ladder" && !_physicsController.IsGrounded())
         {
-            _playerTransform.gameObject.layer = 15;
+            _playerTransform.gameObject.layer = LayerMask.NameToLayer("NoCollisions");
 
             _animationsController.ClimbTopLadder();
         }
@@ -109,14 +112,13 @@ public class ClimbingState : BasePlayerState
 
     public override void Die()
     {
-        if(_rotateToLadder!=null)
-        _playerController.StopCoroutine(_rotateToLadder);
-        if(_moveToLadder!=null)
-        _playerController.StopCoroutine(_moveToLadder);
+        if(_climbLadder!=null)
+        _playerController.StopCoroutine(_climbLadder);
 
+        _ladderScript.IsPersonClimbing = false;
         _physicsController.HasGravity(true);
         _animationsController.Climb(false);
         _animationsController.ApplyRootMotion(false);
-        _playerController.gameObject.layer = 9;
+        _playerController.gameObject.layer = LayerMask.NameToLayer("Player");
     }
 }

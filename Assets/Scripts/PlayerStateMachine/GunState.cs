@@ -95,7 +95,7 @@ public class GunState : BasePlayerState
         {
             if (_punchCoolDownTimer >= _playerController.PunchCoolDown)
             {
-                _animationsController.Punch();
+                Punch();
                 _punchCoolDownTimer = 0;
             }
 
@@ -133,7 +133,7 @@ public class GunState : BasePlayerState
     {
         Debug.Log(_triggers.Count);
 
-        if (_triggers.Count == 0) return;
+        if (_triggers.Count <= 0) return;
 
         _object = GetClosestTriggerObject();
 
@@ -150,6 +150,20 @@ public class GunState : BasePlayerState
                     _gun = _object;
                 }
                 break;
+        }
+    }
+
+    private void Punch()
+    {
+        _animationsController.Punch();
+        RaycastHit hit;
+        if (Physics.Raycast(_playerTransform.position + new Vector3(0, 1.5f, 0), _playerTransform.forward, out hit, _playerController.PunchRange))
+        {
+            if (hit.transform.gameObject.layer == 16)
+            {
+                if (hit.transform.GetComponent<EnemyBehaviour>())
+                    hit.transform.GetComponent<EnemyBehaviour>().TakePunch(_playerController.PunchDamage, _playerTransform.position);
+            }
         }
     }
 

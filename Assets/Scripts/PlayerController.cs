@@ -9,9 +9,23 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour {
 
     [SerializeField] private CinematicBehaviour _cinematicBehaviour;
-    public Transform LeftHand;
-    public Transform RightHand;
-    public Transform CameraRoot;
+    [SerializeField] private Transform _leftHand;
+    [SerializeField] private Transform _rightHand;
+    public Transform RightHand
+    {
+        get
+        {
+            return _rightHand;
+        }
+    }
+    [SerializeField ]private Transform _camRoot;
+    public Transform CameraRoot
+    {
+        get
+        {
+            return _camRoot;
+        }
+    }
     [SerializeField] private Transform _obstacleIKLeftHand;
     [SerializeField] private Transform _obstacleIKRightHand;
 
@@ -67,7 +81,18 @@ public class PlayerController : MonoBehaviour {
     private Vector3 _startPosition;
     private Quaternion _startRotation;
 
-    [HideInInspector] public List<Collider> Triggers = new List<Collider>();
+    private List<Collider> _triggers = new List<Collider>();
+    public List<Collider> Triggers
+    {
+        get
+        {
+            return _triggers;
+        }
+        set
+        {
+            _triggers = value;
+        }
+    }
 
     // Use this for initialization
     void Start () {
@@ -80,7 +105,7 @@ public class PlayerController : MonoBehaviour {
 
         _animationsController.HoldGunIK.Player=_transform;
         _animationsController.LookAtIK.LookAtPosition=_lookAtTransform;
-        _animationsController.ClimbBottomLadderIK.LeftHand = LeftHand;
+        _animationsController.ClimbBottomLadderIK.LeftHand = _leftHand;
         _animationsController.ClimbBottomLadderIK.RightHand = RightHand;
 
         _cameraController = GetComponent<CameraController>();

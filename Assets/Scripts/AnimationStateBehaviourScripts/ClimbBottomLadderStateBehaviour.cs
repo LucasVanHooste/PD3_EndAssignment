@@ -63,7 +63,6 @@ public class ClimbBottomLadderStateBehaviour : StateMachineBehaviour {
         _IKWeightLeftHand = animator.GetFloat("LadderIKWeightLeftHand");
 
         GetClosestIKToHand(_leftHand);
-        Debug.Log(_closestIKToHand.name);
         animator.SetIKPosition(AvatarIKGoal.LeftHand, _closestIKToHand.position);
         animator.SetIKRotation(AvatarIKGoal.LeftHand, _closestIKToHand.rotation);
 
@@ -71,7 +70,6 @@ public class ClimbBottomLadderStateBehaviour : StateMachineBehaviour {
         animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, _IKWeightLeftHand);
 
         GetClosestIKToHand(_rightHand);
-        Debug.Log(_closestIKToHand.name);
         animator.SetIKPosition(AvatarIKGoal.RightHand, _closestIKToHand.position);
         animator.SetIKRotation(AvatarIKGoal.RightHand, _closestIKToHand.rotation);
 

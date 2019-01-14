@@ -7,12 +7,18 @@ public class ClimbTopLadderPart2StateBehaviour : StateMachineBehaviour {
     private PhysicsController _physicsController;
     private PlayerController _playerController;
     private AnimationsController _animationsController;
+    private EnemyBehaviour _enemyBehaviour;
+    private NavMeshAgentController _navMeshAgentController;
 
 
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
-    //override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-    //
-    //}
+    override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    {
+        if(_playerController!=null)
+        _playerController.gameObject.layer = LayerMask.NameToLayer("Player");
+        if(_navMeshAgentController!=null)
+            _navMeshAgentController.gameObject.layer = LayerMask.NameToLayer("Enemy");
+    }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
     //override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
@@ -22,11 +28,26 @@ public class ClimbTopLadderPart2StateBehaviour : StateMachineBehaviour {
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        _playerController.ToNormalState();
-        _physicsController.HasGravity(true);
-        _animationsController.Climb(false);
-        animator.applyRootMotion=false;
-        _playerController.gameObject.layer = 9;
+        if (_playerController != null)
+        {
+            _playerController.ToNormalState();
+            _physicsController.HasGravity(true);
+            _animationsController.Climb(false);
+            animator.applyRootMotion = false;
+            _playerController = null;
+        }
+
+        if (_navMeshAgentController != null)
+        {
+            _navMeshAgentController.RigidBody.isKinematic = true;
+            _navMeshAgentController.ResetRigidbodyConstraints();
+            _navMeshAgentController.UpdateTransformToNavmesh = true;
+            _navMeshAgentController.Warp(_navMeshAgentController.transform.position);
+            _animationsController.Climb(false);
+            animator.applyRootMotion = false;
+            _enemyBehaviour.IsInteracting = false;
+            _navMeshAgentController = null;
+        }
     }
 
     // OnStateMove is called right after Animator.OnAnimatorMove(). Code that processes and affects root motion should be implemented here
@@ -44,6 +65,13 @@ public class ClimbTopLadderPart2StateBehaviour : StateMachineBehaviour {
     {
         _playerController = playerController;
         _physicsController = physicsController;
+        _animationsController = animationsController;
+    }
+
+    public void SetBehaviour(EnemyBehaviour enemyBehaviour, NavMeshAgentController navMeshAgentController, AnimationsController animationsController)
+    {
+        _enemyBehaviour = enemyBehaviour;
+        _navMeshAgentController = navMeshAgentController;
         _animationsController = animationsController;
     }
 }

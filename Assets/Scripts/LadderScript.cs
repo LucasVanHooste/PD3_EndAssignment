@@ -11,4 +11,6 @@ public class LadderScript : MonoBehaviour {
     public Transform TopLadderRightHandIK2;
 
     public Transform[] BottomLadderIKHands;
+
+    public bool IsPersonClimbing { get; set; }
 }

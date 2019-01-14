@@ -4,9 +4,11 @@ using UnityEngine;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
+[RequireComponent(typeof(Rigidbody))]
 public class NavMeshAgentController : MonoBehaviour {
 
     private NavMeshAgent _navMeshAgent;
+    public Rigidbody RigidBody { get; set; }
     private Transform _transform;
     public Transform PlayerTransform;
     [SerializeField] private float _walkingSpeedMultiplier;
@@ -47,7 +49,7 @@ public class NavMeshAgentController : MonoBehaviour {
     }
 
     private bool _updateTransformToNavmesh=true;
-    public bool UpdateNavmesh
+    public bool UpdateTransformToNavmesh
     {
         get
         {
@@ -60,9 +62,14 @@ public class NavMeshAgentController : MonoBehaviour {
             _updateTransformToNavmesh = value;
         }
     }
+
+    [SerializeField] private IsGroundedCheckerScript _isGroundedChecker;
+    private RigidbodyConstraints _constraints;
     // Use this for initialization
     void Start () {
         _navMeshAgent = GetComponent<NavMeshAgent>();
+        RigidBody = GetComponent<Rigidbody>();
+        _constraints = RigidBody.constraints;
         _transform = transform;
 
         _normalSpeed = _navMeshAgent.speed;
@@ -84,7 +91,7 @@ public class NavMeshAgentController : MonoBehaviour {
         RaycastHit hit;
         if (Physics.Raycast(_transform.position + new Vector3(0, 1f, 0), Vector3.down, out hit, 100, _mapLayerMask))
         {
-            //print("I'm looking at " + hit.transform.name);
+            //print("I'm looking at " + hit.transform.name + (hit.point - _transform.position).magnitude);
             return (hit.point - _transform.position).magnitude;
         }
         //print("I'm looking at nothing!");
@@ -93,10 +100,12 @@ public class NavMeshAgentController : MonoBehaviour {
 
     public bool IsGrounded()
     {
-        if (_distanceFromGround > .1f)
-            return false;
+        //if (_distanceFromGround > .1f)
+        //    return false;
 
-        return true;
+        //return true;
+        Debug.Log("Is grounded: "+_isGroundedChecker.IsGrounded);
+        return _isGroundedChecker.IsGrounded;
     }
 
     public void Walk()
@@ -110,13 +119,20 @@ public class NavMeshAgentController : MonoBehaviour {
 
     private Vector3 GetScaledRelativeVelocity()
     {
-        if (!_navMeshAgent.updatePosition || _navMeshAgent.isStopped)
-            return Vector3.zero;
+        if (RigidBody.isKinematic)
+        {
+            if (!_navMeshAgent.updatePosition || _navMeshAgent.isStopped)
+                return Vector3.zero;
 
-        Vector3 relativeVelocity = _transform.InverseTransformVector(_navMeshAgent.velocity);
-        //Debug.Log("relative velocity: " + relativeVelocity * (_navMeshAgent.speed / _normalSpeed) / 2);
-        //Debug.Log("speed: " + _navMeshAgent.speed);
-        return (relativeVelocity * (_navMeshAgent.speed / _normalSpeed)) / 2;
+            Vector3 relativeVelocity = _transform.InverseTransformVector(_navMeshAgent.velocity);
+            return (relativeVelocity * (_navMeshAgent.speed / _normalSpeed)) / 2;
+        }
+        else
+        {
+            Debug.Log("Rigidbody velocity: " + RigidBody.velocity);
+            return _transform.InverseTransformVector(RigidBody.velocity);
+        }
+
     }
 
     public void RotateToPlayer()
@@ -133,7 +149,7 @@ public class NavMeshAgentController : MonoBehaviour {
     {
         float angle = Vector3.SignedAngle(_previousForward, _transform.forward, Vector3.up);
 
-        if (!UpdateNavmesh)
+        if (!UpdateTransformToNavmesh)
         {
             if (angle == 0)
             {
@@ -184,6 +200,11 @@ public class NavMeshAgentController : MonoBehaviour {
     public void Stop(bool stop)
     {
         _navMeshAgent.isStopped = stop;
+    }
+
+    public void ResetRigidbodyConstraints()
+    {
+        RigidBody.constraints = _constraints;
     }
 
     public Vector3 RandomNavSphere(Vector3 origin, float range, int layermask)

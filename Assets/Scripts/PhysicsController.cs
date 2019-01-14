@@ -72,6 +72,8 @@ public class PhysicsController : MonoBehaviour {
     }
     [SerializeField] private LayerMask _mapLayerMask;
 
+    [SerializeField] private IsGroundedCheckerScript _isGroundedChecker;
+
     // Use this for initialization
     void Start() {
         _characterController = GetComponent<CharacterController>();
@@ -92,7 +94,6 @@ public class PhysicsController : MonoBehaviour {
 
         ApplyAirDrag();
         ApplyJump();
-
 
         LimitMaximumRunningSpeed();
 
@@ -218,14 +219,13 @@ public class PhysicsController : MonoBehaviour {
 
     public bool IsGrounded()
     {
+            return _isGroundedChecker.IsGrounded;
+        //if (_characterController.isGrounded || GetDistanceFromGround() < _skinWidth + 0.02f) //.02 is padding
+        //{
 
-
-        if (_characterController.isGrounded || GetDistanceFromGround() < _skinWidth + 0.02f) //.02 is padding
-        {
-
-            return true;
-        }
-        return false;
+        //    return true;
+        //}
+        //return false;
     }
 
     //public bool IsGroundedAnimationCheck()
@@ -246,4 +246,5 @@ public class PhysicsController : MonoBehaviour {
     {
         _playerTransform.position = position;
     }
+
 }

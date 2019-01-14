@@ -9,6 +9,7 @@ TagManager:
   - FirstGun
   - Ladder
   - Turret
+  - Jump
   layers:
   - Default
   - TransparentFX
@@ -24,11 +25,11 @@ TagManager:
   - ObsctacleCollisionChecker
   - GravityBox
   - NoCollisionWithPlayer
-  - Guns
+  - Interactables
   - NoCollisions
   - Enemy
-  - 
-  - 
+  - Ladder
+  - EnemyOnly
   - 
   - 
   - 
