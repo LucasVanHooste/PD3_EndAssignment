@@ -138,6 +138,7 @@ new SelectorNode(
     // Update is called once per frame
     void Update()
     {
+        if (_health <= 0) return;
         //Debug.Log("rigidbody: " + _rigidBody.velocity);
         //Debug.Log("navmesh: " + _navMeshAgent.velocity);
 
@@ -152,10 +153,8 @@ new SelectorNode(
         _fireGun = false;
         _aimGun = false;
 
-        if (_navMeshAgentController.IsOnOffMeshLink())
+        if (_navMeshAgentController.IsOnOffMeshLink()&&!IsInteracting&& _triggers.Count > 0)
         {
-            if (IsInteracting) return;
-            if (_triggers.Count <= 0) return;
             IsInteracting = true;
             _object = GetClosestTriggerObject();
 
@@ -173,11 +172,14 @@ new SelectorNode(
                 default: IsInteracting = false; break;
             }
         }
+        else
+        {
+            _forgetAboutPlayerTimer += Time.deltaTime;
+        }
 
         _animationsController.Update();
 
         _punchCoolDownTimer += Time.deltaTime;
-        _forgetAboutPlayerTimer += Time.deltaTime;
         _roamingTimer += Time.deltaTime;
     }
 
@@ -472,9 +474,11 @@ new SelectorNode(
 
         _navMeshAgentController.RigidBody.useGravity = true;
         _navMeshAgentController.RigidBody.isKinematic = false;
-
-        _navMeshAgentController.RigidBody.AddForce(_transform.TransformVector(_jumpForce),ForceMode.Impulse);
-
+        if(Vector3.Angle(_transform.forward, _object.transform.forward) > 140)
+            _navMeshAgentController.RigidBody.AddForce(_transform.TransformVector(_jumpForce), ForceMode.Impulse);
+        else
+            _navMeshAgentController.RigidBody.AddForce((Vector3.Scale(_object.transform.position - _transform.position, new Vector3(1,0,1)).normalized*5)+new Vector3(0,4,0),ForceMode.Impulse);
+        Debug.Log("angle: " + Vector3.Angle(_transform.forward, _object.transform.forward));
     }
 
     private IEnumerator InteractWithLadder()
@@ -570,7 +574,7 @@ new SelectorNode(
 
     private void OnCollisionEnter(Collision collision)
     {
-        if(_object!=null && _object.CompareTag("Jump") && _navMeshAgentController.IsGrounded())
+        if (_object != null && _object.CompareTag("Jump") && _navMeshAgentController.IsGrounded())
         {
             _navMeshAgentController.UpdateTransformToNavmesh = true;
             _navMeshAgentController.Warp(_transform.position);
@@ -579,6 +583,7 @@ new SelectorNode(
             _navMeshAgentController.RigidBody.isKinematic = true;
 
             IsInteracting = false;
+            Debug.Log("end jump");
         }
     }
 
