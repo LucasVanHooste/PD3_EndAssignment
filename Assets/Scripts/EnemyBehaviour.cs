@@ -66,7 +66,8 @@ public class EnemyBehaviour : MonoBehaviour
 
     [SerializeField] private Vector3 _jumpForce;
     [SerializeField] private float _maxDistancefromGun;
-    [SerializeField] private float _maxDistancefromTurret;
+    [SerializeField] private RangeTriggerCheckerScript _rangeTriggerChecker;
+    private GameObject _targetGun;
 
     void Start()
     {
@@ -119,14 +120,18 @@ new SelectorNode(
             new ParallelNode(
                 OneSuccesIsSuccesAccumulator.Factory,
                 new SequenceNode(
-                    new ConditionNode(IsCloseToPlayer),
+                    new ConditionNode(IsWithinPunchRangeOfPlayer),
                     new ActionNode(PunchPlayer)),
-                new ActionNode(SetPlayerPositionAsTarget))
+                new SelectorNode(
+                    new SequenceNode(
+                        new ConditionNode(IsPlayerCloserThanGun),
+                        new ActionNode(SetPlayerPositionAsTarget)),
+                    new ActionNode(LookForGun)))
             )),
     new SequenceNode(
         new ConditionNode(HasBeenAttacked),
         new ActionNode(SetPlayerPositionAsTarget)),
-
+    new ActionNode(LookForGun),
     new SequenceNode(
         new ConditionNode(HasSeenPlayerRecently),
         new ActionNode(LookForPlayer)),
@@ -199,7 +204,7 @@ new SelectorNode(
 
     private IEnumerator<NodeResult> Roam()
     {
-        //Debug.Log("Roaming");
+        Debug.Log("Roaming");
         if (_roamingTimer >= _roamingTime)
         {
             _roamingTime = UnityEngine.Random.Range(_roamingTimeRange.x, _roamingTimeRange.y);
@@ -217,13 +222,15 @@ new SelectorNode(
         {
             _navMeshAgentController.Warp(_transform.position);
             _navMeshAgentController.UpdateTransformToNavmesh = true;
-
+            _navMeshAgentController.SetDestination(_navMeshAgentController.RandomNavSphere(_playerTransform.position, 4, -1));
         }
 
         if (_navMeshAgentController.HasNavMeshReachedDestination())
         {
             if ((_playerTransform.position - _transform.position).sqrMagnitude < _hearingDistance * _hearingDistance)
                 _navMeshAgentController.SetDestination(_navMeshAgentController.RandomNavSphere(_playerTransform.position, 4, -1));
+            else
+                _forgetAboutPlayerTimer = _forgetAboutPlayerTime;
         }
         yield return NodeResult.Succes;
     }
@@ -255,7 +262,7 @@ new SelectorNode(
             _navMeshAgentController.SetDestination(_playerTransform.position);
         }
 
-        Debug.Log("SetPlayerposAsTarget");
+        //Debug.Log("SetPlayerposAsTarget");
         yield return NodeResult.Succes;
     }
 
@@ -294,6 +301,50 @@ new SelectorNode(
         yield return NodeResult.Succes;
     }
 
+    private IEnumerator<NodeResult> LookForGun()
+    {
+        if (_gun != null || GetGunInHolster() != null)
+            yield return NodeResult.Failure;
+
+        if (_targetGun == null)
+        {
+            _targetGun = _rangeTriggerChecker.GetClosestTriggerObjectWithTag("Gun");
+            if (_targetGun != null)
+            {
+                Debug.Log("set target ("+gameObject.name+")");
+                _navMeshAgentController.Run();
+                _navMeshAgentController.SetDestination(_targetGun.transform.position);
+                yield return NodeResult.Running;
+            }
+        }
+        else
+        {
+            //pick up gun
+            if (_triggers.Contains(_targetGun.GetComponent<Collider>()))
+            {
+                Debug.Log("gun in triggers");
+                PickUpGun(_targetGun.transform);
+                RemoveTriggersFromList(_targetGun.GetComponents<Collider>());
+                _rangeTriggerChecker.RemoveTriggersFromList(_targetGun.GetComponents<Collider>());
+                _targetGun = null;
+                yield return NodeResult.Succes;
+            }
+
+            if (_navMeshAgentController.HasNavMeshReachedDestination() || _targetGun.transform.parent!=null)
+            {
+                _rangeTriggerChecker.RemoveTriggersFromList(_targetGun.GetComponents<Collider>());
+                _targetGun = null;
+                _roamingTime = _roamingTimer;
+            }
+            else
+            {
+                yield return NodeResult.Running;
+            }
+        }
+
+        yield return NodeResult.Failure;
+    }
+
     private bool IsNotInteracting()
     {
         return !IsInteracting;
@@ -311,7 +362,7 @@ new SelectorNode(
                 //Debug.Log(hit.transform.name);
                 if (hit.transform.gameObject.layer == 9)
                 {
-                    //Debug.Log("I see player");
+                    Debug.Log("I see player");
                     _forgetAboutPlayerTimer = 0;
                     _hasBeenAttacked = false;
                     _anchorPoint.localEulerAngles = new Vector3(Vector3.SignedAngle(Vector3.Scale(_playerTransform.position - _transform.position,new Vector3(1,0,1)), _playerTransform.position - _transform.position, _transform.right), 0, 0);
@@ -331,12 +382,13 @@ new SelectorNode(
         _forgetAboutPlayerTimer += Time.deltaTime;
         if (_forgetAboutPlayerTimer < _forgetAboutPlayerTime)
         {
+            Debug.Log("has seen recently");
             return true;
         }
         return false;
     }
 
-    private bool IsCloseToPlayer()
+    private bool IsWithinPunchRangeOfPlayer()
     {
         if (Vector3.Magnitude(Vector3.Scale(_playerTransform.position - _transform.position, new Vector3(1, 0, 1))) <= _horizontalPunchReach
             && _playerTransform.position.y - _transform.position.y <= _verticalPunchReach)
@@ -345,6 +397,19 @@ new SelectorNode(
         }
         else
             return false;
+    }
+
+    private bool IsPlayerCloserThanGun()
+    {
+        GameObject gun = _rangeTriggerChecker.GetClosestTriggerObjectWithTag("Gun");
+        if (gun != null)
+        {
+            if ((_playerTransform.position - _transform.position).sqrMagnitude > (gun.transform.position - _transform.position).sqrMagnitude)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     private bool HasBeenAttacked()
@@ -645,6 +710,19 @@ new SelectorNode(
             _transform.gameObject.layer = LayerMask.NameToLayer("NoCollisions");
 
             _animationsController.ClimbTopLadder();
+        }
+    }
+
+    public void RemoveTriggersFromList(Collider[] colliders)
+    {
+        for (int i = colliders.Length - 1; i >= 0; i--)
+        {
+            if (colliders[i].isTrigger)
+            {
+                if (_triggers.Contains(colliders[i]))
+                    _triggers.Remove(colliders[i]);
+            }
+
         }
     }
 

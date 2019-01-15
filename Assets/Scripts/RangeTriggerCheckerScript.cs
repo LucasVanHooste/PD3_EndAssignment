@@ -5,12 +5,6 @@ using UnityEngine;
 public class RangeTriggerCheckerScript : MonoBehaviour {
 
     private List<Collider> _triggers = new List<Collider>();
-    private Transform _transform;
-
-    private void Start()
-    {
-        _transform = transform;
-    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -26,7 +20,7 @@ public class RangeTriggerCheckerScript : MonoBehaviour {
 
     public GameObject GetClosestTriggerObjectWithTag(string tag)
     {
-        Vector3 position = _transform.position;
+        Vector3 position = transform.position;
         float distance = 100;
         GameObject closest = null;
         foreach (Collider col in _triggers)
@@ -42,5 +36,18 @@ public class RangeTriggerCheckerScript : MonoBehaviour {
 
         }
         return closest;
+    }
+
+    public void RemoveTriggersFromList(Collider[] colliders)
+    {
+        for (int i = colliders.Length - 1; i >= 0; i--)
+        {
+            if (colliders[i].isTrigger)
+            {
+                if (_triggers.Contains(colliders[i]))
+                    _triggers.Remove(colliders[i]);
+            }
+
+        }
     }
 }
