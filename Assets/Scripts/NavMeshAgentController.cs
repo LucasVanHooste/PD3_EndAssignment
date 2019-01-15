@@ -104,7 +104,7 @@ public class NavMeshAgentController : MonoBehaviour {
         //    return false;
 
         //return true;
-        Debug.Log("Is grounded: "+_isGroundedChecker.IsGrounded);
+        //Debug.Log("Is grounded: "+_isGroundedChecker.IsGrounded);
         return _isGroundedChecker.IsGrounded;
     }
 
@@ -129,7 +129,7 @@ public class NavMeshAgentController : MonoBehaviour {
         }
         else
         {
-            Debug.Log("Rigidbody velocity: " + RigidBody.velocity);
+            //Debug.Log("Rigidbody velocity: " + RigidBody.velocity);
             return _transform.InverseTransformVector(RigidBody.velocity);
         }
 
@@ -140,7 +140,6 @@ public class NavMeshAgentController : MonoBehaviour {
         //Vector3 newDir = Vector3.RotateTowards(_transform.forward, Vector3.Scale(_playerTransform.position - _transform.position, new Vector3(1, 0, 1)), .1f, 0.0f);
         //    _transform.rotation = Quaternion.LookRotation(newDir);
         _transform.rotation = Quaternion.RotateTowards(_transform.rotation, Quaternion.LookRotation(Vector3.Scale(PlayerTransform.position - _transform.position, new Vector3(1, 0, 1))), Time.deltaTime * _idleRotationSpeed);
-
     }
 
 

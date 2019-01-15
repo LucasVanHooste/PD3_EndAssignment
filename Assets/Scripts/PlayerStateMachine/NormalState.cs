@@ -92,7 +92,7 @@ public class NormalState : BasePlayerState
                 break;
             case "Ladder":
                 {
-
+                    if(!_object.GetComponent<LadderScript>().IsPersonClimbing)
                     _playerController.ToClimbingState(_object);
                 }
                 break;

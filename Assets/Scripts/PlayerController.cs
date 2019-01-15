@@ -77,7 +77,6 @@ public class PlayerController : MonoBehaviour {
     private AnimationsController _animationsController;
     private CameraController _cameraController;
 
-    //private GameObject _gun;
     private Vector3 _startPosition;
     private Quaternion _startRotation;
 

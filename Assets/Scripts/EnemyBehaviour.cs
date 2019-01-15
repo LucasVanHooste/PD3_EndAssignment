@@ -36,6 +36,8 @@ public class EnemyBehaviour : MonoBehaviour
     private bool _hasBeenAttacked = false;
 
     [SerializeField] private Transform _gun;
+    [SerializeField]private Transform _holsterGun1Hand;
+    [SerializeField]private Transform _holsterGun2Hands;
     private GunScript _gunScript;
     private bool _fireGun = false;
     private bool _aimGun = false;
@@ -60,9 +62,11 @@ public class EnemyBehaviour : MonoBehaviour
     private GameObject _object;
     public bool IsInteracting { get; set; }
     private Coroutine _climbLadder;
-    private float _ladderPaddingDistance = 0.1f;
+    private float _ladderPaddingDistance = 0.15f;
 
     [SerializeField] private Vector3 _jumpForce;
+    [SerializeField] private float _maxDistancefromGun;
+    [SerializeField] private float _maxDistancefromTurret;
 
     void Start()
     {
@@ -139,11 +143,9 @@ new SelectorNode(
     void Update()
     {
         if (_health <= 0) return;
-        //Debug.Log("rigidbody: " + _rigidBody.velocity);
-        //Debug.Log("navmesh: " + _navMeshAgent.velocity);
 
-        //Debug.Log("navmesh desired: " + _navMeshAgent.desiredVelocity);
-        //Debug.Log("navmesh speed: " + _navMeshAgent.speed);
+        if (_navMeshAgentController.RigidBody.velocity.y < -6.5f)
+            DropGun();
 
         if (_gun != null)
         {
@@ -172,10 +174,7 @@ new SelectorNode(
                 default: IsInteracting = false; break;
             }
         }
-        else
-        {
-            _forgetAboutPlayerTimer += Time.deltaTime;
-        }
+        
 
         _animationsController.Update();
 
@@ -200,7 +199,7 @@ new SelectorNode(
 
     private IEnumerator<NodeResult> Roam()
     {
-        Debug.Log("Roaming");
+        //Debug.Log("Roaming");
         if (_roamingTimer >= _roamingTime)
         {
             _roamingTime = UnityEngine.Random.Range(_roamingTimeRange.x, _roamingTimeRange.y);
@@ -291,7 +290,7 @@ new SelectorNode(
             }
         }
 
-        Debug.Log("Fire gun");
+        //Debug.Log("Fire gun");
         yield return NodeResult.Succes;
     }
 
@@ -312,28 +311,24 @@ new SelectorNode(
                 //Debug.Log(hit.transform.name);
                 if (hit.transform.gameObject.layer == 9)
                 {
-                    Debug.Log("I see player");
+                    //Debug.Log("I see player");
                     _forgetAboutPlayerTimer = 0;
                     _hasBeenAttacked = false;
-                    //if (_gun != null && !_navMeshAgentController.IsOnOffMeshLink())
-                    //{
-                    //    AimGun(true);
-                    //}
+                    _anchorPoint.localEulerAngles = new Vector3(Vector3.SignedAngle(Vector3.Scale(_playerTransform.position - _transform.position,new Vector3(1,0,1)), _playerTransform.position - _transform.position, _transform.right), 0, 0);
+
 
                     return true;
                 }
             }
         }
+        _anchorPoint.localEulerAngles = Vector3.zero;
 
-        //if (_gun != null|| _navMeshAgentController.IsOnOffMeshLink())
-        //{
-        //    AimGun(false);
-        //}
         return false;
     }
 
     private bool HasSeenPlayerRecently()
     {
+        _forgetAboutPlayerTimer += Time.deltaTime;
         if (_forgetAboutPlayerTimer < _forgetAboutPlayerTime)
         {
             return true;
@@ -367,6 +362,13 @@ new SelectorNode(
         {
             return true;
         }
+
+        if (GetGunInHolster() != null)
+        {
+            TakeGunFromHolster(GetGunInHolster());
+            return true;
+        }
+
         return false;
     }
 
@@ -386,6 +388,25 @@ new SelectorNode(
         }
     }
 
+    private void DropGun()
+    {
+        if (_gun == null) return;
+
+        _aimGun = false;
+        AimGun(_aimGun);
+
+        _gunScript.DropGun();
+
+        _animationsController.HoldGunIK.Gun = null;
+        _gun = null;
+    }
+
+    private void DropHolsterGun()
+    {
+        if (GetGunInHolster() != null)
+            GetGunInHolster().GetComponent<GunScript>().DropGun();
+    }
+
     private void AimGun(bool aim)
     {
         _animationsController.AimGun(aim);
@@ -397,6 +418,57 @@ new SelectorNode(
         Vector3 randomPosition = UnityEngine.Random.insideUnitSphere * _missingShotRange;
 
         _gunScript.EnemyFireGun(fire, _anchorPoint.position, (_playerTransform.position+randomPosition)-_transform.position);
+    }
+    private void HolsterGun()
+    {
+        if (_gun == null) return;
+
+        GameObject tempGun = GetGunInHolster();
+
+        if (_gunScript.IsTwoHanded)
+        {
+            _gun.transform.parent = _holsterGun2Hands;
+            _gun.transform.position = _holsterGun2Hands.position;
+            _gun.transform.rotation = _holsterGun2Hands.rotation;
+        }
+        else
+        {
+            _gun.transform.parent = _holsterGun1Hand;
+            _gun.transform.position = _holsterGun1Hand.position;
+            _gun.transform.rotation = _holsterGun1Hand.rotation;
+        }
+
+        _animationsController.HoldGunIK.Gun = null;
+
+
+        if (tempGun != null)
+        {
+            TakeGunFromHolster(tempGun);
+        }
+        else
+        {
+            _gun = null;
+        }
+    }
+
+    private GameObject GetGunInHolster()
+    {
+        GameObject tempGun = null;
+
+        if (_holsterGun1Hand.childCount > 0)
+            tempGun = _holsterGun1Hand.GetChild(0).gameObject;
+
+        if (_holsterGun2Hands.childCount > 0)
+            tempGun = _holsterGun2Hands.GetChild(0).gameObject;
+
+        return tempGun;
+    }
+
+    private void TakeGunFromHolster(GameObject gun)
+    {
+        _gun = gun.transform;
+
+        PickUpGun(_gun);
     }
 
     private void TakeDamage(int damage, Vector3 originOfDamage)
@@ -428,7 +500,7 @@ new SelectorNode(
             StopCoroutine(_climbLadder);
         }
 
-        if (_object.GetComponent<LadderScript>())
+        if (_object!=null&& _object.GetComponent<LadderScript>())
             _object.GetComponent<LadderScript>().IsPersonClimbing = false;
 
         Vector3 transformedOrigin = GetTransformedOrigin(originOfDamage);
@@ -439,6 +511,9 @@ new SelectorNode(
         _navMeshAgentController.RigidBody.constraints = RigidbodyConstraints.FreezeRotation;
         _navMeshAgentController.RigidBody.isKinematic = false;  
         _navMeshAgentController.RigidBody.useGravity = true;
+
+        DropGun();
+        DropHolsterGun();
 
         ToDeadState();
     }
@@ -499,7 +574,8 @@ new SelectorNode(
             yield return null;
         }
 
-        
+        HolsterGun();
+        ladderScript.IsPersonClimbing = true;
         _climbLadder = StartCoroutine(RotateToLadder());
     }
 
@@ -555,14 +631,14 @@ new SelectorNode(
         if (other.isTrigger && !_triggers.Contains(other))
             _triggers.Add(other);
 
-        Debug.Log("enter");
+        Debug.Log("enter "+other.gameObject.name);
     }
 
     private void OnTriggerExit(Collider other)
     {
         if (_triggers.Contains(other))
             _triggers.Remove(other);
-        Debug.Log("exit");
+        Debug.Log("exit "+other.gameObject.name);
         Debug.Log("is grounded: "+_navMeshAgentController.IsGrounded());
         if (IsInteracting && _health>0 && other.gameObject.CompareTag("Ladder") && !_navMeshAgentController.IsGrounded())
         {

@@ -73,6 +73,11 @@ public class PhysicsController : MonoBehaviour {
     [SerializeField] private LayerMask _mapLayerMask;
 
     [SerializeField] private IsGroundedCheckerScript _isGroundedChecker;
+    public IsGroundedCheckerScript IsGroundedChecker
+    {
+        get { return _isGroundedChecker; }
+        set { _isGroundedChecker = value; }
+    }
 
     // Use this for initialization
     void Start() {

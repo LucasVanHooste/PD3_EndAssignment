@@ -34,13 +34,11 @@ public class ClimbingState : BasePlayerState
 
     public override void Update()
     {
-        
+
     }
 
     private void Climb()
     {
-        if (_ladderScript.IsPersonClimbing) return;
-
         _physicsController.Aim = Vector3.zero;
         _physicsController.StopMoving();
 
@@ -64,7 +62,7 @@ public class ClimbingState : BasePlayerState
         while (Quaternion.Angle(_playerTransform.rotation, Quaternion.LookRotation(direction)) > 1)
         {
             //direction = Vector3.Scale((_ladder.transform.position - _playerTransform.position), new Vector3(1, 0, 1));
-            Debug.Log("rotate");
+            //Debug.Log("rotate");
             Vector3 newDir = Vector3.RotateTowards(_playerTransform.forward, direction, .05f, 0.0f);
 
             float angle = Vector3.SignedAngle(_playerTransform.forward, newDir, Vector3.up);
@@ -104,8 +102,10 @@ public class ClimbingState : BasePlayerState
     {
         if (_playerController.Health>0 && other.gameObject.tag == "Ladder" && !_physicsController.IsGrounded())
         {
-            _playerTransform.gameObject.layer = LayerMask.NameToLayer("NoCollisions");
+            int mask = LayerMask.NameToLayer("NoCollisions");
 
+            _playerTransform.gameObject.layer = mask;
+            _physicsController.IsGroundedChecker.gameObject.layer = mask;
             _animationsController.ClimbTopLadder();
         }
     }

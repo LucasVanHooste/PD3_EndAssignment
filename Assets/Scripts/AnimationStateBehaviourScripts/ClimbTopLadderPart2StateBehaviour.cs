@@ -14,9 +14,12 @@ public class ClimbTopLadderPart2StateBehaviour : StateMachineBehaviour {
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if(_playerController!=null)
-        _playerController.gameObject.layer = LayerMask.NameToLayer("Player");
-        if(_navMeshAgentController!=null)
+        if (_playerController != null)
+        {
+            _playerController.gameObject.layer = LayerMask.NameToLayer("Player");
+            _physicsController.IsGroundedChecker.gameObject.layer=LayerMask.NameToLayer("Player");
+        }
+        if (_navMeshAgentController!=null)
             _navMeshAgentController.gameObject.layer = LayerMask.NameToLayer("Enemy");
     }
 

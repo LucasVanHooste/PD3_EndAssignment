@@ -80,7 +80,6 @@ public class GunScript : MonoBehaviour {
         GameObject.Destroy(_gunCollisionChecker.gameObject);
 
         _trigger.enabled = false;
-        //gameObject.layer = layerIndex;
 
         if (IsTwoHanded)
         {
@@ -93,7 +92,6 @@ public class GunScript : MonoBehaviour {
 
         _transform.localPosition = LocalPositionOnPlayer;
         _transform.localEulerAngles = LocalRotationOnPlayer;
-        //holdGunIK.SetGun(_transform);
 
         _rightHandTransform = RightHand;
         _cameraRootTransform = CameraRootTransform;
@@ -103,7 +101,6 @@ public class GunScript : MonoBehaviour {
     {
         _transform.parent = null;
         _trigger.enabled = true;
-        gameObject.layer = 14;
         _gunCollisionChecker = GameObject.Instantiate(_gunCollisionCheckerPrefab, _transform.position, _transform.rotation);
     }
 
