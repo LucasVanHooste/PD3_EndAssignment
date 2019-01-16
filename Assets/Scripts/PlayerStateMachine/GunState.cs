@@ -139,6 +139,24 @@ public class GunState : BasePlayerState
 
         switch (_object.tag)
         {
+            case "Obstacle":
+                {
+                    if (GetGunInHolster() == null)
+                    {
+                        HolsterGun();
+                        _playerController.ToPushingState(_object);
+                    }
+
+                }
+                break;
+            case "FirstGun":
+                {
+                    //drop current gun
+                    _gunScript.DropGun();
+
+                    _playerController.ToCinematicState(_object);
+                }
+                break;
             case "Gun":
                 {
                     //drop current gun
@@ -148,6 +166,25 @@ public class GunState : BasePlayerState
                     PickUpGun();
                     RemoveTriggersFromList(_object.GetComponents<Collider>());
                     _gun = _object;
+                }
+                break;
+            case "Ladder":
+                {
+                    if (GetGunInHolster() == null)
+                    {
+                        HolsterGun();
+                        if (!_object.GetComponent<LadderScript>().IsPersonClimbing)
+                            _playerController.ToClimbingState(_object);
+                    }
+                }
+                break;
+            case "Turret":
+                {
+                    if (GetGunInHolster() == null)
+                    {
+                        HolsterGun();
+                        _playerController.ToTurretState(_object);
+                    }
                 }
                 break;
         }

@@ -735,7 +735,7 @@ MonoBehaviour:
   LocalAimPositionOnPlayer: {x: 0.1, y: 0.06, z: 0.65}
   LocalAimRotationOnPlayer: {x: 0, y: 180, z: 0}
   IsTwoHanded: 0
-  _fireRate: 1
+  _fireRate: 0.6
   _bulletDamage: 20
   _playerBulletLayermask:
     serializedVersion: 2
@@ -753,6 +753,6 @@ CapsuleCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   m_Radius: 0.4
-  m_Height: 4
+  m_Height: 1.5
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}

@@ -20,9 +20,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4145964824480300}
   - component: {fileID: 65977277152014232}
-  - component: {fileID: 65304636740394850}
   - component: {fileID: 114837596277830786}
-  m_Layer: 0
+  - component: {fileID: 114541525381860316}
+  m_Layer: 17
   m_Name: Ladder
   m_TagString: Ladder
   m_Icon: {fileID: 0}
@@ -84,7 +84,6 @@ GameObject:
   - component: {fileID: 4832054691143606}
   - component: {fileID: 33508988165981212}
   - component: {fileID: 23741142042490742}
-  - component: {fileID: 65414286655841948}
   m_Layer: 0
   m_Name: Cube (3)
   m_TagString: Untagged
@@ -117,7 +116,6 @@ GameObject:
   - component: {fileID: 4659954960334128}
   - component: {fileID: 33979757880135502}
   - component: {fileID: 23290109095473526}
-  - component: {fileID: 65942678972821870}
   m_Layer: 0
   m_Name: Cube (1)
   m_TagString: Untagged
@@ -229,7 +227,6 @@ GameObject:
   - component: {fileID: 4545245459638594}
   - component: {fileID: 33323089290509956}
   - component: {fileID: 23700805294589706}
-  - component: {fileID: 65277606722296776}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -277,7 +274,6 @@ GameObject:
   - component: {fileID: 4802942109478010}
   - component: {fileID: 33634688880184700}
   - component: {fileID: 23875230228144814}
-  - component: {fileID: 65160945910500936}
   m_Layer: 0
   m_Name: Cube (2)
   m_TagString: Untagged
@@ -919,66 +915,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1195994153373044}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!65 &65160945910500936
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1569073361299256}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!65 &65277606722296776
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1452218854408098}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!65 &65304636740394850
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1005743711500684}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  serializedVersion: 2
-  m_Size: {x: 0.8, y: 6, z: 0.2}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!65 &65414286655841948
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1096639629943806}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!65 &65942678972821870
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1195994153373044}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!65 &65977277152014232
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -989,8 +925,27 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.4, y: 3.6, z: 1.4}
+  m_Size: {x: 0.6, y: 3.6, z: 1.8}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &114541525381860316
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1005743711500684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6eeb5dc026fdf4b488bc7ae0138ab719, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AgentTypeID: 0
+  m_StartPoint: {x: 0, y: 0, z: 0.7}
+  m_EndPoint: {x: 0, y: 3, z: -0.7}
+  m_Width: 0
+  m_CostModifier: -1
+  m_Bidirectional: 0
+  m_AutoUpdatePosition: 0
+  m_Area: 0
 --- !u!114 &114837596277830786
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -10,6 +10,7 @@ TagManager:
   - Ladder
   - Turret
   - Jump
+  - Fall
   layers:
   - Default
   - TransparentFX

@@ -67,6 +67,7 @@ public class EnemyBehaviour : MonoBehaviour
     [SerializeField] private Vector3 _jumpForce;
     [SerializeField] private float _maxDistancefromGun;
     [SerializeField] private RangeTriggerCheckerScript _rangeTriggerChecker;
+    [SerializeField] private Vector3 _fallForce;
     private GameObject _targetGun;
 
     void Start()
@@ -176,6 +177,11 @@ new SelectorNode(
                     {
                         Jump();
                     }break;
+                case "Fall":
+                    {
+                        Fall();
+                    }
+                    break;
                 default: IsInteracting = false; break;
             }
         }
@@ -617,8 +623,18 @@ new SelectorNode(
         if(Vector3.Angle(_transform.forward, _object.transform.forward) > 140)
             _navMeshAgentController.RigidBody.AddForce(_transform.TransformVector(_jumpForce), ForceMode.Impulse);
         else
-            _navMeshAgentController.RigidBody.AddForce((Vector3.Scale(_object.transform.position - _transform.position, new Vector3(1,0,1)).normalized*5)+new Vector3(0,4,0),ForceMode.Impulse);
+            _navMeshAgentController.RigidBody.AddForce((Vector3.Scale(_object.transform.position - _transform.position, new Vector3(1,0,1)).normalized*_jumpForce.z)+new Vector3(0,_jumpForce.y,0),ForceMode.Impulse);
         Debug.Log("angle: " + Vector3.Angle(_transform.forward, _object.transform.forward));
+    }
+
+    private void Fall()
+    {
+        _navMeshAgentController.UpdateTransformToNavmesh = false;
+
+        _navMeshAgentController.RigidBody.useGravity = true;
+        _navMeshAgentController.RigidBody.isKinematic = false;
+
+        _navMeshAgentController.RigidBody.AddForce((Vector3.Scale(_object.transform.position - _transform.position, new Vector3(1, 0, 1)).normalized * _fallForce.z) + new Vector3(0, _fallForce.y, 0), ForceMode.Impulse);
     }
 
     private IEnumerator InteractWithLadder()
@@ -728,16 +744,20 @@ new SelectorNode(
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (_object != null && _object.CompareTag("Jump") && _navMeshAgentController.IsGrounded())
+        if (_object != null  && _navMeshAgentController.IsGrounded())
         {
-            _navMeshAgentController.UpdateTransformToNavmesh = true;
-            _navMeshAgentController.Warp(_transform.position);
+            if(_object.CompareTag("Jump") || _object.CompareTag("Fall"))
+            {
+                _navMeshAgentController.UpdateTransformToNavmesh = true;
+                _navMeshAgentController.Warp(_transform.position);
 
-            _navMeshAgentController.RigidBody.useGravity = false;
-            _navMeshAgentController.RigidBody.isKinematic = true;
+                _navMeshAgentController.RigidBody.useGravity = false;
+                _navMeshAgentController.RigidBody.isKinematic = true;
 
-            IsInteracting = false;
-            Debug.Log("end jump");
+                IsInteracting = false;
+                Debug.Log("end jump");
+            }
+
         }
     }
 

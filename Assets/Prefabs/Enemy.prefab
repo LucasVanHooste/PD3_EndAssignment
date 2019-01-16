@@ -2404,9 +2404,10 @@ MonoBehaviour:
   _lookAtPosition: {fileID: 4164360721212554}
   _headTransform: {fileID: 4011835408085360}
   _maxHealth: 100
-  _jumpForce: {x: 0, y: 4.5, z: 5}
+  _jumpForce: {x: 0, y: 4.5, z: 5.5}
   _maxDistancefromGun: 0
   _rangeTriggerChecker: {fileID: 114852952954886888}
+  _fallForce: {x: 0, y: 2.5, z: 3}
 --- !u!114 &114634048270874922
 MonoBehaviour:
   m_ObjectHideFlags: 1
