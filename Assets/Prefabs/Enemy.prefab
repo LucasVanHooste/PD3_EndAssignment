@@ -2005,7 +2005,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1585486145818626}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -12, y: -2, z: 29.5}
+  m_LocalPosition: {x: -12.5, y: -1, z: 29.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4018703244197080}
@@ -2390,7 +2390,7 @@ MonoBehaviour:
   _horizontalPunchReach: 1.5
   _verticalPunchReach: 1
   _punchCoolDown: 2
-  _punchDamage: 0
+  _punchDamage: 40
   _forgetAboutPlayerTime: 8
   _hearingDistance: 8
   _roamingTimeRange: {x: 4, y: 9}
@@ -2402,7 +2402,7 @@ MonoBehaviour:
   _leftHand: {fileID: 4427747616123900}
   _rightHand: {fileID: 4218463091016424}
   _lookAtPosition: {fileID: 4164360721212554}
-  _headTransform: {fileID: 4011835408085360}
+  _eyesPosition: {x: 0, y: 1.5, z: 0}
   _maxHealth: 100
   _jumpForce: {x: 0, y: 4.5, z: 5.5}
   _maxDistancefromGun: 3

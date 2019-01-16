@@ -10,6 +10,7 @@ public class EnemyBehaviour : MonoBehaviour
 {
 
     private INode _behaviourTree;
+    private Coroutine _treeCoroutine;
     private Transform _transform;
     private NavMeshAgentController _navMeshAgentController;
     private EnemyBehaviour _enemyBehaviour;
@@ -46,7 +47,8 @@ public class EnemyBehaviour : MonoBehaviour
     [SerializeField] private Transform _leftHand;
     [SerializeField] private Transform _rightHand;
     [SerializeField] private Transform _lookAtPosition;
-    [SerializeField] private Transform _headTransform;
+    //[SerializeField] private Transform _headTransform;
+    [SerializeField] private Vector3 _eyesPosition;
 
     [SerializeField] private int _maxHealth;
     private int _health;
@@ -145,7 +147,7 @@ new SelectorNode(
 
 
 
-        StartCoroutine(RunTree());
+        _treeCoroutine= StartCoroutine(RunTree());
     }
 
     // Update is called once per frame
@@ -174,7 +176,7 @@ new SelectorNode(
                 case "Ladder":
                     {
                         Debug.Log("ladder");
-                        _climbLadder= StartCoroutine(InteractWithLadder());
+                            _climbLadder = StartCoroutine(InteractWithLadder());
                     }break;
                 case "Jump":
                     {
@@ -213,7 +215,7 @@ new SelectorNode(
 
     private IEnumerator<NodeResult> Roam()
     {
-        Debug.Log("Roaming");
+        //Debug.Log("Roaming");
         if (_roamingTimer >= _roamingTime)
         {
             _roamingTime = UnityEngine.Random.Range(_roamingTimeRange.x, _roamingTimeRange.y);
@@ -234,6 +236,7 @@ new SelectorNode(
             _navMeshAgentController.SetDestination(_navMeshAgentController.RandomNavSphere(_playerTransform.position, 4, -1));
         }
 
+        _navMeshAgentController.Run();
         if (_navMeshAgentController.HasNavMeshReachedDestination())
         {
             if ((_playerTransform.position - _transform.position).sqrMagnitude < _hearingDistance * _hearingDistance)
@@ -384,12 +387,12 @@ new SelectorNode(
         {
             //Debug.Log("angle: " + Quaternion.Angle(_transform.rotation, Quaternion.LookRotation(directionPlayer)));
             RaycastHit hit;
-            if (Physics.Raycast(_headTransform.position, directionPlayer, out hit, 100, _canSeePlayerLayerMask))
+            if (Physics.Raycast(_transform.position + _eyesPosition, directionPlayer, out hit, 100, _canSeePlayerLayerMask))
             {
                 //Debug.Log(hit.transform.name);
                 if (hit.transform.gameObject.layer == 9)
                 {
-                    Debug.Log("I see player");
+                    //Debug.Log("I see player");
                     _forgetAboutPlayerTimer = 0;
                     _hasBeenAttacked = false;
                     _anchorPoint.localEulerAngles = new Vector3(Vector3.SignedAngle(Vector3.Scale(_playerTransform.position - _transform.position,new Vector3(1,0,1)), _playerTransform.position - _transform.position, _transform.right), 0, 0);
@@ -409,7 +412,7 @@ new SelectorNode(
         _forgetAboutPlayerTimer += Time.deltaTime;
         if (_forgetAboutPlayerTimer < _forgetAboutPlayerTime)
         {
-            Debug.Log("has seen recently");
+            //Debug.Log("has seen recently");
             return true;
         }
         return false;
@@ -442,7 +445,9 @@ new SelectorNode(
 
     private bool SeesGun()
     {
-        if (GetGunInHolster() != null) return false;
+        _targetGun = null;
+
+        if (GetGunInHolster() != null || _gun!=null) return false;
 
         //get all guns that are closeby
         List<GameObject> _targetGuns = _rangeTriggerChecker.GetTriggerObjectsWithTag("Gun");
@@ -453,22 +458,33 @@ new SelectorNode(
         foreach (GameObject gun in _targetGuns)
         {
             RaycastHit hit;
-            if (Physics.Raycast(_headTransform.position, gun.transform.position - _headTransform.position, out hit, 100, _canSeePlayerLayerMask))
+            if (Physics.Raycast(_transform.position+_eyesPosition, gun.transform.position - (_transform.position+ _eyesPosition), out hit, 100, _canSeePlayerLayerMask))
             {
                 if (hit.collider.CompareTag("Gun"))
                 {
-                    float tempDistance = Vector3.SqrMagnitude(gun.transform.position- _transform.position);
-                    if (tempDistance < distance)
+                    if (gun.transform.parent != null)
                     {
-                        distance = tempDistance;
-                        _targetGun = gun.gameObject;
+                        _rangeTriggerChecker.RemoveTriggersFromList(gun.GetComponents<Collider>());
+                        _roamingTimer = _roamingTime;
                     }
-                    Debug.Log("I see gun");
+                    else
+                    {
+                        float tempDistance = Vector3.SqrMagnitude(gun.transform.position - _transform.position);
+                        if (tempDistance < distance)
+                        {
+                            distance = tempDistance;
+                            _targetGun = gun.gameObject;
+                        }
+                    }
+
+                    //Debug.Log("I see gun");
                 }
             }
         }
 
+
         if (_targetGun != null) return true;
+        Debug.Log("GUN TARGET");
         return false;
     }
 
@@ -540,7 +556,9 @@ new SelectorNode(
 
     private void FireGun(bool fire)
     {
-        Vector3 randomPosition = UnityEngine.Random.insideUnitSphere * _missingShotRange;
+        //decrease chance of hitting if player is further away
+        float offset = Mathf.Clamp((_playerTransform.position - _transform.position).sqrMagnitude, 1, _missingShotRange);
+        Vector3 randomPosition = UnityEngine.Random.insideUnitSphere * offset;
 
         _gunScript.EnemyFireGun(fire, _anchorPoint.position, (_playerTransform.position+randomPosition)-_transform.position);
     }
@@ -666,6 +684,8 @@ new SelectorNode(
         _health = 0;
         _navMeshAgentController.Stop(true);
         gameObject.layer = LayerMask.NameToLayer("NoCollisionWithPlayer");
+        StopCoroutine(_treeCoroutine);
+        GameObject.Destroy(this);
     }
 
     private void Jump()
@@ -711,6 +731,7 @@ new SelectorNode(
 
         HolsterGun();
         ladderScript.IsPersonClimbing = true;
+        gameObject.layer = LayerMask.NameToLayer("NoCollisionWithEnemy");
         _climbLadder = StartCoroutine(RotateToLadder());
     }
 
@@ -748,7 +769,7 @@ new SelectorNode(
             _navMeshAgentController.RigidBody.velocity = direction.normalized;
             yield return null;
         }
-
+        Debug.Log("finish moving");
         _navMeshAgentController.RigidBody.velocity = Vector3.zero;
         //_navMeshAgentController.RigidBody.isKinematic = true;
         ClimbLadder();
@@ -775,7 +796,7 @@ new SelectorNode(
             _triggers.Remove(other);
         Debug.Log("exit "+other.gameObject.name);
         Debug.Log("is grounded: "+_navMeshAgentController.IsGrounded());
-        if (IsInteracting && _health>0 && other.gameObject.CompareTag("Ladder") && !_navMeshAgentController.IsGrounded())
+        if (IsInteracting && _health>0 && other.gameObject.CompareTag("Ladder") /*&& !_navMeshAgentController.IsGrounded()*/)
         {
             _transform.gameObject.layer = LayerMask.NameToLayer("NoCollisions");
 

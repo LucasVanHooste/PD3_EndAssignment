@@ -125,7 +125,7 @@ public class TurretScript : MonoBehaviour {
 
         _horizontalRotation = Mathf.Clamp(_horizontalRotation, _minHorizontalAngle, _maxHorizontalAngle); //clamp vertical rotation
 
-        _horizontalAnchorTransform.localEulerAngles = new Vector3(_horizontalAnchorTransform.eulerAngles.x, _horizontalRotation, _horizontalAnchorTransform.eulerAngles.z);
+        transform.localEulerAngles = new Vector3(transform.eulerAngles.x, _horizontalRotation, transform.eulerAngles.z);
 
         //vertical rotation
         _verticalRotation += verticalRotation; //get vertical rotation

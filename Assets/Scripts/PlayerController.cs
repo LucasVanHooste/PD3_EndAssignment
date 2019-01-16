@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(PhysicsController))]
 [RequireComponent(typeof(Animator))]
@@ -33,6 +34,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private Transform _holsterGun1Hand;
     [SerializeField] private Transform _holsterGun2Hands;
     [SerializeField] private GameObject _crossHair;
+    [SerializeField] private Slider _healthbar;
 
     [SerializeField] private int _maxHealth;
     private int _health;
@@ -112,6 +114,7 @@ public class PlayerController : MonoBehaviour {
         _startRotation = _transform.rotation;
 
         _state = new NormalState(_transform, _physicsController, _playerController, _animationsController);
+        SetHealthBar();
     }
 	
 	// Update is called once per frame
@@ -197,6 +200,7 @@ public class PlayerController : MonoBehaviour {
     {
         _health -= damage;
         _animationsController.TakeDamage();
+        SetHealthBar();
 
         Die(originOfDamage);
     }
@@ -243,13 +247,10 @@ public class PlayerController : MonoBehaviour {
         return transformedOrigin;
     }
 
-    //private bool IsOriginInFrontOfPlayer(Vector3 originOfDamage)
-    //{
-    //    if (_transform.InverseTransformPoint(originOfDamage).z < 0)
-    //        return false;
-
-    //    return true;
-    //}
+    private void SetHealthBar()
+    {
+        _healthbar.value = (float)_health/ _maxHealth;
+    }
 
     public void Respawn()
     {
@@ -258,5 +259,6 @@ public class PlayerController : MonoBehaviour {
         _animationsController.ResetAnimations();
         _health = _maxHealth;
         _playerController.ToNormalState();
+        SetHealthBar();
     }
 }

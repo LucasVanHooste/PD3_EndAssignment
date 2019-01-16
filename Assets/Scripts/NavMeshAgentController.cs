@@ -196,6 +196,11 @@ public class NavMeshAgentController : MonoBehaviour {
         return _navMeshAgent.isOnOffMeshLink;
     }
 
+    public bool IsOnNavMesh()
+    {
+        return _navMeshAgent.isOnNavMesh;
+    }
+
     public void Stop(bool stop)
     {
         _navMeshAgent.isStopped = stop;
@@ -214,7 +219,7 @@ public class NavMeshAgentController : MonoBehaviour {
 
         NavMeshHit navHit;
         NavMesh.SamplePosition(randomPosition, out navHit, range, layermask);
-        Debug.Log("navpos: " + navHit.position);
+        //Debug.Log("navpos: " + navHit.position);
         return navHit.position;
     }
 }

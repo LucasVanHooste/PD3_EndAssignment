@@ -1413,10 +1413,10 @@ MonoBehaviour:
   _camAimingTransform: {fileID: 4414139825384956}
   _fireRate: 0.08
   _fireTurretEffect: {fileID: 1385166733387736}
-  _bulletDamage: 10
+  _bulletDamage: 15
   _bulletLayermask:
     serializedVersion: 2
-    m_Bits: 73015
+    m_Bits: 597303
   _minVerticalAngle: -35
   _maxVerticalAngle: 30
   _minHorizontalAngle: -80
