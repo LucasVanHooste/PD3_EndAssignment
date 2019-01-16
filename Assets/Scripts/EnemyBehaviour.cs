@@ -119,20 +119,23 @@ new SelectorNode(
                 new ConditionNode(HasGun),
                 new ActionNode(FireGunAtPlayer)),
             new ParallelNode(
-                OneSuccesIsSuccesAccumulator.Factory,
+                OneRunningIsRunningAccumulator.Factory,
                 new SequenceNode(
                     new ConditionNode(IsWithinPunchRangeOfPlayer),
                     new ActionNode(PunchPlayer)),
                 new SelectorNode(
                     new SequenceNode(
-                        new ConditionNode(IsPlayerCloserThanGun),
-                        new ActionNode(SetPlayerPositionAsTarget)),
-                    new ActionNode(LookForGun)))
+                        new ConditionNode(SeesGun),
+                        new ConditionNode(IsGunCloserThanPlayer),
+                        new ActionNode(RunForGun)),
+                    new ActionNode(SetPlayerPositionAsTarget)))
             )),
     new SequenceNode(
         new ConditionNode(HasBeenAttacked),
         new ActionNode(SetPlayerPositionAsTarget)),
-    new ActionNode(LookForGun),
+    new SequenceNode(
+        new ConditionNode(SeesGun),
+        new ActionNode(RunForGun)),
     new SequenceNode(
         new ConditionNode(HasSeenPlayerRecently),
         new ActionNode(LookForPlayer)),
@@ -307,48 +310,66 @@ new SelectorNode(
         yield return NodeResult.Succes;
     }
 
-    private IEnumerator<NodeResult> LookForGun()
+    private IEnumerator<NodeResult> RunForGun()
     {
-        if (_gun != null || GetGunInHolster() != null)
-            yield return NodeResult.Failure;
+        //if (_gun != null || GetGunInHolster() != null)
+        //    yield return NodeResult.Failure;
 
-        if (_targetGun == null)
+        //if (_targetGun == null)
+        //{
+        //    _targetGun = _rangeTriggerChecker.GetClosestTriggerObjectWithTag("Gun");
+        //    if (_targetGun != null)
+        //    {
+        //        .
+        //        Debug.Log("set target ("+gameObject.name+")");
+        //        _navMeshAgentController.Run();
+        //        _navMeshAgentController.SetDestination(_targetGun.transform.position);
+        //        yield return NodeResult.Running;
+        //    }
+        //}
+        //else
+        //{
+        //    //pick up gun
+        //    if (_triggers.Contains(_targetGun.GetComponent<Collider>()))
+        //    {
+        //        Debug.Log("gun in triggers");
+        //        PickUpGun(_targetGun.transform);
+        //        RemoveTriggersFromList(_targetGun.GetComponents<Collider>());
+        //        _rangeTriggerChecker.RemoveTriggersFromList(_targetGun.GetComponents<Collider>());
+        //        _targetGun = null;
+        //        yield return NodeResult.Succes;
+        //    }
+
+        //    if (_navMeshAgentController.HasNavMeshReachedDestination() || _targetGun.transform.parent!=null)
+        //    {
+        //        _rangeTriggerChecker.RemoveTriggersFromList(_targetGun.GetComponents<Collider>());
+        //        _targetGun = null;
+        //        _roamingTime = _roamingTimer;
+        //    }
+        //    else
+        //    {
+        //        yield return NodeResult.Running;
+        //    }
+        //}
+
+        //yield return NodeResult.Failure;
+
+        //pick up gun
+        if (_triggers.Contains(_targetGun.GetComponent<Collider>()))
         {
-            _targetGun = _rangeTriggerChecker.GetClosestTriggerObjectWithTag("Gun");
-            if (_targetGun != null)
-            {
-                Debug.Log("set target ("+gameObject.name+")");
-                _navMeshAgentController.Run();
-                _navMeshAgentController.SetDestination(_targetGun.transform.position);
-                yield return NodeResult.Running;
-            }
+            Debug.Log("gun in triggers");
+            PickUpGun(_targetGun.transform);
+            RemoveTriggersFromList(_targetGun.GetComponents<Collider>());
+            _rangeTriggerChecker.RemoveTriggersFromList(_targetGun.GetComponents<Collider>());
+            _targetGun = null;
         }
         else
         {
-            //pick up gun
-            if (_triggers.Contains(_targetGun.GetComponent<Collider>()))
-            {
-                Debug.Log("gun in triggers");
-                PickUpGun(_targetGun.transform);
-                RemoveTriggersFromList(_targetGun.GetComponents<Collider>());
-                _rangeTriggerChecker.RemoveTriggersFromList(_targetGun.GetComponents<Collider>());
-                _targetGun = null;
-                yield return NodeResult.Succes;
-            }
-
-            if (_navMeshAgentController.HasNavMeshReachedDestination() || _targetGun.transform.parent!=null)
-            {
-                _rangeTriggerChecker.RemoveTriggersFromList(_targetGun.GetComponents<Collider>());
-                _targetGun = null;
-                _roamingTime = _roamingTimer;
-            }
-            else
-            {
-                yield return NodeResult.Running;
-            }
+            Debug.Log("set target (" + gameObject.name + ")");
+            _navMeshAgentController.Run();
+            _navMeshAgentController.SetDestination(_targetGun.transform.position);
         }
-
-        yield return NodeResult.Failure;
+        yield return NodeResult.Succes;
     }
 
     private bool IsNotInteracting()
@@ -363,7 +384,7 @@ new SelectorNode(
         {
             //Debug.Log("angle: " + Quaternion.Angle(_transform.rotation, Quaternion.LookRotation(directionPlayer)));
             RaycastHit hit;
-            if (Physics.Raycast(_headTransform.position, directionPlayer, out hit, 1000, _canSeePlayerLayerMask))
+            if (Physics.Raycast(_headTransform.position, directionPlayer, out hit, 100, _canSeePlayerLayerMask))
             {
                 //Debug.Log(hit.transform.name);
                 if (hit.transform.gameObject.layer == 9)
@@ -405,17 +426,50 @@ new SelectorNode(
             return false;
     }
 
-    private bool IsPlayerCloserThanGun()
+    private bool IsGunCloserThanPlayer()
     {
-        GameObject gun = _rangeTriggerChecker.GetClosestTriggerObjectWithTag("Gun");
-        if (gun != null)
+        if (_targetGun != null)
         {
-            if ((_playerTransform.position - _transform.position).sqrMagnitude > (gun.transform.position - _transform.position).sqrMagnitude)
+            if ((_playerTransform.position - _transform.position).sqrMagnitude > (_targetGun.transform.position - _transform.position).sqrMagnitude
+                && (_targetGun.transform.position - _transform.position).sqrMagnitude<_maxDistancefromGun*_maxDistancefromGun)
             {
-                return false;
+                Debug.Log("Gun is closer");
+                return true;
             }
         }
-        return true;
+        return false;
+    }
+
+    private bool SeesGun()
+    {
+        if (GetGunInHolster() != null) return false;
+
+        //get all guns that are closeby
+        List<GameObject> _targetGuns = _rangeTriggerChecker.GetTriggerObjectsWithTag("Gun");
+        if (_targetGuns.Count <= 0) return false;
+
+        //get the closest gun the player can see
+        float distance = 100;
+        foreach (GameObject gun in _targetGuns)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(_headTransform.position, gun.transform.position - _headTransform.position, out hit, 100, _canSeePlayerLayerMask))
+            {
+                if (hit.collider.CompareTag("Gun"))
+                {
+                    float tempDistance = Vector3.SqrMagnitude(gun.transform.position- _transform.position);
+                    if (tempDistance < distance)
+                    {
+                        distance = tempDistance;
+                        _targetGun = gun.gameObject;
+                    }
+                    Debug.Log("I see gun");
+                }
+            }
+        }
+
+        if (_targetGun != null) return true;
+        return false;
     }
 
     private bool HasBeenAttacked()
@@ -620,7 +674,7 @@ new SelectorNode(
 
         _navMeshAgentController.RigidBody.useGravity = true;
         _navMeshAgentController.RigidBody.isKinematic = false;
-        if(Vector3.Angle(_transform.forward, _object.transform.forward) > 140)
+        if(Vector3.Angle(_transform.forward, _object.transform.forward) > 145)
             _navMeshAgentController.RigidBody.AddForce(_transform.TransformVector(_jumpForce), ForceMode.Impulse);
         else
             _navMeshAgentController.RigidBody.AddForce((Vector3.Scale(_object.transform.position - _transform.position, new Vector3(1,0,1)).normalized*_jumpForce.z)+new Vector3(0,_jumpForce.y,0),ForceMode.Impulse);

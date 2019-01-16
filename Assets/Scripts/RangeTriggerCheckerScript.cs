@@ -38,6 +38,17 @@ public class RangeTriggerCheckerScript : MonoBehaviour {
         return closest;
     }
 
+    public List<GameObject> GetTriggerObjectsWithTag(string tag)
+    {
+        List<GameObject> _objects = new List<GameObject>();
+        foreach (Collider col in _triggers)
+        {
+            if (!col.gameObject.CompareTag(tag)) continue;
+            _objects.Add(col.gameObject);
+        }
+        return _objects;
+    }
+
     public void RemoveTriggersFromList(Collider[] colliders)
     {
         for (int i = colliders.Length - 1; i >= 0; i--)

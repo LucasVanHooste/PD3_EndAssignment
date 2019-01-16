@@ -2004,8 +2004,8 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1585486145818626}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 41, y: 1, z: 14.5}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -12, y: -2, z: 29.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4018703244197080}
@@ -2385,7 +2385,7 @@ MonoBehaviour:
   FOV: 180
   _canSeePlayerLayerMask:
     serializedVersion: 2
-    m_Bits: 5633
+    m_Bits: 22017
   _minDistanceFromPlayer: 1.2
   _horizontalPunchReach: 1.5
   _verticalPunchReach: 1
@@ -2405,7 +2405,7 @@ MonoBehaviour:
   _headTransform: {fileID: 4011835408085360}
   _maxHealth: 100
   _jumpForce: {x: 0, y: 4.5, z: 5.5}
-  _maxDistancefromGun: 0
+  _maxDistancefromGun: 3
   _rangeTriggerChecker: {fileID: 114852952954886888}
   _fallForce: {x: 0, y: 2.5, z: 3}
 --- !u!114 &114634048270874922
@@ -2440,7 +2440,7 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 4
+  m_Radius: 5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!136 &136371829917209094
 CapsuleCollider:
