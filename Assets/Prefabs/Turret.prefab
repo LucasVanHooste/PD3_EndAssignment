@@ -633,15 +633,15 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1599814158366782}
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 41.5, y: 4, z: 7.5}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -15.5, y: 1.05, z: 43.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4651168968549960}
   - {fileID: 4946257679830138}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4706706527993928
 Transform:
   m_ObjectHideFlags: 1
@@ -1406,8 +1406,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _horizontalAnchorTransform: {fileID: 4651168968549960}
   _verticalAnchorTransform: {fileID: 4941332014303374}
-  LeftHandIK: {fileID: 4161835485873696}
-  RightHandIK: {fileID: 4542576122770240}
+  _leftHandIK: {fileID: 4161835485873696}
+  _rightHandIK: {fileID: 4542576122770240}
   _playerTransform: {fileID: 4887205847476872}
   _camDefaultTransform: {fileID: 4040145489540014}
   _camAimingTransform: {fileID: 4414139825384956}

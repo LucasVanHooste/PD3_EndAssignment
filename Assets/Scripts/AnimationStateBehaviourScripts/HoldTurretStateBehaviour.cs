@@ -69,17 +69,5 @@ public class HoldTurretStateBehaviour : StateMachineBehaviour {
             animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, _iKWeight);
             animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, _iKWeight);
         }
-
-        //if (_turretScript.LeftElbowIK)
-        //{
-        //    animator.SetIKHintPosition(AvatarIKHint.LeftElbow, _turretScript.LeftElbowIK.position);
-        //    animator.SetIKHintPositionWeight(AvatarIKHint.LeftElbow, 1f);
-        //}
-        //if (_turretScript.RightElbowIK)
-        //{
-        //    animator.SetIKHintPosition(AvatarIKHint.RightElbow, _turretScript.RightElbowIK.position);
-        //    animator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, .5f);
-        //}
-
     }
 }

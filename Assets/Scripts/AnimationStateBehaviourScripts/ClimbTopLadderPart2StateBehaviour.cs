@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class ClimbTopLadderPart2StateBehaviour : StateMachineBehaviour {
 
-    private PhysicsController _physicsController;
+    private PlayerPhysicsController _physicsController;
     private PlayerController _playerController;
     private AnimationsController _animationsController;
     private EnemyBehaviour _enemyBehaviour;
-    private NavMeshAgentController _navMeshAgentController;
+    private EnemyPhysicsController _navMeshAgentController;
 
 
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
@@ -48,7 +48,7 @@ public class ClimbTopLadderPart2StateBehaviour : StateMachineBehaviour {
             _navMeshAgentController.Warp(_navMeshAgentController.transform.position);
             _animationsController.Climb(false);
             animator.applyRootMotion = false;
-            _enemyBehaviour.IsInteracting = false;
+            _enemyBehaviour.StopMovementAction();
             _navMeshAgentController = null;
         }
     }
@@ -64,14 +64,14 @@ public class ClimbTopLadderPart2StateBehaviour : StateMachineBehaviour {
 
     //}
 
-    public void SetBehaviour(PlayerController playerController, PhysicsController physicsController, AnimationsController animationsController)
+    public void SetBehaviour(PlayerController playerController, PlayerPhysicsController physicsController, AnimationsController animationsController)
     {
         _playerController = playerController;
         _physicsController = physicsController;
         _animationsController = animationsController;
     }
 
-    public void SetBehaviour(EnemyBehaviour enemyBehaviour, NavMeshAgentController navMeshAgentController, AnimationsController animationsController)
+    public void SetBehaviour(EnemyBehaviour enemyBehaviour, EnemyPhysicsController navMeshAgentController, AnimationsController animationsController)
     {
         _enemyBehaviour = enemyBehaviour;
         _navMeshAgentController = navMeshAgentController;

@@ -13,8 +13,8 @@ public class AnimationsController {
     public readonly HoldTurretStateBehaviour TurretIK;
 
     private Animator _animator;
-    private PhysicsController _physicsController;
-    private NavMeshAgentController _navMeshAgentController;
+    private PlayerPhysicsController _physicsController;
+    private EnemyPhysicsController _navMeshAgentController;
 
     private int _zMovementAnimationParameter = Animator.StringToHash("ZMovement");
     private int _xMovementAnimationParameter = Animator.StringToHash("XMovement");
@@ -55,11 +55,11 @@ public class AnimationsController {
         TurretIK = _animator.GetBehaviour<HoldTurretStateBehaviour>();
     }
 
-    public AnimationsController(Animator animator, NavMeshAgentController navMeshAgentController) : this(animator)
+    public AnimationsController(Animator animator, EnemyPhysicsController navMeshAgentController) : this(animator)
     {       
         _navMeshAgentController = navMeshAgentController;
     }
-    public AnimationsController(Animator animator, PhysicsController physicsController) : this(animator)
+    public AnimationsController(Animator animator, PlayerPhysicsController physicsController) : this(animator)
     {
         _physicsController = physicsController;
     }
@@ -121,9 +121,6 @@ public class AnimationsController {
 
     public void Die(float localXCoordinate, float localZCoordinate)
     {
-        Debug.Log("DieX: " + localXCoordinate);
-        Debug.Log("DieZ: " + localZCoordinate);
-
         _animator.SetFloat(_hitOriginXParameter, localXCoordinate);
         _animator.SetFloat(_hitOriginZParameter, localZCoordinate);
         _animator.SetTrigger(_deathParameter);
@@ -145,19 +142,9 @@ public class AnimationsController {
 
     public void ResetAnimations()
     {
-        //_animator.SetFloat(_zMovementAnimationParameter, 0);
-        //_animator.SetFloat(_xMovementVelocityAnimationParameter, 0);
-
-        //_animator.SetFloat(_horizontalRotationAnimationParameter, 0);
-        //_animator.SetFloat(_verticalVelocityAnimationParameter, 0);
-        //_animator.SetFloat(_distanceFromGroundParameter, _physicsController.GetDistanceFromGround());
-
-        //_animator.SetBool(_jumpingAnimationParameter, true);
-        //_animator.SetBool(_pushingAnimationParameter, false);
-        //_animator.SetBool(_pickingUpGunParameter, false);
-        //_animator.SetBool(_punchParameter, false);
         _animator.SetBool(_isAimingGunParameter, false);
         _animator.SetTrigger(_resetParameter);
+        //other parameters are reset on update
     }
 
     public void ApplyRootMotion(bool apply)

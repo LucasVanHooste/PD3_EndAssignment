@@ -2370,6 +2370,8 @@ MonoBehaviour:
   _mapLayerMask:
     serializedVersion: 2
     m_Bits: 1537
+  _jumpForce: {x: 0, y: 4.5, z: 5.5}
+  _fallForce: {x: 0, y: 2.5, z: 3}
   _isGroundedChecker: {fileID: 114634048270874922}
 --- !u!114 &114503319564626038
 MonoBehaviour:
@@ -2404,10 +2406,8 @@ MonoBehaviour:
   _lookAtPosition: {fileID: 4164360721212554}
   _eyesPosition: {x: 0, y: 1.5, z: 0}
   _maxHealth: 100
-  _jumpForce: {x: 0, y: 4.5, z: 5.5}
   _maxDistancefromGun: 3
   _rangeTriggerChecker: {fileID: 114852952954886888}
-  _fallForce: {x: 0, y: 2.5, z: 3}
 --- !u!114 &114634048270874922
 MonoBehaviour:
   m_ObjectHideFlags: 1

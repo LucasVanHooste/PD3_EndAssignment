@@ -28,20 +28,9 @@ public class CinematicBehaviour : MonoBehaviour {
 
     private CinematicScene _currentScene;
 
-    // Use this for initialization
-    void Start () {
-
-    }
-	
-	// Update is called once per frame
-	//void Update () {
-
- //   }
-
     public void PlayCinematicScene(string sceneName)
     {
         _isSceneFinished = false;
-        Debug.Log("Play cinematic");
 
         //get scene from list
         foreach (CinematicScene scene in _cinematicScenes)

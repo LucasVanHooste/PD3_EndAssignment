@@ -398,7 +398,7 @@ MonoBehaviour:
   LocalRotationOnPlayer: {x: 0, y: 0, z: 0}
   LocalAimPositionOnPlayer: {x: 0.12, y: 0.05, z: 0.52}
   LocalAimRotationOnPlayer: {x: 0, y: 0, z: 0}
-  IsTwoHanded: 1
+  _isTwoHanded: 1
   _fireRate: 0.2
   _bulletDamage: 30
   _playerBulletLayermask:
