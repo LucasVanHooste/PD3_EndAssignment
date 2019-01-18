@@ -14,6 +14,8 @@ public class EnemyLadderAction : IEnemyMovementAction
 
     const float _ladderPaddingDistance = 0.15f;
 
+    private bool _isClimbing = false;
+
     public EnemyLadderAction(AnimationsController animationsController, EnemyPhysicsController navMeshAgentController, EnemyBehaviour enemyBehaviour, Transform ladder)
     {
         _animationsController = animationsController;
@@ -46,6 +48,7 @@ public class EnemyLadderAction : IEnemyMovementAction
             yield return null;
         }
 
+        _isClimbing = true;
         _enemyBehaviour.HolsterGun();
         ladderScript.IsPersonClimbing = true;
         _enemyBehaviour.gameObject.layer = LayerMask.NameToLayer("NoCollisionWithEnemy");
@@ -89,7 +92,9 @@ public class EnemyLadderAction : IEnemyMovementAction
 
     public void Stop()
     {
+        if(_isClimbing)
         _ladderScript.IsPersonClimbing = false;
+
         if (_climbLadder != null)
         {
             _enemyBehaviour.StopCoroutine(_climbLadder);

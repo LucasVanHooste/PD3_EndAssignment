@@ -224,6 +224,12 @@ public class EnemyPhysicsController : MonoBehaviour {
         _navMeshAgent.isStopped = stop;
     }
 
+    public void Die()
+    {
+        _navMeshAgent.isStopped = true;
+        _navMeshAgent.enabled = false;
+    }
+
     public void ResetRigidbodyConstraints()
     {
         RigidBody.constraints = _constraints;

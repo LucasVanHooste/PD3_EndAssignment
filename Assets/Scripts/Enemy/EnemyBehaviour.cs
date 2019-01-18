@@ -605,7 +605,7 @@ public class EnemyBehaviour : MonoBehaviour
     public void ToDeadState()
     {
         _health = 0;
-        _navMeshAgentController.Stop(true);
+        _navMeshAgentController.Die();
         gameObject.layer = LayerMask.NameToLayer("NoCollisionWithPlayer");
         StopCoroutine(_treeCoroutine);
         GameObject.Destroy(this);

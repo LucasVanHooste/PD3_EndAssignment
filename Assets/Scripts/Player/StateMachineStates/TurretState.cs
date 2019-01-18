@@ -144,13 +144,6 @@ public class TurretState : BasePlayerState
         _cameraController.HoldTurret(_turretScript.CamDefaultTransform, _turretScript.CamAimingTransform, _turretScript.VerticalAnchorTransform);
     }
 
-    private void ClimbLadder()
-    {
-        _animationsController.ApplyRootMotion(true);
-        _physicsController.HasGravity(false);
-        _animationsController.Climb(true);
-    }
-
     private void FireTurret()
     {
         _turretScript.FireTurret(_isShooting);

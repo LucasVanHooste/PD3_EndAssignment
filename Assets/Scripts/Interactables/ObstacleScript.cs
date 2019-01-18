@@ -8,11 +8,6 @@ public class ObstacleScript : MonoBehaviour {
     public readonly float ObstacleWidth = 2;
 
     public GameObject ObstacleCollisionCheckerPrefab;
-    public Transform LeftHandIK;
-    public Transform RightHandIK;
-
-    public float ObstacleHeightPadding;
-    public float ObstaclePadding;
 
     private Rigidbody _rigidbody;
 
