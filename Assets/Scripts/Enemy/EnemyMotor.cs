@@ -143,7 +143,7 @@ public class EnemyMotor : MonoBehaviour {
     {
         if (RigidBody.isKinematic)
         {
-            if (!_navMeshAgent.updatePosition || _navMeshAgent.isStopped)
+            if (!_navMeshAgent.updatePosition || (_navMeshAgent.isOnNavMesh && _navMeshAgent.isStopped))
                 return Vector3.zero;
 
             Vector3 relativeVelocity = _transform.InverseTransformVector(_navMeshAgent.velocity);

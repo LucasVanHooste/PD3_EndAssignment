@@ -54547,6 +54547,21 @@ PrefabInstance:
       propertyPath: m_RootOrder
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 114685799192635404, guid: ac5eae4ee151913489c82c210b1f2983,
+        type: 3}
+      propertyPath: _dragOnGround
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 114685799192635404, guid: ac5eae4ee151913489c82c210b1f2983,
+        type: 3}
+      propertyPath: _dragInAir
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114685799192635404, guid: ac5eae4ee151913489c82c210b1f2983,
+        type: 3}
+      propertyPath: _dragWhileFalling
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 54866441737205970, guid: ac5eae4ee151913489c82c210b1f2983,
         type: 3}
       propertyPath: m_IsKinematic

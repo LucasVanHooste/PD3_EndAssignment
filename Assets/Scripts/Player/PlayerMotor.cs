@@ -18,8 +18,6 @@ public class PlayerMotor : MonoBehaviour {
 
     [SerializeField] private float _dragInAir = 1;
 
-    [SerializeField] private float _dragWhileFalling = 1;
-
     [SerializeField] private float _walkingSpeedMultiplier;
 
     private CharacterController _characterController;
@@ -118,7 +116,7 @@ public class PlayerMotor : MonoBehaviour {
 
     private void ApplyGround()
     {
-        if (_characterController.isGrounded)
+        if (IsGrounded)
         {
             _velocity -= Vector3.Project(_velocity, Physics.gravity.normalized);
         }
@@ -135,16 +133,6 @@ public class PlayerMotor : MonoBehaviour {
 
     private void ApplyJump()
     {
-        //https://en.wikipedia.org/wiki/Equations_of_motion
-        //v^2 = v0^2  + 2*a(r - r0)
-        //v = 0
-        //v0 = ?
-        //a = 9.81
-        //r = 1
-        //r0 = 0
-        //v0 = sqrt(2 * 9.81 * 1) 
-        //but => g is inverted
-
         if (Jump && IsGrounded)
         {
             _velocity += -Physics.gravity.normalized * Mathf.Sqrt(2 * Physics.gravity.magnitude * _jumpHeight);
@@ -157,10 +145,11 @@ public class PlayerMotor : MonoBehaviour {
     {
         if (!IsGrounded)
         {
-            _velocity.x = _velocity.x * (1 - Time.deltaTime * _dragInAir);
+            Vector3 xzVelocity = Vector3.Scale(_velocity, new Vector3(1, 0, 1));
+            xzVelocity = xzVelocity * (1 - Time.deltaTime * _dragInAir);
 
-            if (_velocity.y < 0)
-                _velocity.y = _velocity.y * (1 - Time.deltaTime * _dragWhileFalling);
+            xzVelocity.y = _velocity.y;
+            _velocity = xzVelocity;
         }
     }
 
