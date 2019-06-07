@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Animator))]
-[RequireComponent(typeof(EnemyPhysicsController))]
+[RequireComponent(typeof(EnemyMotor))]
 public class EnemyBehaviour : MonoBehaviour
 {
 
@@ -12,7 +12,7 @@ public class EnemyBehaviour : MonoBehaviour
     private Coroutine _treeCoroutine;
     private IEnemyMovementAction _enemyMovementAction;
     private Transform _transform;
-    private EnemyPhysicsController _navMeshAgentController;
+    private EnemyMotor _enemyMotor;
     private Animator _animator;
     private AnimationsController _animationsController;
     private Transform _playerTransform;
@@ -80,16 +80,16 @@ public class EnemyBehaviour : MonoBehaviour
     {
         _health = _maxHealth;
         _transform = transform;
-        _navMeshAgentController = GetComponent<EnemyPhysicsController>();
+        _enemyMotor = GetComponent<EnemyMotor>();
 
         _animator = GetComponent<Animator>();
-        _animationsController = new AnimationsController(_animator, _navMeshAgentController);
+        _animationsController = new AnimationsController(_animator);
         _animationsController.HoldGunIK.Player = _transform;
         _animationsController.LookAtIK.LookAtPosition = _lookAtPosition;
         _animationsController.ClimbBottomLadderIK.LeftHand = _leftHand;
         _animationsController.ClimbBottomLadderIK.RightHand =_rightHand;
 
-        _playerTransform = _navMeshAgentController.PlayerTransform;
+        _playerTransform = _enemyMotor.PlayerTransform;
         _playerController = _playerTransform.GetComponent<PlayerController>();
 
         _forgetAboutPlayerTimer = _forgetAboutPlayerTime;
@@ -137,7 +137,7 @@ public class EnemyBehaviour : MonoBehaviour
     {
         if (_health <= 0) return;
 
-        if (_navMeshAgentController.RigidBody.velocity.y < -7f)
+        if (_enemyMotor.RigidBody.velocity.y < -7f)
             DropGun();
 
         if (_gun != null)
@@ -148,7 +148,7 @@ public class EnemyBehaviour : MonoBehaviour
         _fireGun = false;
         _aimGun = false;
 
-        if (!IsInMovementAction && _navMeshAgentController.IsOnOffMeshLink() && _triggers.Count > 0)
+        if (!IsInMovementAction && _enemyMotor.IsOnOffMeshLink() && _triggers.Count > 0)
         {
              GameObject _object = GetClosestTriggerObject();
 
@@ -156,24 +156,34 @@ public class EnemyBehaviour : MonoBehaviour
             {
                 case "Ladder":
                     {
-                        _enemyMovementAction = new EnemyLadderAction(_animationsController, _navMeshAgentController, this, _object.transform);
+                        _enemyMovementAction = new EnemyLadderAction(_animationsController, _enemyMotor, this, _object.transform);
                     }break;
                 case "Jump":
                     {
-                        _enemyMovementAction = new EnemyJumpAction(_navMeshAgentController,this, _object.transform);
+                        _enemyMovementAction = new EnemyJumpAction(_enemyMotor,this, _object.transform);
                     }break;
                 case "Fall":
                     {
-                        _enemyMovementAction = new EnemyFallAction(_navMeshAgentController,this, _object.transform);
+                        _enemyMovementAction = new EnemyFallAction(_enemyMotor,this, _object.transform);
                     }
                     break;
             }
         }
-        
-        _animationsController.Update();
+
+        UpdateAnimations();
 
         _punchCoolDownTimer += Time.deltaTime;
         _roamingTimer += Time.deltaTime;
+    }
+
+    private void UpdateAnimations()
+    {
+        _animationsController.SetHorizontalMovement(_enemyMotor.RelativeVelocity);
+        _animationsController.SetRotationSpeed(_enemyMotor.RotationSpeed);
+
+        _animationsController.SetIsGrounded(_enemyMotor.IsGrounded());
+        _animationsController.SetDistanceFromGround(_enemyMotor.DistanceFromGround);
+        _animationsController.SetVerticalVelocity(_enemyMotor.RelativeVelocity.y);
     }
 
     private void OnDrawGizmos()
@@ -199,26 +209,26 @@ public class EnemyBehaviour : MonoBehaviour
         {
             _roamingTime = UnityEngine.Random.Range(_roamingTimeRange.x, _roamingTimeRange.y);
             _roamingTimer = 0;
-            _navMeshAgentController.Walk();
-            _navMeshAgentController.SetDestination(_navMeshAgentController.RandomNavSphere(_transform.position, 3, -1));
+            _enemyMotor.Walk();
+            _enemyMotor.SetDestination(_enemyMotor.RandomNavSphere(_transform.position, 3, -1));
         }
         yield return NodeResult.Succes;
     }
 
     private IEnumerator<NodeResult> LookForPlayer()
     {
-        if (!_navMeshAgentController.UpdateTransformToNavmesh)
+        if (!_enemyMotor.UpdateTransformToNavmesh)
         {
-            _navMeshAgentController.Warp(_transform.position);
-            _navMeshAgentController.UpdateTransformToNavmesh = true;
-            _navMeshAgentController.SetDestination(_navMeshAgentController.RandomNavSphere(_playerTransform.position, 4, -1));
+            _enemyMotor.Warp(_transform.position);
+            _enemyMotor.UpdateTransformToNavmesh = true;
+            _enemyMotor.SetDestination(_enemyMotor.RandomNavSphere(_playerTransform.position, 4, -1));
         }
 
-        _navMeshAgentController.Run();
-        if (_navMeshAgentController.HasNavMeshReachedDestination())
+        _enemyMotor.Run();
+        if (_enemyMotor.HasNavMeshReachedDestination())
         {
             if ((_playerTransform.position - _transform.position).sqrMagnitude < _hearingDistance * _hearingDistance)
-                _navMeshAgentController.SetDestination(_navMeshAgentController.RandomNavSphere(_playerTransform.position, 4, -1));
+                _enemyMotor.SetDestination(_enemyMotor.RandomNavSphere(_playerTransform.position, 4, -1));
             else
                 _forgetAboutPlayerTimer = _forgetAboutPlayerTime;
         }
@@ -231,21 +241,21 @@ public class EnemyBehaviour : MonoBehaviour
         {
             if (Vector3.Scale(_playerTransform.position - _transform.position, new Vector3(1, 0, 1)).magnitude > _minDistanceFromPlayer)
             {
-                _navMeshAgentController.Run();
+                _enemyMotor.Run();
 
-                if (!_navMeshAgentController.UpdateTransformToNavmesh)
+                if (!_enemyMotor.UpdateTransformToNavmesh)
                 {
-                    _navMeshAgentController.Warp(_transform.position);
-                    _navMeshAgentController.UpdateTransformToNavmesh = true;
+                    _enemyMotor.Warp(_transform.position);
+                    _enemyMotor.UpdateTransformToNavmesh = true;
                 }
             }
             else
             {
-                _navMeshAgentController.UpdateTransformToNavmesh = false;
-                _navMeshAgentController.RotateToPlayer();
+                _enemyMotor.UpdateTransformToNavmesh = false;
+                _enemyMotor.RotateToPlayer();
             }
 
-            _navMeshAgentController.SetDestination(_playerTransform.position);
+            _enemyMotor.SetDestination(_playerTransform.position);
         }
 
         yield return NodeResult.Succes;
@@ -267,10 +277,10 @@ public class EnemyBehaviour : MonoBehaviour
 
     private IEnumerator<NodeResult> FireGunAtPlayer()
     {
-        if (!_navMeshAgentController.IsOnOffMeshLink())
+        if (!_enemyMotor.IsOnOffMeshLink())
         {
-            _navMeshAgentController.UpdateTransformToNavmesh = false;
-            _navMeshAgentController.RotateToPlayer();
+            _enemyMotor.UpdateTransformToNavmesh = false;
+            _enemyMotor.RotateToPlayer();
 
             if (_playerController.Health > 0)
             {
@@ -294,8 +304,8 @@ public class EnemyBehaviour : MonoBehaviour
         }
         else
         {
-            _navMeshAgentController.Run();
-            _navMeshAgentController.SetDestination(_targetGun.transform.position);
+            _enemyMotor.Run();
+            _enemyMotor.SetDestination(_targetGun.transform.position);
         }
         yield return NodeResult.Succes;
     }
@@ -574,9 +584,9 @@ public class EnemyBehaviour : MonoBehaviour
         _animationsController.Die(transformedOrigin.x, transformedOrigin.z);
         _animationsController.Climb(false);
         _animationsController.ApplyRootMotion(false);
-        _navMeshAgentController.RigidBody.constraints = RigidbodyConstraints.FreezeRotation;
-        _navMeshAgentController.RigidBody.isKinematic = false;  
-        _navMeshAgentController.RigidBody.useGravity = true;
+        _enemyMotor.RigidBody.constraints = RigidbodyConstraints.FreezeRotation;
+        _enemyMotor.RigidBody.isKinematic = false;  
+        _enemyMotor.RigidBody.useGravity = true;
 
         DropGun();
         DropHolsterGun();
@@ -605,7 +615,7 @@ public class EnemyBehaviour : MonoBehaviour
     public void ToDeadState()
     {
         _health = 0;
-        _navMeshAgentController.Die();
+        _enemyMotor.Die();
         gameObject.layer = LayerMask.NameToLayer("NoCollisionWithPlayer");
         StopCoroutine(_treeCoroutine);
         GameObject.Destroy(this);

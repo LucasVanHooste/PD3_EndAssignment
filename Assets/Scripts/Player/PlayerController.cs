@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(PlayerPhysicsController))]
+[RequireComponent(typeof(PlayerMotor))]
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(CameraController))]
 
 public class PlayerController : MonoBehaviour {
 
     private Transform _transform;
-    private PlayerPhysicsController _physicsController;
+    private PlayerMotor _playerMotor;
     private Animator _animator;
     private PlayerController _playerController;
     private IState _state;
@@ -105,10 +105,10 @@ public class PlayerController : MonoBehaviour {
     void Start () {
         _health = _maxHealth;
         _transform = transform;
-        _physicsController = GetComponent<PlayerPhysicsController>();
+        _playerMotor = GetComponent<PlayerMotor>();
         _animator = GetComponent<Animator>();
         _playerController = GetComponent<PlayerController>();
-        _animationsController = new AnimationsController(_animator, _physicsController);
+        _animationsController = new AnimationsController(_animator);
 
         _animationsController.HoldGunIK.Player=_transform;
         _animationsController.LookAtIK.LookAtPosition=_lookAtTransform;
@@ -119,15 +119,26 @@ public class PlayerController : MonoBehaviour {
         _startPosition= _transform.position;
         _startRotation = _transform.rotation;
 
-        _state = new NormalState(_transform, _physicsController, _playerController, _animationsController);
+        _state = new NormalState(_transform, _playerMotor, _playerController, _animationsController);
         SetHealthBar();
     }
 	
 	// Update is called once per frame
 	void Update () {
         _state.Update();
-        _animationsController.Update();
+
+        UpdateAnimations();
 	}
+
+    private void UpdateAnimations()
+    {
+        _animationsController.SetHorizontalMovement(_playerMotor.Movement);
+        _animationsController.SetRotationSpeed(_playerMotor.Aim.x);
+
+        _animationsController.SetIsGrounded(_playerMotor.IsGrounded());
+        _animationsController.SetDistanceFromGround(_playerMotor.GetDistanceFromGround());
+        _animationsController.SetVerticalVelocity(_playerMotor.GetVelocity().y);
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -152,33 +163,33 @@ public class PlayerController : MonoBehaviour {
 
     public void ToNormalState()
     {
-        _state = new NormalState(_transform, _physicsController,_playerController, _animationsController);
+        _state = new NormalState(_transform, _playerMotor,_playerController, _animationsController);
     }
     public void ToPushingState(GameObject _obstacle)
     {
-        _state = new PushingState(_transform, _physicsController, _playerController, _animationsController, _obstacle, _obstacleIKLeftHand, _obstacleIKRightHand);
+        _state = new PushingState(_transform, _playerMotor, _playerController, _animationsController, _obstacle, _obstacleIKLeftHand, _obstacleIKRightHand);
     }
     public void ToCinematicState(GameObject _object)
     {
-        _state = new CinematicState(_transform, _physicsController, _playerController, _animationsController, _object, _cinematicBehaviour);
+        _state = new CinematicState(_transform, _playerMotor, _playerController, _animationsController, _object, _cinematicBehaviour);
     }
     public void ToGunState(GameObject _gun)
     {
-        _state = new GunState(_transform, _physicsController, _playerController, _animationsController, _gun, _cameraController, _holsterGun1Hand, _holsterGun2Hands, _crossHair);
+        _state = new GunState(_transform, _playerMotor, _playerController, _animationsController, _gun, _cameraController, _holsterGun1Hand, _holsterGun2Hands, _crossHair);
     }
     public void ToDeadState()
     {
-        _state = new DeadState(_physicsController, _playerController);
+        _state = new DeadState(_playerMotor, _playerController);
     }
 
     public void ToClimbingState(GameObject _ladder)
     {
-        _state = new ClimbingState(_transform, _physicsController, _playerController, _animationsController, _ladder);
+        _state = new ClimbingState(_transform, _playerMotor, _playerController, _animationsController, _ladder);
     }
 
     public void ToTurretState(GameObject _turret)
     {
-        _state = new TurretState(_transform, _physicsController, _playerController, _animationsController, _turret, _cameraController, _crossHair);
+        _state = new TurretState(_transform, _playerMotor, _playerController, _animationsController, _turret, _cameraController, _crossHair);
     }
 
     public void PickUpGun()

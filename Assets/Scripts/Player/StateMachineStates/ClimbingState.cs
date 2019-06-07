@@ -6,7 +6,7 @@ using UnityEngine;
 public class ClimbingState : BasePlayerState
 {
     private Transform _playerTransform;
-    private PlayerPhysicsController _physicsController;
+    private PlayerMotor _physicsController;
     private PlayerController _playerController;
     private AnimationsController _animationsController;
 
@@ -16,7 +16,7 @@ public class ClimbingState : BasePlayerState
     private const float _ladderPaddingDistance = 0.15f;
     private Coroutine _climbLadder;
 
-    public ClimbingState(Transform playerTransform, PlayerPhysicsController physicsController, PlayerController playerController, AnimationsController animationsController, GameObject ladder)
+    public ClimbingState(Transform playerTransform, PlayerMotor physicsController, PlayerController playerController, AnimationsController animationsController, GameObject ladder)
     {
         _playerTransform = playerTransform;
         _physicsController = physicsController;

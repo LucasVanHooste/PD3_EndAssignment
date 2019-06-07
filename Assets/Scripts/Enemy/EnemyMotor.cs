@@ -5,7 +5,7 @@ using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(Rigidbody))]
-public class EnemyPhysicsController : MonoBehaviour {
+public class EnemyMotor : MonoBehaviour {
 
     private NavMeshAgent _navMeshAgent;
     public Rigidbody RigidBody { get; set; }

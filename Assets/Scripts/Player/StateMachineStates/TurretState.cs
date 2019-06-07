@@ -6,7 +6,7 @@ using UnityEngine;
 public class TurretState : BasePlayerState
 {
     private Transform _playerTransform;
-    private PlayerPhysicsController _physicsController;
+    private PlayerMotor _physicsController;
     private PlayerController _playerController;
     private AnimationsController _animationsController;
 
@@ -23,7 +23,7 @@ public class TurretState : BasePlayerState
 
     float _turretPaddingDistance = 0.15f;
 
-    public TurretState(Transform playerTransform, PlayerPhysicsController physicsController, PlayerController playerController, AnimationsController animationsController, GameObject turret,
+    public TurretState(Transform playerTransform, PlayerMotor physicsController, PlayerController playerController, AnimationsController animationsController, GameObject turret,
         CameraController cameraController, GameObject crossHair)
     {
         _playerTransform = playerTransform;

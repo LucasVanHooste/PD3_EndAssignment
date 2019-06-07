@@ -6,7 +6,7 @@ using UnityEngine;
 public class PushingState : BasePlayerState
 {
     private Transform _playerTransform;
-    private PlayerPhysicsController _physicsController;
+    private PlayerMotor _physicsController;
     private PlayerController _playerController;
     private AnimationsController _animationsController;
 
@@ -21,7 +21,7 @@ public class PushingState : BasePlayerState
     bool _hasHitObstacle = false;
     private Vector3 _pushStartPosition;
 
-    public PushingState(Transform playerTransform, PlayerPhysicsController physicsController, PlayerController playerController, AnimationsController animationsController, 
+    public PushingState(Transform playerTransform, PlayerMotor physicsController, PlayerController playerController, AnimationsController animationsController, 
         GameObject obstacle, Transform obstacleIKLeftHand, Transform obstacleIKRightHand)
     {
         _playerTransform = playerTransform;

@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class ClimbTopLadderPart2StateBehaviour : StateMachineBehaviour {
 
-    private PlayerPhysicsController _physicsController;
+    private PlayerMotor _physicsController;
     private PlayerController _playerController;
     private AnimationsController _animationsController;
     private EnemyBehaviour _enemyBehaviour;
-    private EnemyPhysicsController _navMeshAgentController;
+    private EnemyMotor _navMeshAgentController;
 
 
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
@@ -64,14 +64,14 @@ public class ClimbTopLadderPart2StateBehaviour : StateMachineBehaviour {
 
     //}
 
-    public void SetBehaviour(PlayerController playerController, PlayerPhysicsController physicsController, AnimationsController animationsController)
+    public void SetBehaviour(PlayerController playerController, PlayerMotor physicsController, AnimationsController animationsController)
     {
         _playerController = playerController;
         _physicsController = physicsController;
         _animationsController = animationsController;
     }
 
-    public void SetBehaviour(EnemyBehaviour enemyBehaviour, EnemyPhysicsController navMeshAgentController, AnimationsController animationsController)
+    public void SetBehaviour(EnemyBehaviour enemyBehaviour, EnemyMotor navMeshAgentController, AnimationsController animationsController)
     {
         _enemyBehaviour = enemyBehaviour;
         _navMeshAgentController = navMeshAgentController;

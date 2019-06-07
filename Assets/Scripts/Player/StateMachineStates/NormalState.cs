@@ -6,7 +6,7 @@ using UnityEngine;
 public class NormalState : BasePlayerState
 {
     private Transform _playerTransform;
-    private PlayerPhysicsController _physicsController;
+    private PlayerMotor _physicsController;
     private PlayerController _playerController;
     private AnimationsController _animationsController;
     private List<Collider> _triggers;
@@ -14,7 +14,7 @@ public class NormalState : BasePlayerState
 
     private float _punchCoolDownTimer = 0;
 
-    public NormalState(Transform playerTransform, PlayerPhysicsController physicsController,PlayerController playerController, AnimationsController animationsController)
+    public NormalState(Transform playerTransform, PlayerMotor physicsController,PlayerController playerController, AnimationsController animationsController)
     {
         _playerTransform = playerTransform;
         _physicsController = physicsController;

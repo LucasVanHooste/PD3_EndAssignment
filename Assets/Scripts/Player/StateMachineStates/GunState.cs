@@ -6,7 +6,7 @@ using UnityEngine;
 public class GunState : BasePlayerState
 {
     private Transform _playerTransform;
-    private PlayerPhysicsController _physicsController;
+    private PlayerMotor _physicsController;
     private PlayerController _playerController;
     private AnimationsController _animationsController;
     private List<Collider> _triggers;
@@ -25,7 +25,7 @@ public class GunState : BasePlayerState
     private float _dropGunTimer=0;
     private float _punchCoolDownTimer = 0;
 
-    public GunState(Transform playerTransform, PlayerPhysicsController physicsController, PlayerController playerController, AnimationsController animationsController, GameObject gun, 
+    public GunState(Transform playerTransform, PlayerMotor physicsController, PlayerController playerController, AnimationsController animationsController, GameObject gun, 
         CameraController cameraController, Transform holsterGun1Hand, Transform holsterGun2Hands, GameObject crossHair)
     {
         _playerTransform = playerTransform;

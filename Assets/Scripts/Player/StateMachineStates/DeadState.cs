@@ -5,12 +5,12 @@ using UnityEngine;
 
 public class DeadState : BasePlayerState
 {
-    private PlayerPhysicsController _physicsController;
+    private PlayerMotor _physicsController;
     private PlayerController _playerController;
 
     private GameObject _object;
 
-    public DeadState(PlayerPhysicsController physicsController, PlayerController playerController)
+    public DeadState(PlayerMotor physicsController, PlayerController playerController)
     {
         _physicsController = physicsController;
         _playerController = playerController;

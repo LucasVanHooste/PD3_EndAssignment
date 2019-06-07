@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class EnemyFallAction : IEnemyMovementAction
 {
-    EnemyPhysicsController _navMeshAgentController;
+    EnemyMotor _navMeshAgentController;
     EnemyBehaviour _enemyBehaviour;
     Transform _transform;
     Transform _offMeshLink;
 
     Coroutine _jump;
 
-    public EnemyFallAction(EnemyPhysicsController navMeshAgentController,EnemyBehaviour enemyBahvriour, Transform offMeshLink)
+    public EnemyFallAction(EnemyMotor navMeshAgentController,EnemyBehaviour enemyBahvriour, Transform offMeshLink)
     {
         _navMeshAgentController = navMeshAgentController;
         _enemyBehaviour = enemyBahvriour;

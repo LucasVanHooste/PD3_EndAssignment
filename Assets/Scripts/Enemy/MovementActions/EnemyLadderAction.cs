@@ -5,7 +5,7 @@ using UnityEngine;
 public class EnemyLadderAction : IEnemyMovementAction
 {
     AnimationsController _animationsController;
-    EnemyPhysicsController _navMeshAgentController;
+    EnemyMotor _navMeshAgentController;
     EnemyBehaviour _enemyBehaviour;
     Transform _transform;
     Transform _ladder;
@@ -16,7 +16,7 @@ public class EnemyLadderAction : IEnemyMovementAction
 
     private bool _isClimbing = false;
 
-    public EnemyLadderAction(AnimationsController animationsController, EnemyPhysicsController navMeshAgentController, EnemyBehaviour enemyBehaviour, Transform ladder)
+    public EnemyLadderAction(AnimationsController animationsController, EnemyMotor navMeshAgentController, EnemyBehaviour enemyBehaviour, Transform ladder)
     {
         _animationsController = animationsController;
         _navMeshAgentController = navMeshAgentController;

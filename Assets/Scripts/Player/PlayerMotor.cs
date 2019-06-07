@@ -4,7 +4,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(CameraController))]
-public class PlayerPhysicsController : MonoBehaviour {
+public class PlayerMotor : MonoBehaviour {
 
     [Header("Locomotion Parameters")]
     //[SerializeField] private float _mass = 75; // [kg]

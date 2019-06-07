@@ -13,36 +13,34 @@ public class AnimationsController {
     public readonly HoldTurretStateBehaviour TurretIK;
 
     private Animator _animator;
-    private PlayerPhysicsController _physicsController;
-    private EnemyPhysicsController _navMeshAgentController;
 
-    private int _zMovementAnimationParameter = Animator.StringToHash("ZMovement");
-    private int _xMovementAnimationParameter = Animator.StringToHash("XMovement");
+    private static int _zMovementAnimationParameter = Animator.StringToHash("ZMovement");
+    private static int _xMovementAnimationParameter = Animator.StringToHash("XMovement");
 
-    private int _isGroundedAnimationParameter = Animator.StringToHash("IsGrounded");
-    private int _distanceFromGroundParameter = Animator.StringToHash("DistanceFromGround");
+    private static int _isGroundedAnimationParameter = Animator.StringToHash("IsGrounded");
+    private static int _distanceFromGroundParameter = Animator.StringToHash("DistanceFromGround");
 
-    private int _horizontalRotationAnimationParameter = Animator.StringToHash("HorizontalRotation");
-    private int _verticalVelocityAnimationParameter = Animator.StringToHash("VerticalVelocity");
+    private static int _horizontalRotationAnimationParameter = Animator.StringToHash("HorizontalRotation");
+    private static int _verticalVelocityAnimationParameter = Animator.StringToHash("VerticalVelocity");
 
-    private int _pushingAnimationParameter = Animator.StringToHash("Pushing");
-    private int _pickingUpGunParameter = Animator.StringToHash("PickingUpGun");
+    private static int _pushingAnimationParameter = Animator.StringToHash("Pushing");
+    private static int _pickingUpGunParameter = Animator.StringToHash("PickingUpGun");
 
-    private int _punchParameter = Animator.StringToHash("Punch");
-    private int _isAimingGunParameter = Animator.StringToHash("IsAiming");
-    private int _isTwoHandedGunParameter = Animator.StringToHash("IsTwoHandedGun");
+    private static int _punchParameter = Animator.StringToHash("Punch");
+    private static int _isAimingGunParameter = Animator.StringToHash("IsAiming");
+    private static int _isTwoHandedGunParameter = Animator.StringToHash("IsTwoHandedGun");
 
-    private int _climbingAnimationParameter = Animator.StringToHash("Climbing");
-    private int _climbTopAnimationParameter = Animator.StringToHash("ClimbTopLadder");
+    private static int _climbingAnimationParameter = Animator.StringToHash("Climbing");
+    private static int _climbTopAnimationParameter = Animator.StringToHash("ClimbTopLadder");
 
-    private int _takeDamageAnimationParameter = Animator.StringToHash("TakeDamage");
-    private int _hitOriginXParameter = Animator.StringToHash("HitOriginX");
-    private int _hitOriginZParameter = Animator.StringToHash("HitOriginZ");
-    private int _deathParameter = Animator.StringToHash("Die");
+    private static int _takeDamageAnimationParameter = Animator.StringToHash("TakeDamage");
+    private static int _hitOriginXParameter = Animator.StringToHash("HitOriginX");
+    private static int _hitOriginZParameter = Animator.StringToHash("HitOriginZ");
+    private static int _deathParameter = Animator.StringToHash("Die");
 
-    private int _resetParameter = Animator.StringToHash("Reset");
+    private static int _resetParameter = Animator.StringToHash("Reset");
 
-    private AnimationsController(Animator animator)
+    public AnimationsController(Animator animator)
     {
         _animator = animator;
 
@@ -55,37 +53,31 @@ public class AnimationsController {
         TurretIK = _animator.GetBehaviour<HoldTurretStateBehaviour>();
     }
 
-    public AnimationsController(Animator animator, EnemyPhysicsController navMeshAgentController) : this(animator)
-    {       
-        _navMeshAgentController = navMeshAgentController;
-    }
-    public AnimationsController(Animator animator, PlayerPhysicsController physicsController) : this(animator)
+
+    public void SetHorizontalMovement(Vector3 movement)
     {
-        _physicsController = physicsController;
+        _animator.SetFloat(_zMovementAnimationParameter, movement.z);
+        _animator.SetFloat(_xMovementAnimationParameter, movement.x);
     }
 
-    public void Update()
+    public void SetVerticalVelocity(float velocity)
     {
-        if (_physicsController != null)
-        {
-            _animator.SetFloat(_zMovementAnimationParameter, _physicsController.Movement.z);
-            _animator.SetFloat(_xMovementAnimationParameter, _physicsController.Movement.x);
-            _animator.SetFloat(_horizontalRotationAnimationParameter, _physicsController.Aim.x);
+        _animator.SetFloat(_verticalVelocityAnimationParameter, velocity);
+    }
 
-            _animator.SetBool(_isGroundedAnimationParameter, _physicsController.IsGrounded());
-            _animator.SetFloat(_distanceFromGroundParameter, _physicsController.GetDistanceFromGround());
-            _animator.SetFloat(_verticalVelocityAnimationParameter, _physicsController.GetVelocity().y);
-        }
-        if (_navMeshAgentController != null)
-        {
-            _animator.SetFloat(_zMovementAnimationParameter, _navMeshAgentController.RelativeVelocity.z);
-            _animator.SetFloat(_xMovementAnimationParameter, _navMeshAgentController.RelativeVelocity.x);
-            _animator.SetFloat(_horizontalRotationAnimationParameter, _navMeshAgentController.RotationSpeed);
+    public void SetRotationSpeed(float speed)
+    {
+        _animator.SetFloat(_horizontalRotationAnimationParameter, speed);
+    }
 
-            _animator.SetFloat(_verticalVelocityAnimationParameter, _navMeshAgentController.RelativeVelocity.y);
-            _animator.SetBool(_isGroundedAnimationParameter, _navMeshAgentController.IsGrounded());
-            _animator.SetFloat(_distanceFromGroundParameter, _navMeshAgentController.DistanceFromGround);
-        }
+    public void SetIsGrounded(bool isGrounded)
+    {
+        _animator.SetBool(_isGroundedAnimationParameter, isGrounded);
+    }
+
+    public void SetDistanceFromGround(float distance)
+    {
+        _animator.SetFloat(_distanceFromGroundParameter, distance);
     }
 
     public void Push(bool push)
