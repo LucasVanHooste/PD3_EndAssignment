@@ -27,12 +27,12 @@ public class NormalState : BasePlayerState
 
     public override void Update()
     {
-        if (Input.GetButtonDown("Jump") && _physicsController.IsGrounded())
+        if (Input.GetButtonDown("Jump") && _physicsController.IsGrounded)
         {
             _physicsController.Jump = true;
         }
 
-        if (_physicsController.IsGrounded())
+        if (_physicsController.IsGrounded)
             _physicsController.Movement = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
         _physicsController.Aim = new Vector3(Input.GetAxis("RightJoystickX"), 0, Input.GetAxis("RightJoystickY"));
@@ -48,7 +48,7 @@ public class NormalState : BasePlayerState
         }
         _punchCoolDownTimer += Time.deltaTime;
 
-        if (Input.GetButtonDown("Interact") && _physicsController.IsGrounded())
+        if (Input.GetButtonDown("Interact") && _physicsController.IsGrounded)
         {
             InteractWithObject();
         }

@@ -44,7 +44,7 @@ public class TurretState : BasePlayerState
     {
         if (!_isReady) return;
 
-        if (Input.GetAxis("TriggerLeft") > 0.2f && _physicsController.IsGrounded())
+        if (Input.GetAxis("TriggerLeft") > 0.2f && _physicsController.IsGrounded)
         {
             _isAiming = true;
         }

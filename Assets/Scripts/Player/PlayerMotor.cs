@@ -7,7 +7,6 @@ using UnityEngine;
 public class PlayerMotor : MonoBehaviour {
 
     [Header("Locomotion Parameters")]
-    //[SerializeField] private float _mass = 75; // [kg]
 
     [SerializeField] public float MaxRunningSpeed = (30.0f * 1000) / (60 * 60);
 
@@ -15,11 +14,11 @@ public class PlayerMotor : MonoBehaviour {
 
     [SerializeField] private float _jumpHeight = 1; // [m/s^2]
 
-    [SerializeField] private float _dragOnGround = 1; // []
+    [SerializeField] private float _dragOnGround = 1;
 
-    [SerializeField] private float _dragInAir = 1; // []
+    [SerializeField] private float _dragInAir = 1;
 
-    [SerializeField] private float _dragWhileFalling = 1; // []
+    [SerializeField] private float _dragWhileFalling = 1;
 
     [SerializeField] private float _walkingSpeedMultiplier;
 
@@ -32,6 +31,8 @@ public class PlayerMotor : MonoBehaviour {
 
     public bool IsWalking { get; set; }
     public bool Jump { get; set; }
+    public bool IsGrounded { get => _isGroundedChecker.IsGrounded; }
+    public bool HasGravity { get; set; } = true;
     public Vector3 Movement
     {
         get
@@ -53,11 +54,7 @@ public class PlayerMotor : MonoBehaviour {
         set { _aim = value; }
     }
 
-    //public bool Jumping { get; set; }
-
     private Vector3 _velocity = Vector3.zero;
-    private float _timeInAir = 0;
-    private bool _hasGravity = true;
 
     [SerializeField] private float _horizontalRotationSpeed;
     public float HorizontalRotationSpeed
@@ -69,13 +66,12 @@ public class PlayerMotor : MonoBehaviour {
     {
         get { return _verticalRotationSpeed; }
     }
-    [SerializeField] private LayerMask _mapLayerMask;
 
+    [SerializeField] private LayerMask _mapLayerMask;
     [SerializeField] private IsGroundedCheckerScript _isGroundedChecker;
     public IsGroundedCheckerScript IsGroundedChecker
     {
         get { return _isGroundedChecker; }
-        set { _isGroundedChecker = value; }
     }
 
     // Use this for initialization
@@ -104,7 +100,7 @@ public class PlayerMotor : MonoBehaviour {
 
     private void ApplyMovement()
     {
-        if (_characterController.isGrounded)
+        if (IsGrounded)
         {
                 Vector3 relativeMovement = RelativeDirection(Movement);
                 _velocity += relativeMovement * _acceleration * Time.deltaTime; // F(= m.a) [m/s^2] * t [s]
@@ -125,16 +121,14 @@ public class PlayerMotor : MonoBehaviour {
         if (_characterController.isGrounded)
         {
             _velocity -= Vector3.Project(_velocity, Physics.gravity.normalized);
-            //Jumping = false;
         }
     }
 
     private void ApplyGravity()
     {
-        if (_hasGravity && !_characterController.isGrounded)
+        if (HasGravity && !IsGrounded)
         {
             _velocity += Physics.gravity * Time.deltaTime; // g[m/s^2] * t[s]
-            _timeInAir += Time.fixedDeltaTime;
         }
 
     }
@@ -151,19 +145,17 @@ public class PlayerMotor : MonoBehaviour {
         //v0 = sqrt(2 * 9.81 * 1) 
         //but => g is inverted
 
-        if (Jump && _characterController.isGrounded)
+        if (Jump && IsGrounded)
         {
             _velocity += -Physics.gravity.normalized * Mathf.Sqrt(2 * Physics.gravity.magnitude * _jumpHeight);
             Jump = false;
-            //Jumping = true;
-            _timeInAir = 0;
         }
 
     }
 
     private void ApplyAirDrag()
     {
-        if (!_characterController.isGrounded)
+        if (!IsGrounded)
         {
             _velocity.x = _velocity.x * (1 - Time.deltaTime * _dragInAir);
 
@@ -174,7 +166,7 @@ public class PlayerMotor : MonoBehaviour {
 
     private void ApplyGroundDrag()
     {
-        if (_characterController.isGrounded)
+        if (IsGrounded)
         {
             _velocity = _velocity * (1 - Time.deltaTime * _dragOnGround);
         }
@@ -217,31 +209,6 @@ public class PlayerMotor : MonoBehaviour {
         }
         //print("I'm looking at nothing!");
         return 1000;
-    }
-
-    public bool IsGrounded()
-    {
-            return _isGroundedChecker.IsGrounded;
-        //if (_characterController.isGrounded || GetDistanceFromGround() < _skinWidth + 0.02f) //.02 is padding
-        //{
-
-        //    return true;
-        //}
-        //return false;
-    }
-
-    //public bool IsGroundedAnimationCheck()
-    //{
-    //    Debug.Log(Mathf.Abs(_prevPosY - _playerTransform.position.y));
-    //    if (IsGrounded() || (Mathf.Abs(_prevPosY - _playerTransform.position.y) < .001f))
-    //        return true;
-
-    //    return false;
-    //}
-
-    public void HasGravity(bool hasGravity)
-    {
-        _hasGravity = hasGravity;
     }
 
     public void SetPosition(Vector3 position)

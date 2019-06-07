@@ -135,7 +135,7 @@ public class PlayerController : MonoBehaviour {
         _animationsController.SetHorizontalMovement(_playerMotor.Movement);
         _animationsController.SetRotationSpeed(_playerMotor.Aim.x);
 
-        _animationsController.SetIsGrounded(_playerMotor.IsGrounded());
+        _animationsController.SetIsGrounded(_playerMotor.IsGrounded);
         _animationsController.SetDistanceFromGround(_playerMotor.GetDistanceFromGround());
         _animationsController.SetVerticalVelocity(_playerMotor.GetVelocity().y);
     }

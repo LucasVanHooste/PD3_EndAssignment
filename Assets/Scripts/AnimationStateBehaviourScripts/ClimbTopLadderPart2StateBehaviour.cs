@@ -34,7 +34,7 @@ public class ClimbTopLadderPart2StateBehaviour : StateMachineBehaviour {
         if (_playerController != null)
         {
             _playerController.ToNormalState();
-            _physicsController.HasGravity(true);
+            _physicsController.HasGravity=true;
             _animationsController.Climb(false);
             animator.applyRootMotion = false;
             _playerController = null;

@@ -82,13 +82,13 @@ public class ClimbingState : BasePlayerState
     private void ClimbLadder()
     {
         _animationsController.ApplyRootMotion(true);
-        _physicsController.HasGravity(false);
+        _physicsController.HasGravity=false;
         _animationsController.Climb(true);
     }
 
     public override void OnTriggerExit(Collider other)
     {
-        if (_playerController.Health>0 && other.gameObject.tag == "Ladder" && !_physicsController.IsGrounded())
+        if (_playerController.Health>0 && other.gameObject.tag == "Ladder" && !_physicsController.IsGrounded)
         {
             int mask = LayerMask.NameToLayer("NoCollisions");
 
@@ -104,7 +104,7 @@ public class ClimbingState : BasePlayerState
         _playerController.StopCoroutine(_climbLadder);
 
         _ladderScript.IsPersonClimbing = false;
-        _physicsController.HasGravity(true);
+        _physicsController.HasGravity=true;
         _animationsController.Climb(false);
         _animationsController.ApplyRootMotion(false);
         _playerController.gameObject.layer = LayerMask.NameToLayer("Player");

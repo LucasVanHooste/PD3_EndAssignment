@@ -63,17 +63,17 @@ public class GunState : BasePlayerState
             return;
         }
 
-        if (Input.GetButtonDown("Jump") && _physicsController.IsGrounded())
+        if (Input.GetButtonDown("Jump") && _physicsController.IsGrounded)
         {
             _physicsController.Jump = true;
         }
 
-        if (_physicsController.IsGrounded())
+        if (_physicsController.IsGrounded)
             _physicsController.Movement = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
         _physicsController.Aim = new Vector3(Input.GetAxis("RightJoystickX"), 0, Input.GetAxis("RightJoystickY"));
 
-        if (Input.GetAxis("TriggerLeft") > 0.2f && _physicsController.IsGrounded())
+        if (Input.GetAxis("TriggerLeft") > 0.2f && _physicsController.IsGrounded)
         {
             _isAiming = true;
         }
@@ -99,7 +99,7 @@ public class GunState : BasePlayerState
 
         }
         _punchCoolDownTimer += Time.deltaTime;
-        if (Input.GetButtonDown("Interact") && _physicsController.IsGrounded() && !_isAiming)
+        if (Input.GetButtonDown("Interact") && _physicsController.IsGrounded && !_isAiming)
         {
             InteractWithObject();
         }
