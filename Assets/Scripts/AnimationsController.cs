@@ -24,7 +24,7 @@ public class AnimationsController {
     private static int _verticalVelocityAnimationParameter = Animator.StringToHash("VerticalVelocity");
 
     private static int _pushingAnimationParameter = Animator.StringToHash("Pushing");
-    private static int _pickingUpGunParameter = Animator.StringToHash("PickingUpGun");
+    private static int _pickUpFirstGunParameter = Animator.StringToHash("PickUpFirstGun");
 
     private static int _punchParameter = Animator.StringToHash("Punch");
     private static int _isAimingGunParameter = Animator.StringToHash("IsAiming");
@@ -85,9 +85,9 @@ public class AnimationsController {
         _animator.SetBool(_pushingAnimationParameter, push);
     }
 
-    public void PickUpGun(bool pickup)
+    public void PickUpFirstGun()
     {
-        _animator.SetBool(_pickingUpGunParameter, pickup);
+        _animator.SetTrigger(_pickUpFirstGunParameter);
     }
 
     public void AimGun(bool aimGun)
@@ -136,7 +136,6 @@ public class AnimationsController {
     {
         _animator.SetBool(_isAimingGunParameter, false);
         _animator.SetTrigger(_resetParameter);
-        //other parameters are reset on update
     }
 
     public void ApplyRootMotion(bool apply)

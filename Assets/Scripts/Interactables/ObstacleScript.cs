@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class ObstacleScript : MonoBehaviour {
+public class ObstacleScript : MonoBehaviour, IInteractable {
 
     public readonly float ObstacleWidth = 2;
 

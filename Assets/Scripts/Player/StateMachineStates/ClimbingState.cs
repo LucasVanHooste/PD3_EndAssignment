@@ -10,26 +10,33 @@ public class ClimbingState : BasePlayerState
     private PlayerController _playerController;
     private AnimationsController _animationsController;
 
-    private GameObject _ladder;
     private LadderScript _ladderScript;
 
     private const float _ladderPaddingDistance = 0.15f;
     private Coroutine _climbLadder;
 
-    public ClimbingState(Transform playerTransform, PlayerMotor physicsController, PlayerController playerController, AnimationsController animationsController, GameObject ladder)
+    public ClimbingState(PlayerMotor physicsController, PlayerController playerController, AnimationsController animationsController, LadderScript ladder)
     {
-        _playerTransform = playerTransform;
+        _playerTransform = PlayerController.PlayerTransform;
         _physicsController = physicsController;
         _playerController = playerController;
         _animationsController = animationsController;
-        _ladder = ladder;
-        _ladderScript = _ladder.GetComponent<LadderScript>();
+        _ladderScript = ladder;
 
         _animationsController.ClimbBottomLadderIK.LadderIKHands = _ladderScript.BottomLadderIKHands;
-        _animationsController.ClimbTopLadderPart1IK.Ladderscript = _ladderScript;
+        _animationsController.ClimbTopLadderPart1IK.Ladder = _ladderScript;
         _animationsController.ClimbTopLadderPart2IK.SetBehaviour(_playerController, _physicsController, _animationsController);
 
+    }
+
+    public override void OnStateEnter()
+    {
         Climb();
+    }
+
+    public override void OnStateExit()
+    {
+        
     }
 
     public override void Update()
@@ -48,7 +55,7 @@ public class ClimbingState : BasePlayerState
 
     private IEnumerator RotateToLadder()
     {
-        Vector3 direction = -_ladder.transform.forward;
+        Vector3 direction = -_ladderScript.transform.forward;
 
         while (Quaternion.Angle(_playerTransform.rotation, Quaternion.LookRotation(direction)) > 1)
         {
@@ -109,4 +116,6 @@ public class ClimbingState : BasePlayerState
         _animationsController.ApplyRootMotion(false);
         _playerController.gameObject.layer = LayerMask.NameToLayer("Player");
     }
+
+
 }

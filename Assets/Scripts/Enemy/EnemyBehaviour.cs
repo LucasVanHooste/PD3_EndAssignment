@@ -5,7 +5,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(EnemyMotor))]
-public class EnemyBehaviour : MonoBehaviour
+public class EnemyBehaviour : MonoBehaviour, IDamageable
 {
 
     private INode _behaviourTree;
@@ -50,13 +50,14 @@ public class EnemyBehaviour : MonoBehaviour
     [Space]
     [Header("Gun Parameters")]
     [SerializeField] private Transform _gun;
+    [SerializeField] private LayerMask _bulletLayerMask;
     [SerializeField]private Transform _holsterGun1Hand;
     [SerializeField]private Transform _holsterGun2Hands;
     private GunScript _gunScript;
     private bool _fireGun = false;
     private bool _aimGun = false;
     [SerializeField] float _missingShotRange;
-    [SerializeField] private Transform _anchorPoint;
+    [SerializeField] private Transform _gunAnchorPoint;
     [SerializeField] private Transform _leftHand;
     [SerializeField] private Transform _rightHand;
     [SerializeField] private Transform _lookAtPosition;
@@ -89,7 +90,7 @@ public class EnemyBehaviour : MonoBehaviour
         _animationsController.ClimbBottomLadderIK.LeftHand = _leftHand;
         _animationsController.ClimbBottomLadderIK.RightHand =_rightHand;
 
-        _playerTransform = _enemyMotor.PlayerTransform;
+        _playerTransform = PlayerController.PlayerTransform;
         _playerController = _playerTransform.GetComponent<PlayerController>();
 
         _forgetAboutPlayerTimer = _forgetAboutPlayerTime;
@@ -181,7 +182,7 @@ public class EnemyBehaviour : MonoBehaviour
         _animationsController.SetHorizontalMovement(_enemyMotor.RelativeVelocity);
         _animationsController.SetRotationSpeed(_enemyMotor.RotationSpeed);
 
-        _animationsController.SetIsGrounded(_enemyMotor.IsGrounded());
+        _animationsController.SetIsGrounded(_enemyMotor.IsGrounded);
         _animationsController.SetDistanceFromGround(_enemyMotor.DistanceFromGround);
         _animationsController.SetVerticalVelocity(_enemyMotor.RelativeVelocity.y);
     }
@@ -267,7 +268,7 @@ public class EnemyBehaviour : MonoBehaviour
         {
             if (_playerController.Health > 0)
             {
-                _playerController.TakePunch(_punchDamage, _transform.position);
+                _playerController.TakeDamage(_punchDamage, _transform.position);
                 _punchCoolDownTimer = 0;
                 _animationsController.Punch();
             }
@@ -331,14 +332,18 @@ public class EnemyBehaviour : MonoBehaviour
                 {
                     _forgetAboutPlayerTimer = 0;
                     _hasBeenAttacked = false;
-                    _anchorPoint.localEulerAngles = new Vector3(Vector3.SignedAngle(Vector3.Scale(_playerTransform.position - _transform.position,new Vector3(1,0,1)), _playerTransform.position - _transform.position, _transform.right), 0, 0);
 
+                    //this might need a fix 
 
+                    //Vector3 flatDirection = Vector3.Scale(_playerTransform.position - _transform.position, new Vector3(1, 0, 1));
+                    //_gunAnchorPoint.localEulerAngles = new Vector3(Vector3.SignedAngle(flatDirection, _playerTransform.position - _transform.position, _transform.right), 0, 0);
+                    _gunAnchorPoint.LookAt(_playerTransform.position + new Vector3(0, 1.4f, 0));
+                    _gunAnchorPoint.localEulerAngles = new Vector3(_gunAnchorPoint.localEulerAngles.x, 0, 0);
                     return true;
                 }
             }
         }
-        _anchorPoint.localEulerAngles = Vector3.zero;
+        _gunAnchorPoint.localEulerAngles = Vector3.zero;
 
         return false;
     }
@@ -455,7 +460,7 @@ public class EnemyBehaviour : MonoBehaviour
         {
             _gun = gun;
             _gunScript = _gun.GetComponent<GunScript>();
-            _gunScript.TakeGun(_rightHand, _anchorPoint);
+            _gunScript.HoldGun(_rightHand, _gunAnchorPoint);
             _animationsController.HoldGunIK.Gun = _gun.transform;
             _animationsController.IsTwoHandedGun(_gunScript.IsTwoHanded);
         }
@@ -496,7 +501,9 @@ public class EnemyBehaviour : MonoBehaviour
         float offset = Mathf.Clamp((_playerTransform.position - _transform.position).sqrMagnitude, 1, _missingShotRange);
         Vector3 randomPosition = UnityEngine.Random.insideUnitSphere * offset;
 
-        _gunScript.EnemyFireGun(fire, _anchorPoint.position, (_playerTransform.position+randomPosition)-_transform.position);
+        Vector3 direction = _playerTransform.position - _transform.position + randomPosition;
+
+        _gunScript.FireWeapon(fire, new Ray(_gunAnchorPoint.position, direction), _bulletLayerMask);
     }
     public void HolsterGun()
     {
@@ -552,24 +559,12 @@ public class EnemyBehaviour : MonoBehaviour
 
     #endregion
 
-    private void TakeDamage(int damage, Vector3 originOfDamage)
+    public void TakeDamage(int damage, Vector3 originOfDamage)
     {
         _health -= damage;
         _animationsController.TakeDamage();
 
         Die(originOfDamage);
-    }
-
-    public void TakePunch(int damage, Vector3 originOfDamage)
-    {
-        _hasBeenAttacked = true;
-        TakeDamage(damage, originOfDamage);
-    }
-
-    public void GetShot(int damage, Vector3 originOfDamage)
-    {
-        _hasBeenAttacked = true;
-        TakeDamage(damage, originOfDamage);
     }
 
     private void Die(Vector3 originOfDamage)
@@ -579,7 +574,9 @@ public class EnemyBehaviour : MonoBehaviour
         if(IsInMovementAction)
         _enemyMovementAction.Stop();
 
-        Vector3 transformedOrigin = GetTransformedOrigin(originOfDamage);
+        Vector3 transformedOrigin = _transform.InverseTransformPoint(originOfDamage);
+        //added this because the directional death animations didn't blend well
+        transformedOrigin = transformedOrigin.TransformToHorizontalAxisVector();
 
         _animationsController.Die(transformedOrigin.x, transformedOrigin.z);
         _animationsController.Climb(false);
@@ -593,24 +590,7 @@ public class EnemyBehaviour : MonoBehaviour
 
         ToDeadState();
     }
-
-    private Vector3 GetTransformedOrigin(Vector3 origin)
-    {
-        Vector3 transformedOrigin = _transform.InverseTransformPoint(origin);
-
-        if (Mathf.Abs(transformedOrigin.x) > Mathf.Abs(transformedOrigin.z))
-        {
-            transformedOrigin.x = transformedOrigin.x / Mathf.Abs(transformedOrigin.x);
-            transformedOrigin.z = 0;
-        }
-        else
-        {
-            transformedOrigin.z = transformedOrigin.z / Mathf.Abs(transformedOrigin.z);
-            transformedOrigin.x = 0;
-        }
-
-        return transformedOrigin;
-    }
+    
 
     public void ToDeadState()
     {

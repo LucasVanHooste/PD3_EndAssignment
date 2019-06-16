@@ -53,24 +53,17 @@ public class PlayerMotor : MonoBehaviour {
     }
 
     private Vector3 _velocity = Vector3.zero;
+    public Vector3 Velocity { get => _velocity; }
 
     [SerializeField] private float _horizontalRotationSpeed;
-    public float HorizontalRotationSpeed
-    {
-        get { return _horizontalRotationSpeed; }
-    }
+    public float HorizontalRotationSpeed{ get => _horizontalRotationSpeed; }
+
     [SerializeField] private float _verticalRotationSpeed;
-    public float VerticalRotationSpeed
-    {
-        get { return _verticalRotationSpeed; }
-    }
+    public float VerticalRotationSpeed{ get => _verticalRotationSpeed; }
 
     [SerializeField] private LayerMask _mapLayerMask;
     [SerializeField] private IsGroundedCheckerScript _isGroundedChecker;
-    public IsGroundedCheckerScript IsGroundedChecker
-    {
-        get { return _isGroundedChecker; }
-    }
+    public IsGroundedCheckerScript IsGroundedChecker { get=> _isGroundedChecker;}
 
     // Use this for initialization
     void Start() {
@@ -174,18 +167,13 @@ public class PlayerMotor : MonoBehaviour {
     public void ApplyRotation()
     {
         _characterController.transform.eulerAngles += new Vector3(0, Aim.x, 0) * _horizontalRotationSpeed * Time.deltaTime;
-        _cameraController.RotateVertically(Aim.z * _verticalRotationSpeed);
+        _cameraController.RotateVertically(Aim.z * _verticalRotationSpeed * Time.deltaTime);
     }
 
     public void StopMoving()
     {
         Movement = Vector3.zero;
         _velocity = Vector3.zero;
-    }
-
-    public Vector3 GetVelocity()
-    {
-        return _velocity;
     }
 
     public float GetDistanceFromGround()

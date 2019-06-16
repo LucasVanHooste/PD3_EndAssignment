@@ -37,7 +37,7 @@ public class EnemyJumpAction : IEnemyMovementAction
 
     public void OnCollisionEnter(Collision collision)
     {
-        if (_navMeshAgentController.IsGrounded())
+        if (_navMeshAgentController.IsGrounded)
         {
                 _navMeshAgentController.UpdateTransformToNavmesh = true;
                 _navMeshAgentController.Warp(_transform.position);
@@ -46,7 +46,6 @@ public class EnemyJumpAction : IEnemyMovementAction
                 _navMeshAgentController.RigidBody.isKinematic = true;
 
             _enemyBehaviour.StopMovementAction();
-            Debug.Log("end jump");
         }
     }
 

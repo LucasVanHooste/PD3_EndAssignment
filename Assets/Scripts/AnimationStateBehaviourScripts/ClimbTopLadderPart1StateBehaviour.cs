@@ -5,60 +5,36 @@ using UnityEngine;
 public class ClimbTopLadderPart1StateBehaviour : StateMachineBehaviour {
 
     private float _iKWeight = 1f;
-    private LadderScript _ladderScript;
-    public LadderScript Ladderscript
-    {
-        set
-        {
-            _ladderScript = value;
-        }
-    }
+    public LadderScript Ladder { private get; set; }
 
-    // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
-    //override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    //{
 
-    //}
-
-    // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
-    //override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-    //
-    //}
-
-    // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        _ladderScript.IsPersonClimbing = false;
+        Ladder.IsPersonClimbing = false;
     }
 
-    // OnStateMove is called right after Animator.OnAnimatorMove(). Code that processes and affects root motion should be implemented here
-    //override public void OnStateMove(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-    //
-    //}
-
-    // OnStateIK is called right after Animator.OnAnimatorIK(). Code that sets up animation IK (inverse kinematics) should be implemented here.
     override public void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if (_ladderScript == null) return;
+        if (Ladder == null) return;
 
         if (stateInfo.normalizedTime > .6f)
         {
             //IK
             animator.SetBoneLocalRotation(HumanBodyBones.Spine, Quaternion.Euler(new Vector3(20, 0, 0)));
 
-            if (_ladderScript.TopLadderRightHandIK2)
+            if (Ladder.TopLadderRightHandIK2)
             {
-                animator.SetIKPosition(AvatarIKGoal.RightHand, _ladderScript.TopLadderRightHandIK2.position);
-                animator.SetIKRotation(AvatarIKGoal.RightHand, _ladderScript.TopLadderRightHandIK2.rotation);
+                animator.SetIKPosition(AvatarIKGoal.RightHand, Ladder.TopLadderRightHandIK2.position);
+                animator.SetIKRotation(AvatarIKGoal.RightHand, Ladder.TopLadderRightHandIK2.rotation);
 
                 animator.SetIKPositionWeight(AvatarIKGoal.RightHand, _iKWeight);
                 animator.SetIKRotationWeight(AvatarIKGoal.RightHand, _iKWeight);
             }
 
-            if (_ladderScript.TopLadderLeftHandIK2)
+            if (Ladder.TopLadderLeftHandIK2)
             {
-                animator.SetIKPosition(AvatarIKGoal.LeftHand, _ladderScript.TopLadderLeftHandIK2.position);
-                animator.SetIKRotation(AvatarIKGoal.LeftHand, _ladderScript.TopLadderLeftHandIK2.rotation);
+                animator.SetIKPosition(AvatarIKGoal.LeftHand, Ladder.TopLadderLeftHandIK2.position);
+                animator.SetIKRotation(AvatarIKGoal.LeftHand, Ladder.TopLadderLeftHandIK2.rotation);
                 animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, _iKWeight);
                 animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, _iKWeight);
             }
@@ -69,19 +45,19 @@ public class ClimbTopLadderPart1StateBehaviour : StateMachineBehaviour {
         //IK
         animator.SetBoneLocalRotation(HumanBodyBones.Spine, Quaternion.Euler(new Vector3(20, 0, 0)));
 
-        if (_ladderScript.TopLadderRightHandIK)
+        if (Ladder.TopLadderRightHandIK)
         {
-            animator.SetIKPosition(AvatarIKGoal.RightHand, _ladderScript.TopLadderRightHandIK.position);
-            animator.SetIKRotation(AvatarIKGoal.RightHand, _ladderScript.TopLadderRightHandIK.rotation);
+            animator.SetIKPosition(AvatarIKGoal.RightHand, Ladder.TopLadderRightHandIK.position);
+            animator.SetIKRotation(AvatarIKGoal.RightHand, Ladder.TopLadderRightHandIK.rotation);
 
             animator.SetIKPositionWeight(AvatarIKGoal.RightHand, _iKWeight);
             animator.SetIKRotationWeight(AvatarIKGoal.RightHand, _iKWeight);
         }
 
-        if (_ladderScript.TopLadderLeftHandIK)
+        if (Ladder.TopLadderLeftHandIK)
         {
-            animator.SetIKPosition(AvatarIKGoal.LeftHand, _ladderScript.TopLadderLeftHandIK.position);
-            animator.SetIKRotation(AvatarIKGoal.LeftHand, _ladderScript.TopLadderLeftHandIK.rotation);
+            animator.SetIKPosition(AvatarIKGoal.LeftHand, Ladder.TopLadderLeftHandIK.position);
+            animator.SetIKRotation(AvatarIKGoal.LeftHand, Ladder.TopLadderLeftHandIK.rotation);
             animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, _iKWeight);
             animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, _iKWeight);
         }

@@ -24,10 +24,7 @@ public abstract class BasePlayerState : IState
         
     }
 
-    public virtual void PickUpGun()
-    {
-        
-    }
-
     public abstract void Update();
+    public abstract void OnStateEnter();
+    public abstract void OnStateExit();
 }

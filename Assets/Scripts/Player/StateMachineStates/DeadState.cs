@@ -7,15 +7,27 @@ public class DeadState : BasePlayerState
 {
     private PlayerMotor _physicsController;
     private PlayerController _playerController;
+    private AnimationsController _animationsController;
 
     private GameObject _object;
 
-    public DeadState(PlayerMotor physicsController, PlayerController playerController)
+    public DeadState(PlayerMotor physicsController, PlayerController playerController, AnimationsController animationsController)
     {
         _physicsController = physicsController;
         _playerController = playerController;
+        _animationsController = animationsController;
+        
+    }
 
+    public override void OnStateEnter()
+    {
+        _animationsController.ApplyRootMotion(true);
         _playerController.StartCoroutine(RestartGame());
+    }
+
+    public override void OnStateExit()
+    {
+        _animationsController.ApplyRootMotion(false);
     }
 
     private IEnumerator RestartGame()
@@ -31,4 +43,5 @@ public class DeadState : BasePlayerState
     {
 
     }
+
 }

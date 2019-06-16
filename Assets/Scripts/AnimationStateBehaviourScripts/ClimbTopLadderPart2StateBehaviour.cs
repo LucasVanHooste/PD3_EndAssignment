@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class ClimbTopLadderPart2StateBehaviour : StateMachineBehaviour {
 
-    private PlayerMotor _physicsController;
+    private PlayerMotor _playerMotor;
     private PlayerController _playerController;
     private AnimationsController _animationsController;
     private EnemyBehaviour _enemyBehaviour;
-    private EnemyMotor _navMeshAgentController;
+    private EnemyMotor _enemyMotor;
 
 
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
@@ -17,64 +17,49 @@ public class ClimbTopLadderPart2StateBehaviour : StateMachineBehaviour {
         if (_playerController != null)
         {
             _playerController.gameObject.layer = LayerMask.NameToLayer("Player");
-            _physicsController.IsGroundedChecker.gameObject.layer=LayerMask.NameToLayer("Player");
+            _playerMotor.IsGroundedChecker.gameObject.layer=LayerMask.NameToLayer("Player");
         }
-        if (_navMeshAgentController!=null)
-            _navMeshAgentController.gameObject.layer = LayerMask.NameToLayer("Enemy");
+        if (_enemyMotor!=null)
+            _enemyMotor.gameObject.layer = LayerMask.NameToLayer("Enemy");
     }
 
-    // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
-    //override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-    //
-    //}
 
-    // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         if (_playerController != null)
         {
-            _playerController.ToNormalState();
-            _physicsController.HasGravity=true;
+            _playerController.SwitchState(_playerController.GetNormalState());
+            _playerMotor.HasGravity=true;
             _animationsController.Climb(false);
             animator.applyRootMotion = false;
             _playerController = null;
         }
 
-        if (_navMeshAgentController != null)
+        if (_enemyMotor != null)
         {
-            _navMeshAgentController.RigidBody.isKinematic = true;
-            _navMeshAgentController.ResetRigidbodyConstraints();
-            _navMeshAgentController.UpdateTransformToNavmesh = true;
-            _navMeshAgentController.Warp(_navMeshAgentController.transform.position);
+            _enemyMotor.RigidBody.isKinematic = true;
+            _enemyMotor.ResetRigidbodyConstraints();
+            _enemyMotor.UpdateTransformToNavmesh = true;
+            _enemyMotor.Warp(_enemyMotor.transform.position);
             _animationsController.Climb(false);
             animator.applyRootMotion = false;
             _enemyBehaviour.StopMovementAction();
-            _navMeshAgentController = null;
+            _enemyMotor = null;
         }
     }
 
-    // OnStateMove is called right after Animator.OnAnimatorMove(). Code that processes and affects root motion should be implemented here
-    //override public void OnStateMove(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-    //
-    //}
 
-    // OnStateIK is called right after Animator.OnAnimatorIK(). Code that sets up animation IK (inverse kinematics) should be implemented here.
-    //override public void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    //{
-
-    //}
-
-    public void SetBehaviour(PlayerController playerController, PlayerMotor physicsController, AnimationsController animationsController)
+    public void SetBehaviour(PlayerController playerController, PlayerMotor playerMotor, AnimationsController animationsController)
     {
         _playerController = playerController;
-        _physicsController = physicsController;
+        _playerMotor = playerMotor;
         _animationsController = animationsController;
     }
 
-    public void SetBehaviour(EnemyBehaviour enemyBehaviour, EnemyMotor navMeshAgentController, AnimationsController animationsController)
+    public void SetBehaviour(EnemyBehaviour enemyBehaviour, EnemyMotor enemyMotor, AnimationsController animationsController)
     {
         _enemyBehaviour = enemyBehaviour;
-        _navMeshAgentController = navMeshAgentController;
+        _enemyMotor = enemyMotor;
         _animationsController = animationsController;
     }
 }

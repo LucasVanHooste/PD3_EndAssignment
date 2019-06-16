@@ -13,8 +13,8 @@ public class TurretState : BasePlayerState
     private GameObject _object;
     private CameraController _cameraController;
     private GameObject _crossHair;
+    private LayerMask _bulletLayerMask;
 
-    private GameObject _turret;
     private TurretScript _turretScript;
 
     private bool _isAiming = false;
@@ -23,21 +23,33 @@ public class TurretState : BasePlayerState
 
     float _turretPaddingDistance = 0.15f;
 
-    public TurretState(Transform playerTransform, PlayerMotor physicsController, PlayerController playerController, AnimationsController animationsController, GameObject turret,
-        CameraController cameraController, GameObject crossHair)
+    public TurretState(PlayerMotor physicsController, PlayerController playerController, AnimationsController animationsController, TurretScript turret,
+        CameraController cameraController)
     {
-        _playerTransform = playerTransform;
+        _playerTransform = PlayerController.PlayerTransform;
         _physicsController = physicsController;
         _playerController = playerController;
         _animationsController = animationsController;
 
         _cameraController = cameraController;
-        _crossHair = crossHair;
+        _crossHair = _playerController.CrossHair;
+        _bulletLayerMask = _playerController.BulletLayerMask;
 
-        _turret = turret;
-        _turretScript = _turret.GetComponent<TurretScript>();
+        _turretScript = turret.GetComponent<TurretScript>();
 
+    }
+
+    public override void OnStateEnter()
+    {
         GoToTurret();
+    }
+
+    public override void OnStateExit()
+    {
+        SetTurretIK(null);
+        _cameraController.ResetCameraAnchorAndPositions();
+        _isAiming = false;
+        AimTurret();
     }
 
     public override void Update()
@@ -63,8 +75,7 @@ public class TurretState : BasePlayerState
 
         if (Input.GetButton("Interact"))
         {
-            OnStateExit();
-            _playerController.ToNormalState();
+            _playerController.SwitchState(_playerController.GetNormalState());
             return;
         }
 
@@ -83,7 +94,7 @@ public class TurretState : BasePlayerState
 
     private IEnumerator RotateToTurret()
     {
-        Vector3 direction = Vector3.Scale((_turret.transform.position - _playerTransform.position), new Vector3(1, 0, 1));
+        Vector3 direction = Vector3.Scale((_turretScript.transform.position - _playerTransform.position), new Vector3(1, 0, 1));
 
         while (Quaternion.Angle(_playerTransform.rotation, Quaternion.LookRotation(direction)) >1f)
         {
@@ -141,12 +152,13 @@ public class TurretState : BasePlayerState
     private void UseTurret()
     {
         _isReady = true;
-        _cameraController.HoldTurret(_turretScript.CamDefaultTransform, _turretScript.CamAimingTransform, _turretScript.VerticalAnchorTransform);
+        _cameraController.SetCameraAnchorAndPositions(_turretScript.VerticalAnchorTransform, _turretScript.CamDefaultTransform, _turretScript.CamAimingTransform);
     }
 
     private void FireTurret()
     {
-        _turretScript.FireTurret(_isShooting);
+        Ray centerOfScreenRay = _cameraController.PlayerCamera.ViewportPointToRay(new Vector3(.5f, .5f, 0));
+        _turretScript.FireWeapon(_isShooting, centerOfScreenRay, _bulletLayerMask);
     }
 
     private void AimTurret()
@@ -154,7 +166,7 @@ public class TurretState : BasePlayerState
             _physicsController.IsWalking = _isAiming;
 
             _crossHair.SetActive(_isAiming);
-            _cameraController.AimTurret(_isAiming);
+            _cameraController.IsAiming = _isAiming;
     }
 
     private void RotateTurret(float horizontalInput, float verticalInput)
@@ -174,16 +186,11 @@ public class TurretState : BasePlayerState
         _physicsController.SetPosition(turretPosition);
     }
 
-    private void OnStateExit()
-    {
-        SetTurretIK(null);
-        _cameraController.HoldTurret(null, null, null);
-        _isAiming = false;
-        AimTurret();
-    }
 
     public override void Die()
     {
         OnStateExit();
     }
+
+
 }

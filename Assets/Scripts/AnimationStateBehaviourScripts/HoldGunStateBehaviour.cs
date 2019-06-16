@@ -4,84 +4,26 @@ using UnityEngine;
 
 public class HoldGunStateBehaviour : StateMachineBehaviour {
 
-    private Transform _player;
-    public Transform Player
-    {
-        set
-        {
-            _player = value;
-        }
-    }
-    private Transform _gun;
-    public Transform Gun
-    {
-        set
-        {
-            _gun = value;
-        }
-    }
-    private bool _isAiming = false;
-    public bool IsAiming
-    {
-        set
-        {
-            _isAiming=value;
-        }
-    }
+    public Transform Player { private get; set; }   
+    public Transform Gun { private get; set; }
+    public bool IsAiming { private get; set; }
 
     private float _iKWeight=0;
     private GunScript _gunScript;
 
 
-    // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
-    //override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    //{
-
-    //}
-
-    //OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
-    //override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    //{
-
-    //}
-
-    // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
-    //override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-    //
-    //}
-
-    // OnStateMove is called right after Animator.OnAnimatorMove(). Code that processes and affects root motion should be implemented here
-    //override public void OnStateMove(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-    //
-    //}
-
-    //OnStateIK is called right after Animator.OnAnimatorIK(). Code that sets up animation IK(inverse kinematics) should be implemented here.
 
     override public void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if (_gun == null || _player == null) return;
-        //Debug.Log(_gun.gameObject.name);
+        if (Gun == null || Player == null) return;
 
-            _gunScript = _gun.GetComponent<GunScript>();
+        _gunScript = Gun.GetComponent<GunScript>();
 
-        //IK first pistol
-        if (_gun.tag == "FirstGun")
-        {
-            _iKWeight = animator.GetFloat("IKWeight");
-
-
-            animator.SetIKPosition(AvatarIKGoal.RightHand, _gun.position);
-            animator.SetIKRotation(AvatarIKGoal.RightHand, _player.rotation);
-
-            animator.SetIKPositionWeight(AvatarIKGoal.RightHand, _iKWeight);
-            animator.SetIKRotationWeight(AvatarIKGoal.RightHand, _iKWeight);
-        }
-
-        if (!_gunScript.IsTwoHanded && !_isAiming) return;
+        if (!_gunScript.IsTwoHanded && !IsAiming) return;
 
         _iKWeight = 1;
 
-        //IK all other guns
+
         if (_gunScript.RightHandIK)
         {
             animator.SetIKPosition(AvatarIKGoal.RightHand, _gunScript.RightHandIK.position);
@@ -100,17 +42,17 @@ public class HoldGunStateBehaviour : StateMachineBehaviour {
             animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, _iKWeight);
         }
 
-            if (_gunScript.LeftElbowIK)
-            {
-                animator.SetIKHintPosition(AvatarIKHint.LeftElbow, _gunScript.LeftElbowIK.position);
-                animator.SetIKHintPositionWeight(AvatarIKHint.LeftElbow, 1f);
-            }
-            if (_gunScript.RightElbowIK)
-            {
-                animator.SetIKHintPosition(AvatarIKHint.RightElbow, _gunScript.RightElbowIK.position);
-                animator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, .5f);
-            }
-        
+        if (_gunScript.LeftElbowIK)
+        {
+            animator.SetIKHintPosition(AvatarIKHint.LeftElbow, _gunScript.LeftElbowIK.position);
+            animator.SetIKHintPositionWeight(AvatarIKHint.LeftElbow, 1f);
+        }
+        if (_gunScript.RightElbowIK)
+        {
+            animator.SetIKHintPosition(AvatarIKHint.RightElbow, _gunScript.RightElbowIK.position);
+            animator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, .5f);
+        }
+
     }
 
 }

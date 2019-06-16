@@ -11,7 +11,6 @@ public class PushingState : BasePlayerState
     private AnimationsController _animationsController;
 
     private List<Collider> _triggers;
-    private GameObject _obstacle;
     private ObstacleScript _obstacleScript;
     private GameObject _obstacleCollisionChecker;
     private Transform _obstacleIKLeftHand;
@@ -21,20 +20,27 @@ public class PushingState : BasePlayerState
     bool _hasHitObstacle = false;
     private Vector3 _pushStartPosition;
 
-    public PushingState(Transform playerTransform, PlayerMotor physicsController, PlayerController playerController, AnimationsController animationsController, 
-        GameObject obstacle, Transform obstacleIKLeftHand, Transform obstacleIKRightHand)
+    public PushingState(PlayerMotor physicsController, PlayerController playerController, AnimationsController animationsController, 
+        ObstacleScript obstacle)
     {
-        _playerTransform = playerTransform;
+        _playerTransform = PlayerController.PlayerTransform;
         _physicsController = physicsController;
         _playerController = playerController;
         _animationsController = animationsController;
-        _obstacle = obstacle;
-        _obstacleScript = obstacle.GetComponent<ObstacleScript>();
-        _obstacleIKLeftHand = obstacleIKLeftHand;
-        _obstacleIKRightHand = obstacleIKRightHand;
-        _triggers = _playerController.Triggers;
 
+        _obstacleScript = obstacle.GetComponent<ObstacleScript>();
+        _obstacleIKLeftHand = _playerController.ObstacleIKLeftHand;
+        _obstacleIKRightHand = _playerController.ObstacleIKRightHand;
+        _triggers = _playerController.Triggers;
+    }
+
+    public override void OnStateEnter()
+    {
         InteractWithObstacle();
+    }
+
+    public override void OnStateExit()
+    {
     }
 
     public override void Update()
@@ -44,7 +50,7 @@ public class PushingState : BasePlayerState
 
     public override void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        if (hit.gameObject == _obstacle)
+        if (hit.gameObject == _obstacleScript.gameObject)
         {
             _hasHitObstacle = true;
         }
@@ -56,7 +62,7 @@ public class PushingState : BasePlayerState
         _physicsController.Aim = Vector3.zero;
         direction = GetDirection();
 
-        _obstacleCollisionChecker = GameObject.Instantiate(_obstacleScript.ObstacleCollisionCheckerPrefab, _obstacle.transform.position + direction.normalized, Quaternion.LookRotation(direction));
+        _obstacleCollisionChecker = GameObject.Instantiate(_obstacleScript.ObstacleCollisionCheckerPrefab, _obstacleScript.transform.position + direction.normalized, Quaternion.LookRotation(direction));
 
         _playerController.StartCoroutine(RotateToObstacle());
     }
@@ -109,7 +115,7 @@ public class PushingState : BasePlayerState
         {
             _obstacleScript.SetConstraints(RigidbodyConstraints.None);
             _pushStartPosition = _playerTransform.position;
-            _obstacle.transform.parent = _playerTransform;
+            _obstacleScript.transform.parent = _playerTransform;
             float distance = Vector3.Magnitude(_pushStartPosition - _playerTransform.position);
 
             while (distance < _obstacleScript.ObstacleWidth-.02f)
@@ -130,7 +136,7 @@ public class PushingState : BasePlayerState
     private void StopPushing()
     {
         //reset
-        _obstacle.transform.parent = null;
+        _obstacleScript.transform.parent = null;
         _obstacleScript.SetConstraints(RigidbodyConstraints.FreezeAll);
         _animationsController.Push(false);
         _hasHitObstacle = false;
@@ -141,7 +147,7 @@ public class PushingState : BasePlayerState
             _obstacleScript.SetConstraints(RigidbodyConstraints.None);
             _obstacleScript.UseGravity(true);
 
-            Collider[] triggers = _obstacle.GetComponents<Collider>();
+            Collider[] triggers = _obstacleScript.GetComponents<Collider>();
             for (int i = triggers.Length - 1; i >= 0; i--)
             {
                 if (triggers[i].isTrigger)
@@ -155,12 +161,12 @@ public class PushingState : BasePlayerState
         }
 
         GameObject.Destroy(_obstacleCollisionChecker);
-        _playerController.ToNormalState();
+        _playerController.SwitchState(_playerController.GetNormalState());
     }
 
     private Vector3 GetDirection()
     {
-        Vector3 direction = Vector3.Scale((_obstacle.transform.position - _playerTransform.position), new Vector3(1, 0, 1));
+        Vector3 direction = Vector3.Scale((_obstacleScript.transform.position - _playerTransform.position), new Vector3(1, 0, 1));
         if (Mathf.Abs(direction.x) > Mathf.Abs(direction.z))
         {
             direction.z = 0;
@@ -171,4 +177,6 @@ public class PushingState : BasePlayerState
         }
         return direction.normalized;
     }
+
+
 }

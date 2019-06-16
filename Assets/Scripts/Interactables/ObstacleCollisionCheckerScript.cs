@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ObstacleCollisionCheckerScript : MonoBehaviour {
+public class ObstacleCollisionCheckerScript : MonoBehaviour, IInteractable {
 
     private bool _hasCollided=false;
     private bool _hasGravity = false;

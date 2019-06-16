@@ -42,7 +42,7 @@ public class EnemyFallAction : IEnemyMovementAction
 
     public void OnCollisionEnter(Collision collision)
     {
-        if (_navMeshAgentController.IsGrounded())
+        if (_navMeshAgentController.IsGrounded)
         {
             _navMeshAgentController.UpdateTransformToNavmesh = true;
             _navMeshAgentController.Warp(_transform.position);

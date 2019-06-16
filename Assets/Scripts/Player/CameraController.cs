@@ -4,38 +4,11 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour {
 
-    [SerializeField] private Camera _camera;
+    [SerializeField] private Camera _playerCamera;
     [SerializeField] private Transform _cameraTransform;
-    [SerializeField] private Transform _cameraRootTransform;
-    [SerializeField] private Transform _cameraDefaultTransform;
-    [SerializeField] private Transform _camaraAimTransform;
-
-    public Camera PlayerCamera
-    {
-        get
-        {
-            return _camera;
-        }
-    }
-
-    public Vector3 CameraPosition
-    {
-        get
-        {
-            return _cameraTransform.position;
-        }
-    }
-
-    public Quaternion CameraRotation
-    {
-        get
-        {
-            return _cameraTransform.rotation;
-        }
-    }
-
-    private Transform _turretDefaultTransform = null;
-    private Transform _turretAimTransform = null;
+    [SerializeField] private Transform _cameraStartRootTransform;
+    [SerializeField] private Transform _cameraStartDefaultPosition;
+    [SerializeField] private Transform _cameraStartAimPosition;
 
     [Space]
     [Header("Camera Clamping Parameters")]
@@ -43,91 +16,65 @@ public class CameraController : MonoBehaviour {
     [SerializeField] private float _minCamAngle;
     [SerializeField] private float _maxCamAngle;
 
-    public bool PauseUpdate { get; set; }
+    public Camera PlayerCamera { get => _playerCamera; }
+    public Transform CameraRoot { get => _cameraStartRootTransform; }
+    public Vector3 CameraPosition { get => _cameraTransform.position; }
+    public Quaternion CameraRotation { get => _cameraTransform.rotation; }
 
-    private bool _isAimingGun = false;
-    private bool _isAimingTurret = false;
+
+    private Transform _cameraDefaultPosition;
+    private Transform _cameraAimPosition;
+
+    public bool IsAiming {private get; set; }
+
+
     // Use this for initialization
     void Start () {
+        _cameraDefaultPosition = _cameraStartDefaultPosition;
+        _cameraAimPosition = _cameraStartAimPosition;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        if (PauseUpdate) return;
 
-        if(_turretAimTransform!=null && _turretDefaultTransform != null)
+        if (IsAiming)
         {
-            if (_isAimingTurret)
-            {
-                _cameraTransform.position = Vector3.Lerp(_cameraTransform.position, _turretAimTransform.position, .2f);
-                _cameraTransform.rotation = Quaternion.Lerp(_cameraTransform.rotation, _turretAimTransform.rotation, .2f);
-            }
-            else
-            {
-                _cameraTransform.position = Vector3.Lerp(_cameraTransform.position, _turretDefaultTransform.position, .2f);
-                _cameraTransform.rotation = Quaternion.Lerp(_cameraTransform.rotation, _turretDefaultTransform.rotation, .2f);
-            }
-            return;
-        } 
+            Vector3 position = Vector3.Lerp(_cameraTransform.position, _cameraAimPosition.position, .2f);
+            Quaternion rotation = Quaternion.Lerp(_cameraTransform.rotation, _cameraAimPosition.rotation, .2f);
 
-        if (_isAimingGun)
-        {
-            _cameraTransform.position = Vector3.Lerp(_cameraTransform.position, _camaraAimTransform.position, .2f);
-            _cameraTransform.rotation = Quaternion.Lerp(_cameraTransform.rotation, _camaraAimTransform.rotation, .2f);
-            return;
+            _cameraTransform.SetPositionAndRotation(position, rotation);
         }
+        else
+        {
+            Vector3 position = Vector3.Lerp(_cameraTransform.position, _cameraDefaultPosition.position, .2f);
+            Quaternion rotation = Quaternion.Lerp(_cameraTransform.rotation, _cameraDefaultPosition.rotation, .2f);
 
-            _cameraTransform.position = Vector3.Lerp(_cameraTransform.position, _cameraDefaultTransform.position, .2f);
-            _cameraTransform.rotation = Quaternion.Lerp(_cameraTransform.rotation, _cameraDefaultTransform.rotation, .2f);
+            _cameraTransform.SetPositionAndRotation(position, rotation);
+        }            
 
     }
 
     public void RotateVertically(float angle)
     {
-        _camRotation += angle * Time.deltaTime; //get vertical rotation
+        _camRotation += angle;
 
-        _camRotation = Mathf.Clamp(_camRotation, _minCamAngle, _maxCamAngle); //clamp vertical rotation
+        _camRotation = Mathf.Clamp(_camRotation, _minCamAngle, _maxCamAngle);
 
-        _cameraRootTransform.eulerAngles = new Vector3(_camRotation, _cameraRootTransform.eulerAngles.y, _cameraRootTransform.eulerAngles.z);
+        _cameraStartRootTransform.eulerAngles = new Vector3(_camRotation, _cameraStartRootTransform.eulerAngles.y, _cameraStartRootTransform.eulerAngles.z);
     }
 
-    public void AimGun(bool isAiming)
+    public void SetCameraAnchorAndPositions(Transform cameraAnchor, Transform defaultPosition, Transform aimPosition)
     {
-        _isAimingGun = isAiming;
+        _cameraTransform.parent = cameraAnchor;
+        _cameraDefaultPosition = defaultPosition;
+        _cameraAimPosition = aimPosition;
     }
 
-    public void HoldTurret(Transform turretDefaultTransform, Transform turretAimTransform, Transform turretRootTransform)
+    public void ResetCameraAnchorAndPositions()
     {
-        _turretDefaultTransform = turretDefaultTransform;
-        _turretAimTransform = turretAimTransform;
-
-        if (_turretAimTransform == null || _turretDefaultTransform == null || turretRootTransform==null)
-        {
-            _cameraTransform.parent = _cameraRootTransform;
-        }
-        else
-        {
-            _cameraTransform.parent = turretRootTransform;
-        }
+        _cameraTransform.parent = _cameraStartRootTransform;
+        _cameraDefaultPosition = _cameraStartDefaultPosition;
+        _cameraAimPosition = _cameraStartAimPosition;
     }
 
-    public void AimTurret(bool isAiming)
-    {
-        _isAimingTurret = isAiming;
-    }
-
-    public void MoveTowards(Vector3 targetPosition, float speed)
-    {
-        _cameraTransform.position=Vector3.MoveTowards(_cameraTransform.position, targetPosition, speed);
-    }
-    public void RotateTowards(Quaternion targetRotation, float speed)
-    {
-        _cameraTransform.rotation = Quaternion.RotateTowards(_cameraTransform.rotation, targetRotation, speed);
-    }
-
-    public void SetPositionAndRotation(Vector3 position, Quaternion rotation)
-    {
-        _cameraTransform.position = position;
-        _cameraTransform.rotation = rotation;
-    }
 }

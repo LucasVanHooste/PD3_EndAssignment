@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LadderScript : MonoBehaviour {
+public class LadderScript : MonoBehaviour, IInteractable {
 
     public Transform TakeOfPoint;
     public Transform TopLadderLeftHandIK;

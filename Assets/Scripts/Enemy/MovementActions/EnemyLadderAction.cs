@@ -34,7 +34,7 @@ public class EnemyLadderAction : IEnemyMovementAction
         
         //animaitons
         _animationsController.ClimbBottomLadderIK.LadderIKHands = ladderScript.BottomLadderIKHands;
-        _animationsController.ClimbTopLadderPart1IK.Ladderscript = ladderScript;
+        _animationsController.ClimbTopLadderPart1IK.Ladder = ladderScript;
         _animationsController.ClimbTopLadderPart2IK.SetBehaviour(_enemyBehaviour, _navMeshAgentController, _animationsController);
 
         //physics

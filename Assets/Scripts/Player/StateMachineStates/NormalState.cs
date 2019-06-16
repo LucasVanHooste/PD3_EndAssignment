@@ -10,13 +10,13 @@ public class NormalState : BasePlayerState
     private PlayerController _playerController;
     private AnimationsController _animationsController;
     private List<Collider> _triggers;
-    private GameObject _object;
+    private GameObject _closestGameObject;
 
     private float _punchCoolDownTimer = 0;
 
-    public NormalState(Transform playerTransform, PlayerMotor physicsController,PlayerController playerController, AnimationsController animationsController)
+    public NormalState(PlayerMotor physicsController,PlayerController playerController, AnimationsController animationsController)
     {
-        _playerTransform = playerTransform;
+        _playerTransform = PlayerController.PlayerTransform; ;
         _physicsController = physicsController;
         _playerController = playerController;
         _animationsController = animationsController;
@@ -25,17 +25,45 @@ public class NormalState : BasePlayerState
         _punchCoolDownTimer = _playerController.PunchCoolDown;
     }
 
+    public override void OnStateEnter()
+    {
+
+    }
+
+    public override void OnStateExit()
+    {
+
+    }
+
     public override void Update()
     {
-        if (Input.GetButtonDown("Jump") && _physicsController.IsGrounded)
-        {
-            _physicsController.Jump = true;
-        }
-
+        
         if (_physicsController.IsGrounded)
             _physicsController.Movement = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
         _physicsController.Aim = new Vector3(Input.GetAxis("RightJoystickX"), 0, Input.GetAxis("RightJoystickY"));
+
+
+        if (Input.GetButtonDown("Jump") && _physicsController.IsGrounded)
+        {
+            _physicsController.Jump = true;
+            return;
+        }
+
+        
+        if (Input.GetButtonDown("Interact") && _physicsController.IsGrounded)
+        {
+            InteractWithObject();
+            return;
+        }
+
+
+        if (Input.GetButtonDown("HolsterGun"))
+        {
+            _playerController.SwitchState(_playerController.GetGunState(null));
+            return;
+        }
+
 
         if (Input.GetButtonDown("Punch"))
         {
@@ -47,101 +75,44 @@ public class NormalState : BasePlayerState
 
         }
         _punchCoolDownTimer += Time.deltaTime;
-
-        if (Input.GetButtonDown("Interact") && _physicsController.IsGrounded)
-        {
-            InteractWithObject();
-        }
-
-        if (Input.GetButtonDown("HolsterGun"))
-        {
-            _playerController.ToGunState(null);
-        }
-
     }
 
     private void InteractWithObject()
     {
         if (_triggers.Count <= 0) return;
 
-        _object = GetClosestTriggerObject();
+        _closestGameObject = _playerController.GetClosestTriggerObject();
+        IInteractable interactable = _closestGameObject.GetComponent<IInteractable>();
 
-        switch (_object.tag)
+        switch (interactable)
         {
-            case "Obstacle":
-                {                 
-                    _playerController.ToPushingState(_object);
+            case ObstacleScript obstacle:
+                {
+                    _playerController.SwitchState(_playerController.GetPushingState(obstacle));
                 }
                 break;
-            case "FirstGun":
+            case GunScript gun:
                 {
-                    
-                    _playerController.ToCinematicState(_object);
+                    _playerController.RemoveTriggersFromList(_closestGameObject.GetComponents<Collider>());
+                    _playerController.SwitchState(_playerController.GetGunState(gun));
                 }
                 break;
-            case "Gun":
+            case LadderScript ladder:
                 {
-                    PickUpGun();
-                    RemoveTriggersFromList(_object.GetComponents<Collider>());
-
-                    _playerController.ToGunState(_object);
+                    if (!ladder.IsPersonClimbing)
+                    {
+                        _playerController.SwitchState(_playerController.GetClimbingState(ladder));
+                    }
                 }
                 break;
-            case "Ladder":
+            case TurretScript turret:
                 {
-                    if(!_object.GetComponent<LadderScript>().IsPersonClimbing)
-                    _playerController.ToClimbingState(_object);
+                    _playerController.SwitchState(_playerController.GetTurretState(turret));
                 }
                 break;
-            case "Turret":
-                {
-                    _playerController.ToTurretState(_object);
-                }break;
         }
     }
 
-
-    private GameObject GetClosestTriggerObject()
-    {
-        Vector3 position = _playerTransform.position;
-        float distance = 100;
-        GameObject closest = null;
-        foreach (Collider col in _triggers)
-        {
-            float tempDistance = Vector3.Magnitude(position - col.transform.position);
-            if (tempDistance < distance)
-            {
-                distance = tempDistance;
-                closest = col.gameObject;
-            }
-
-        }
-        return closest;
-    }
-
-    public override void PickUpGun()
-    {
-        if (_object.GetComponent<GunScript>())
-        {
-            GunScript _gunScript = _object.GetComponent<GunScript>();
-                _gunScript.TakeGun(_playerController.RightHand, _playerController.CameraRoot);
-
-            _animationsController.HoldGunIK.Gun=_object.transform;
-        }
-    }
-
-    public void RemoveTriggersFromList(Collider[] colliders)
-    {
-        for (int i = colliders.Length - 1; i >= 0; i--)
-        {
-            if (colliders[i].isTrigger)
-            {
-                if (_triggers.Contains(colliders[i]))
-                    _triggers.Remove(colliders[i]);
-            }
-
-        }
-    }
 
     private void Punch()
     {
@@ -152,8 +123,10 @@ public class NormalState : BasePlayerState
             if (hit.transform.gameObject.layer == 16)
             {
                 if (hit.transform.GetComponent<EnemyBehaviour>())
-                    hit.transform.GetComponent<EnemyBehaviour>().TakePunch(_playerController.PunchDamage, _playerTransform.position);
+                    hit.transform.GetComponent<EnemyBehaviour>().TakeDamage(_playerController.PunchDamage, _playerTransform.position);
             }
         }
     }
+
+   
 }

@@ -10,12 +10,12 @@ public class EnemyMotor : MonoBehaviour {
     private NavMeshAgent _navMeshAgent;
     public Rigidbody RigidBody { get; set; }
     private Transform _transform;
-    public Transform PlayerTransform;
+    private Transform _playerTransform;
 
     [Space]
     [Header("Movement Parameters")]
     [SerializeField] private float _walkingSpeedMultiplier;
-    private float _normalSpeed;
+    private float _runningSpeed;
     private float _walkingSpeed;
     [SerializeField] private float _idleRotationSpeed= 360;
 
@@ -24,34 +24,20 @@ public class EnemyMotor : MonoBehaviour {
     private Vector3 _previousPlayerPosition;
 
     [SerializeField] private LayerMask _mapLayerMask;
-    private float _distanceFromGround = 0;
-    public float DistanceFromGround
-    {
-        get
-        {
-            return _distanceFromGround;
-        }
-    }
 
-    private Vector3 _relativeVelocity;
-    public Vector3 RelativeVelocity
-    {
-        get
-        {
-            return _relativeVelocity;
-        }
-    }
+    [SerializeField] private Vector3 _jumpForce;
+    [SerializeField] private Vector3 _fallForce;
 
-    private float _rotationSpeed;
-    public float RotationSpeed
-    {
-        get
-        {
-            return _rotationSpeed;
-        }
-    }
+    [SerializeField] private IsGroundedCheckerScript _isGroundedChecker;
+    private RigidbodyConstraints _rigidbodyStartConstraints;
 
-    private bool _updateTransformToNavmesh=true;
+
+    public float DistanceFromGround { get; private set; }
+    public Vector3 RelativeVelocity { get; private set; }
+    public float RotationSpeed { get; private set; }
+    public bool IsGrounded { get => _isGroundedChecker.IsGrounded; }
+
+    private bool _updateTransformToNavmesh = true;
     public bool UpdateTransformToNavmesh
     {
         get
@@ -66,31 +52,26 @@ public class EnemyMotor : MonoBehaviour {
         }
     }
 
-    [SerializeField] private Vector3 _jumpForce;
-    [SerializeField] private Vector3 _fallForce;
-
-    [SerializeField] private IsGroundedCheckerScript _isGroundedChecker;
-    private RigidbodyConstraints _constraints;
-
     // Use this for initialization
     void Start () {
+        _playerTransform = PlayerController.PlayerTransform;
         _navMeshAgent = GetComponent<NavMeshAgent>();
         RigidBody = GetComponent<Rigidbody>();
-        _constraints = RigidBody.constraints;
+        _rigidbodyStartConstraints = RigidBody.constraints;
         _transform = transform;
 
-        _normalSpeed = _navMeshAgent.speed;
-        _walkingSpeed = _normalSpeed * _walkingSpeedMultiplier;
+        _runningSpeed = _navMeshAgent.speed;
+        _walkingSpeed = _runningSpeed * _walkingSpeedMultiplier;
 
         _previousForward = _transform.forward;
-        _previousPlayerPosition = PlayerTransform.position;
+        _previousPlayerPosition = _playerTransform.position;
     }
 
     // Update is called once per frame
     void Update () {
-        _distanceFromGround = GetDistanceFromGround();
-        _relativeVelocity = GetScaledRelativeVelocity();
-        _rotationSpeed = GetScaledRotationSpeed();
+        DistanceFromGround = GetDistanceFromGround();
+        RelativeVelocity = GetScaledRelativeVelocity();
+        RotationSpeed = GetScaledRotationSpeed();
     }
 
     private float GetDistanceFromGround()
@@ -103,17 +84,13 @@ public class EnemyMotor : MonoBehaviour {
         return 100;
     }
 
-    public bool IsGrounded()
-    {
-        return _isGroundedChecker.IsGrounded;
-    }
-
     public void Jump(Transform offMeshLink)
     {
         UpdateTransformToNavmesh = false;
         
         RigidBody.useGravity = true;
         RigidBody.isKinematic = false;
+
         if (Vector3.Angle(_transform.forward, offMeshLink.forward) > 145)
             RigidBody.AddForce(_transform.TransformVector(_jumpForce), ForceMode.Impulse);
         else
@@ -136,18 +113,20 @@ public class EnemyMotor : MonoBehaviour {
     }
     public void Run()
     {
-        _navMeshAgent.speed = _normalSpeed;
+        _navMeshAgent.speed = _runningSpeed;
     }
 
     private Vector3 GetScaledRelativeVelocity()
     {
         if (RigidBody.isKinematic)
         {
-            if (!_navMeshAgent.updatePosition || (_navMeshAgent.isOnNavMesh && _navMeshAgent.isStopped))
+            if (IsStandingStill())
                 return Vector3.zero;
-
-            Vector3 relativeVelocity = _transform.InverseTransformVector(_navMeshAgent.velocity);
-            return (relativeVelocity * (_navMeshAgent.speed / _normalSpeed)) / 2;
+            else
+            {
+                Vector3 relativeVelocity = _transform.InverseTransformVector(_navMeshAgent.velocity);
+                return relativeVelocity * (_navMeshAgent.speed / _runningSpeed) / 2;
+            }            
         }
         else
         {
@@ -156,12 +135,15 @@ public class EnemyMotor : MonoBehaviour {
 
     }
 
-    public void RotateToPlayer()
+    private bool IsStandingStill()
     {
-        _transform.rotation = Quaternion.RotateTowards(_transform.rotation, Quaternion.LookRotation(Vector3.Scale(PlayerTransform.position - _transform.position, new Vector3(1, 0, 1))), Time.deltaTime * _idleRotationSpeed);
+        return !_navMeshAgent.updatePosition || (_navMeshAgent.isOnNavMesh && _navMeshAgent.isStopped);
     }
 
-
+    public void RotateToPlayer()
+    {
+        _transform.rotation = Quaternion.RotateTowards(_transform.rotation, Quaternion.LookRotation(Vector3.Scale(_playerTransform.position - _transform.position, new Vector3(1, 0, 1))), Time.deltaTime * _idleRotationSpeed);
+    }
 
     private float GetScaledRotationSpeed()
     {
@@ -171,14 +153,14 @@ public class EnemyMotor : MonoBehaviour {
         {
             if (angle == 0)
             {
-                if (_previousPlayerPosition != PlayerTransform.position)
+                if (_previousPlayerPosition != _playerTransform.position)
                     angle = _previousNotZeroAngle;
             }
             else
                 _previousNotZeroAngle = angle;
         }
 
-        _previousPlayerPosition = PlayerTransform.position;
+        _previousPlayerPosition = _playerTransform.position;
         _previousForward = _transform.forward;
 
         return angle;
@@ -232,7 +214,7 @@ public class EnemyMotor : MonoBehaviour {
 
     public void ResetRigidbodyConstraints()
     {
-        RigidBody.constraints = _constraints;
+        RigidBody.constraints = _rigidbodyStartConstraints;
     }
 
     public Vector3 RandomNavSphere(Vector3 origin, float range, int layermask)
