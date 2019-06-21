@@ -15,8 +15,9 @@ public class PlayerController : MonoBehaviour, IDamageable {
     private PlayerMotor _playerMotor;
     private Animator _animator;
     private IState _state;
+    private PlayerStateManager _playerStateManager;
     private AnimationsController _animationsController;
-    private CameraController _cameraController;
+    public CameraController cameraController { get; private set; }
 
     private Vector3 _startPosition;
     private Quaternion _startRotation;
@@ -80,10 +81,11 @@ public class PlayerController : MonoBehaviour, IDamageable {
 
         SetUpAnimationIK();
 
-        _cameraController = GetComponent<CameraController>();
+        cameraController = GetComponent<CameraController>();
         _startPosition= _transform.position;
         _startRotation = _transform.rotation;
 
+        _playerStateManager = new PlayerStateManager(_playerMotor, this, _animationsController);
         _state = new NormalState(_playerMotor, this, _animationsController);
         SetHealthBar();
     }
@@ -95,9 +97,15 @@ public class PlayerController : MonoBehaviour, IDamageable {
         _animationsController.ClimbBottomLadderIK.LeftHand = _leftHand;
         _animationsController.ClimbBottomLadderIK.RightHand = RightHand;
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    public void SwitchState<T>(IInteractable interactableObject = null) where T : IState
+    {
+        _state.OnStateExit();
+        _state = _playerStateManager.GetState<T>(interactableObject);
+        _state.OnStateEnter();
+    }
+
+    void Update () {
         _state.Update();
 
         UpdateAnimations();
@@ -112,6 +120,7 @@ public class PlayerController : MonoBehaviour, IDamageable {
         _animationsController.SetDistanceFromGround(_playerMotor.GetDistanceFromGround());
         _animationsController.SetVerticalVelocity(_playerMotor.Velocity.y);
     }
+
 
     private void OnTriggerEnter(Collider other)
     {
@@ -146,39 +155,6 @@ public class PlayerController : MonoBehaviour, IDamageable {
         _state.OnControllerColliderHit(hit);
     }
 
-    public void SwitchState(IState state)
-    {
-        _state.OnStateExit();
-        _state = state;
-        _state.OnStateEnter();
-    }
-
-    public IState GetNormalState()
-    {
-        return new NormalState(_playerMotor,this, _animationsController);
-    }
-    public IState GetPushingState(ObstacleScript _obstacle)
-    {
-        return new PushingState( _playerMotor, this, _animationsController, _obstacle);
-    }
-    public IState GetGunState(GunScript _gun)
-    {
-        return new GunState( _playerMotor, this, _animationsController, _gun, _cameraController);
-    }
-    public IState GetDeadState()
-    {
-        return new DeadState(_playerMotor, this, _animationsController);
-    }
-
-    public IState GetClimbingState(LadderScript _ladder)
-    {
-        return new ClimbingState(_playerMotor, this, _animationsController, _ladder);
-    }
-
-    public IState GetTurretState(TurretScript _turret)
-    {
-        return new TurretState(_playerMotor, this, _animationsController, _turret, _cameraController);
-    }
 
     public GameObject GetClosestTriggerObject()
     {
@@ -218,29 +194,27 @@ public class PlayerController : MonoBehaviour, IDamageable {
         _animationsController.Die(transformedOrigin.x, transformedOrigin.z);
 
         _state.Die();
-        SwitchState(GetDeadState());
+        SwitchState<DeadState>();
     }
 
     private void DieFromFalling()
     {
         _state.Die();
-        SwitchState(GetDeadState());
-    }
-
-
-
-    private void SetHealthBar()
-    {
-        _healthbar.value = (float)Health/ _maxHealth;
+        SwitchState<DeadState>();
     }
 
     public void Respawn()
     {
-        _cameraController.ResetCameraAnchorAndPositions();
+        cameraController.ResetCameraAnchorAndPositions();
         _transform.SetPositionAndRotation(_startPosition, _startRotation);
         _animationsController.ResetAnimations();
         Health = _maxHealth;
-        SwitchState(GetNormalState());
+        SwitchState<NormalState>();
         SetHealthBar();
+    }
+
+    private void SetHealthBar()
+    {
+        _healthbar.value = (float)Health/ _maxHealth;
     }
 }

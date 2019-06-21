@@ -6,7 +6,7 @@ using UnityEngine;
 public class NormalState : BasePlayerState
 {
     private Transform _playerTransform;
-    private PlayerMotor _physicsController;
+    private PlayerMotor _playerMotor;
     private PlayerController _playerController;
     private AnimationsController _animationsController;
     private List<Collider> _triggers;
@@ -14,14 +14,17 @@ public class NormalState : BasePlayerState
 
     private float _punchCoolDownTimer = 0;
 
-    public NormalState(PlayerMotor physicsController,PlayerController playerController, AnimationsController animationsController)
+    public NormalState(PlayerMotor playerMotor,PlayerController playerController, AnimationsController animationsController)
     {
-        _playerTransform = PlayerController.PlayerTransform; ;
-        _physicsController = physicsController;
+        _playerTransform = PlayerController.PlayerTransform;
+        _playerMotor = playerMotor;
         _playerController = playerController;
         _animationsController = animationsController;
         _triggers = _playerController.Triggers;
+    }
 
+    public override void ResetState(IInteractable interactable)
+    {
         _punchCoolDownTimer = _playerController.PunchCoolDown;
     }
 
@@ -38,20 +41,20 @@ public class NormalState : BasePlayerState
     public override void Update()
     {
         
-        if (_physicsController.IsGrounded)
-            _physicsController.Movement = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+        if (_playerMotor.IsGrounded)
+            _playerMotor.Movement = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
-        _physicsController.Aim = new Vector3(Input.GetAxis("RightJoystickX"), 0, Input.GetAxis("RightJoystickY"));
+        _playerMotor.Aim = new Vector3(Input.GetAxis("RightJoystickX"), 0, Input.GetAxis("RightJoystickY"));
 
 
-        if (Input.GetButtonDown("Jump") && _physicsController.IsGrounded)
+        if (Input.GetButtonDown("Jump") && _playerMotor.IsGrounded)
         {
-            _physicsController.Jump = true;
+            _playerMotor.Jump = true;
             return;
         }
 
         
-        if (Input.GetButtonDown("Interact") && _physicsController.IsGrounded)
+        if (Input.GetButtonDown("Interact") && _playerMotor.IsGrounded)
         {
             InteractWithObject();
             return;
@@ -60,7 +63,7 @@ public class NormalState : BasePlayerState
 
         if (Input.GetButtonDown("HolsterGun"))
         {
-            _playerController.SwitchState(_playerController.GetGunState(null));
+            _playerController.SwitchState<GunState>(null);
             return;
         }
 
@@ -88,26 +91,26 @@ public class NormalState : BasePlayerState
         {
             case ObstacleScript obstacle:
                 {
-                    _playerController.SwitchState(_playerController.GetPushingState(obstacle));
+                    _playerController.SwitchState<PushingState>(obstacle);
                 }
                 break;
             case GunScript gun:
                 {
                     _playerController.RemoveTriggersFromList(_closestGameObject.GetComponents<Collider>());
-                    _playerController.SwitchState(_playerController.GetGunState(gun));
+                    _playerController.SwitchState<GunState>(gun);
                 }
                 break;
             case LadderScript ladder:
                 {
                     if (!ladder.IsPersonClimbing)
                     {
-                        _playerController.SwitchState(_playerController.GetClimbingState(ladder));
+                        _playerController.SwitchState<ClimbingState>(ladder);
                     }
                 }
                 break;
             case TurretScript turret:
                 {
-                    _playerController.SwitchState(_playerController.GetTurretState(turret));
+                    _playerController.SwitchState<TurretState>(turret);
                 }
                 break;
         }

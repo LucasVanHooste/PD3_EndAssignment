@@ -19,6 +19,11 @@ public class DeadState : BasePlayerState
         
     }
 
+    public override void ResetState(IInteractable interactable)
+    {
+        
+    }
+
     public override void OnStateEnter()
     {
         _animationsController.ApplyRootMotion(true);

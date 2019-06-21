@@ -21,12 +21,15 @@ public class ClimbingState : BasePlayerState
         _physicsController = physicsController;
         _playerController = playerController;
         _animationsController = animationsController;
-        _ladderScript = ladder;
+    }
+
+    public override void ResetState(IInteractable ladder)
+    {
+        _ladderScript = (LadderScript)ladder;
 
         _animationsController.ClimbBottomLadderIK.LadderIKHands = _ladderScript.BottomLadderIKHands;
         _animationsController.ClimbTopLadderPart1IK.Ladder = _ladderScript;
         _animationsController.ClimbTopLadderPart2IK.SetBehaviour(_playerController, _physicsController, _animationsController);
-
     }
 
     public override void OnStateEnter()

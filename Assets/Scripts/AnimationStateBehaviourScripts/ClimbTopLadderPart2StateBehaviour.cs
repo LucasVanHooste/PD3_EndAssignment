@@ -28,7 +28,7 @@ public class ClimbTopLadderPart2StateBehaviour : StateMachineBehaviour {
     {
         if (_playerController != null)
         {
-            _playerController.SwitchState(_playerController.GetNormalState());
+            _playerController.SwitchState<NormalState>();
             _playerMotor.HasGravity=true;
             _animationsController.Climb(false);
             animator.applyRootMotion = false;

@@ -6,7 +6,7 @@ using UnityEngine;
 public class GunState : BasePlayerState
 {
     private Transform _playerTransform;
-    private PlayerMotor _physicsController;
+    private PlayerMotor _playerMotor;
     private PlayerController _playerController;
     private AnimationsController _animationsController;
     private List<Collider> _triggers;
@@ -17,27 +17,30 @@ public class GunState : BasePlayerState
     private GameObject _crossHair;
     private LayerMask _bulletLayerMask;
 
-    private bool _isAiming;
-    private bool _isFiring;
+    private bool _isAiming=false;
+    private bool _isFiring = false;
     private GunScript _gunScript;
 
-    private float _dropGunTime = 1;
+    private const float _dropGunTime = 1;
     private float _dropGunTimer=0;
     private float _punchCoolDownTimer = 0;
 
-    public GunState(PlayerMotor physicsController, PlayerController playerController, AnimationsController animationsController, GunScript gun, 
-        CameraController cameraController)
+    public GunState(PlayerMotor physicsController, PlayerController playerController, AnimationsController animationsController, GunScript gun)
     {
         _playerTransform = PlayerController.PlayerTransform;
-        _physicsController = physicsController;
+        _playerMotor = physicsController;
         _playerController = playerController;
         _animationsController = animationsController;
         _triggers = _playerController.Triggers;
-        _cameraController = cameraController;
+        _cameraController = _playerController.cameraController;
         _holsterGun1Hand = _playerController.HolsterGun1Hand;
         _holsterGun2Hands = _playerController.HolsterGun2Hands;
         _crossHair = _playerController.CrossHair;
         _bulletLayerMask = _playerController.BulletLayerMask;
+    }
+
+    public override void ResetState(IInteractable gun)
+    {
         _playerController.GunAnchor.rotation = _cameraController.CameraRoot.rotation;
 
         if (gun == null)
@@ -46,9 +49,13 @@ public class GunState : BasePlayerState
         }
         else
         {
-            HoldGun(gun);
+            HoldGun((GunScript)gun);
         }
 
+        _isAiming=false;
+        _isFiring=false;
+
+        _dropGunTimer = 0;
         _punchCoolDownTimer = _playerController.PunchCoolDown;
     }
 
@@ -57,7 +64,7 @@ public class GunState : BasePlayerState
         if (_gunScript == null)
         {
             Debug.Log("to normal please");
-            _playerController.SwitchState(_playerController.GetNormalState());
+            _playerController.SwitchState<NormalState>();
         }
     }
 
@@ -70,17 +77,17 @@ public class GunState : BasePlayerState
     {
         _playerController.GunAnchor.rotation = _cameraController.CameraRoot.rotation;
 
-        if (Input.GetButtonDown("Jump") && _physicsController.IsGrounded)
+        if (Input.GetButtonDown("Jump") && _playerMotor.IsGrounded)
         {
-            _physicsController.Jump = true;
+            _playerMotor.Jump = true;
         }
 
-        if (_physicsController.IsGrounded)
-            _physicsController.Movement = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+        if (_playerMotor.IsGrounded)
+            _playerMotor.Movement = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
-        _physicsController.Aim = new Vector3(Input.GetAxis("RightJoystickX"), 0, Input.GetAxis("RightJoystickY"));
+        _playerMotor.Aim = new Vector3(Input.GetAxis("RightJoystickX"), 0, Input.GetAxis("RightJoystickY"));
 
-        _isAiming = Input.GetAxis("TriggerLeft") > 0.2f && _physicsController.IsGrounded;
+        _isAiming = Input.GetAxis("TriggerLeft") > 0.2f && _playerMotor.IsGrounded;
         AimGun();
 
         _isFiring = Input.GetAxis("TriggerRight") > 0.2f && _isAiming;
@@ -96,7 +103,7 @@ public class GunState : BasePlayerState
 
         }
         _punchCoolDownTimer += Time.deltaTime;
-        if (Input.GetButtonDown("Interact") && _physicsController.IsGrounded && !_isAiming)
+        if (Input.GetButtonDown("Interact") && _playerMotor.IsGrounded && !_isAiming)
         {
             InteractWithObject();
         }
@@ -115,7 +122,7 @@ public class GunState : BasePlayerState
             DropGun();
         }
         //bad
-        if (_physicsController.Velocity.y < -10f)
+        if (_playerMotor.Velocity.y < -10f)
             DropGun();
 
         if(Input.GetButtonDown("HolsterGun") && !_isAiming)
@@ -140,7 +147,7 @@ public class GunState : BasePlayerState
                     if (GetGunInHolster() == null)
                     {
                         HolsterGun();
-                        _playerController.SwitchState(_playerController.GetPushingState(obstacle));
+                        _playerController.SwitchState<PushingState>(obstacle);
                     }
                 }break;
             case GunScript gun:
@@ -159,7 +166,7 @@ public class GunState : BasePlayerState
                         if (!ladder.IsPersonClimbing)
                         {
                             HolsterGun();
-                            _playerController.SwitchState(_playerController.GetClimbingState(ladder));
+                            _playerController.SwitchState<ClimbingState>(ladder);
                         }                          
                     }
                 }
@@ -169,7 +176,7 @@ public class GunState : BasePlayerState
                     if (GetGunInHolster() == null)
                     {
                         HolsterGun();
-                        _playerController.SwitchState(_playerController.GetTurretState(turret));
+                        _playerController.SwitchState<TurretState>(turret);
                     }
                 }
                 break;
@@ -193,7 +200,7 @@ public class GunState : BasePlayerState
 
     void AimGun()
     {
-        _physicsController.IsWalking=_isAiming;
+        _playerMotor.IsWalking=_isAiming;
 
         _animationsController.AimGun(_isAiming);
         _animationsController.IsTwoHandedGun(_gunScript.IsTwoHanded);
@@ -232,7 +239,7 @@ public class GunState : BasePlayerState
 
         _animationsController.HoldGunIK.Gun=null;
 
-        _playerController.SwitchState(_playerController.GetNormalState());
+        _playerController.SwitchState<NormalState>();
     }
 
     private void HolsterGun()
@@ -262,7 +269,7 @@ public class GunState : BasePlayerState
         }
         else
         {
-            _playerController.SwitchState(_playerController.GetNormalState());
+            _playerController.SwitchState<NormalState>();
         }
 
     }

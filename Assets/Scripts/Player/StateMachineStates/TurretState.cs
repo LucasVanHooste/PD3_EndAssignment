@@ -23,21 +23,26 @@ public class TurretState : BasePlayerState
 
     float _turretPaddingDistance = 0.15f;
 
-    public TurretState(PlayerMotor physicsController, PlayerController playerController, AnimationsController animationsController, TurretScript turret,
-        CameraController cameraController)
+    public TurretState(PlayerMotor physicsController, PlayerController playerController, AnimationsController animationsController, TurretScript turret)
     {
         _playerTransform = PlayerController.PlayerTransform;
         _physicsController = physicsController;
         _playerController = playerController;
         _animationsController = animationsController;
 
-        _cameraController = cameraController;
+        _cameraController = _playerController.cameraController;
         _crossHair = _playerController.CrossHair;
         _bulletLayerMask = _playerController.BulletLayerMask;
-
-        _turretScript = turret.GetComponent<TurretScript>();
-
     }
+
+    public override void ResetState(IInteractable turret)
+    {
+        _turretScript = (TurretScript)turret;
+
+        _isAiming = false;
+        _isShooting = false;
+        _isReady = false;
+}
 
     public override void OnStateEnter()
     {
@@ -75,7 +80,7 @@ public class TurretState : BasePlayerState
 
         if (Input.GetButton("Interact"))
         {
-            _playerController.SwitchState(_playerController.GetNormalState());
+            _playerController.SwitchState<NormalState>();
             return;
         }
 

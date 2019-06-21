@@ -10,4 +10,5 @@ public interface IState {
     void OnControllerColliderHit(ControllerColliderHit hit);
     void Update();
     void Die();
+    void ResetState(IInteractable interactable);
 }
