@@ -6,15 +6,8 @@ public class IsGroundedCheckerScript : MonoBehaviour {
 
     private List<Collider> _colliders = new List<Collider>();
 
-    public bool IsGrounded
-    {
-        get
-        {
-            if (_colliders.Count > 0)
-                return true;
-            return false;
-        }
-    }
+    public bool IsGrounded { get => _colliders.Count > 0; }
+
 
     private void OnTriggerEnter(Collider other)
     {

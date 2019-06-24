@@ -181,10 +181,9 @@ public class PlayerMotor : MonoBehaviour {
         RaycastHit hit;
         if (Physics.Raycast(_playerTransform.position, Vector3.down, out hit, 1000, _mapLayerMask))
         {
-            //print("I'm looking at " + hit.transform.name);
             return (hit.point - _playerTransform.position).magnitude;
         }
-        //print("I'm looking at nothing!");
+
         return 1000;
     }
 

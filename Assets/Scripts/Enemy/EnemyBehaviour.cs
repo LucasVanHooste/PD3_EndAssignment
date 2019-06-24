@@ -396,42 +396,35 @@ public class EnemyBehaviour : MonoBehaviour, IDamageable
         float distance = 100;
         foreach (GameObject gun in _targetGuns)
         {
+            if (gun.transform.parent != null)
+            {
+                _rangeTriggerChecker.RemoveTriggersFromList(gun.GetComponents<Collider>());
+                _roamingTimer = _roamingTime;
+                continue;
+            }
+
             RaycastHit hit;
             if (Physics.Raycast(_transform.position+_eyesPosition, gun.transform.position - (_transform.position+ _eyesPosition), out hit, 100, _canSeePlayerLayerMask))
             {
                 if (hit.collider.CompareTag("Gun"))
                 {
-                    if (gun.transform.parent != null)
+                    float tempDistance = Vector3.SqrMagnitude(gun.transform.position - _transform.position);
+                    if (tempDistance < distance)
                     {
-                        _rangeTriggerChecker.RemoveTriggersFromList(gun.GetComponents<Collider>());
-                        _roamingTimer = _roamingTime;
+                        distance = tempDistance;
+                        _targetGun = gun.gameObject;
                     }
-                    else
-                    {
-                        float tempDistance = Vector3.SqrMagnitude(gun.transform.position - _transform.position);
-                        if (tempDistance < distance)
-                        {
-                            distance = tempDistance;
-                            _targetGun = gun.gameObject;
-                        }
-                    }
-
                 }
             }
         }
 
 
-        if (_targetGun != null) return true;
-        return false;
+        return _targetGun != null;
     }
 
     private bool HasBeenAttacked()
     {
-        if (_hasBeenAttacked)
-        {
-            return true;
-        }
-        return false;
+        return _hasBeenAttacked;
     }
 
     private bool HasGun()
