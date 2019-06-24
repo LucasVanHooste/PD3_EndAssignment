@@ -22,11 +22,11 @@ public class PlayerStateManager
     private void CreateStates()
     {
         _states.Add(new NormalState(_playerMotor, _playerController, _animationsController));
-        _states.Add(new PushingState(_playerMotor, _playerController, _animationsController, null));
-        _states.Add(new GunState(_playerMotor, _playerController, _animationsController, null));
+        _states.Add(new PushingState(_playerMotor, _playerController, _animationsController));
+        _states.Add(new GunState(_playerMotor, _playerController, _animationsController));
         _states.Add(new DeadState(_playerMotor, _playerController, _animationsController));
-        _states.Add(new ClimbingState(_playerMotor, _playerController, _animationsController, null));
-        _states.Add(new TurretState(_playerMotor, _playerController, _animationsController, null));
+        _states.Add(new ClimbingState(_playerMotor, _playerController, _animationsController));
+        _states.Add(new TurretState(_playerMotor, _playerController, _animationsController));
     }
 
     public IState GetState<T>(IInteractable interactableObject) where T : IState

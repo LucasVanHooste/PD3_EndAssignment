@@ -8,7 +8,7 @@ using UnityEngine.AI;
 public class EnemyMotor : MonoBehaviour {
 
     private NavMeshAgent _navMeshAgent;
-    public Rigidbody RigidBody { get; set; }
+    public Rigidbody RigidBody { get; private set; }
     private Transform _transform;
     private Transform _playerTransform;
 
@@ -208,6 +208,10 @@ public class EnemyMotor : MonoBehaviour {
 
     public void Die()
     {
+        RigidBody.constraints = RigidbodyConstraints.FreezeRotation;
+        RigidBody.isKinematic = false;
+        RigidBody.useGravity = true;
+
         _navMeshAgent.isStopped = true;
         _navMeshAgent.enabled = false;
     }

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GunState : BasePlayerState
+public class GunState : BasePlayerState, IInteractor
 {
     private Transform _playerTransform;
     private PlayerMotor _playerMotor;
@@ -25,12 +25,13 @@ public class GunState : BasePlayerState
     private float _dropGunTimer=0;
     private float _punchCoolDownTimer = 0;
 
-    public GunState(PlayerMotor physicsController, PlayerController playerController, AnimationsController animationsController, GunScript gun)
+    public GunState(PlayerMotor physicsController, PlayerController playerController, AnimationsController animationsController)
     {
         _playerTransform = PlayerController.PlayerTransform;
         _playerMotor = physicsController;
         _playerController = playerController;
         _animationsController = animationsController;
+        _animationsController.FallFlatBehaviour.PlayerGunHolder = this;
         _triggers = _playerController.Triggers;
         _cameraController = _playerController.cameraController;
         _holsterGun1Hand = _playerController.HolsterGun1Hand;
@@ -70,30 +71,30 @@ public class GunState : BasePlayerState
 
     public override void OnStateExit()
     {
-        
+        _gunScript = null;
     }
 
     public override void Update()
     {
         _playerController.GunAnchor.rotation = _cameraController.CameraRoot.rotation;
 
-        if (Input.GetButtonDown("Jump") && _playerMotor.IsGrounded)
+        if (InputController.JumpButtonDown && _playerMotor.IsGrounded)
         {
             _playerMotor.Jump = true;
         }
 
         if (_playerMotor.IsGrounded)
-            _playerMotor.Movement = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+            _playerMotor.Movement = new Vector3(InputController.LeftJoystickX, 0, InputController.LeftJoystickY);
 
-        _playerMotor.Aim = new Vector3(Input.GetAxis("RightJoystickX"), 0, Input.GetAxis("RightJoystickY"));
+        _playerMotor.Aim = new Vector3(InputController.RightJoystickX, 0, InputController.RightJoystickY);
 
-        _isAiming = Input.GetAxis("TriggerLeft") > 0.2f && _playerMotor.IsGrounded;
+        _isAiming = InputController.LeftTrigger > 0.2f && _playerMotor.IsGrounded;
         AimGun();
 
-        _isFiring = Input.GetAxis("TriggerRight") > 0.2f && _isAiming;
+        _isFiring = InputController.RightTrigger > 0.2f && _isAiming;
         FireGun();
 
-        if (Input.GetButtonDown("Punch") && !_gunScript.IsTwoHanded && !_isAiming)
+        if (InputController.PunchButtonDown && !_gunScript.IsTwoHanded && !_isAiming)
         {
             if (_punchCoolDownTimer >= _playerController.PunchCoolDown)
             {
@@ -103,12 +104,12 @@ public class GunState : BasePlayerState
 
         }
         _punchCoolDownTimer += Time.deltaTime;
-        if (Input.GetButtonDown("Interact") && _playerMotor.IsGrounded && !_isAiming)
+        if (InputController.InteractButtonDown && _playerMotor.IsGrounded && !_isAiming)
         {
             InteractWithObject();
         }
 
-        if (Input.GetButton("Interact"))
+        if (InputController.InteractButtonDown)
         {
             _dropGunTimer += Time.deltaTime;
         }
@@ -121,11 +122,8 @@ public class GunState : BasePlayerState
         {
             DropGun();
         }
-        //bad
-        if (_playerMotor.Velocity.y < -10f)
-            DropGun();
 
-        if(Input.GetButtonDown("HolsterGun") && !_isAiming)
+        if(InputController.HolsterButtonDown && !_isAiming)
         {
             HolsterGun();
         }
@@ -133,55 +131,15 @@ public class GunState : BasePlayerState
 
     private void InteractWithObject()
     {
-        Debug.Log(_triggers.Count);
-
         if (_triggers.Count <= 0) return;
 
         _closestGameObject = _playerController.GetClosestTriggerObject();
         IInteractable interactable = _closestGameObject.GetComponent<IInteractable>();
 
-        switch (interactable)
+        if (interactable != null)
         {
-            case ObstacleScript obstacle:
-                {
-                    if (GetGunInHolster() == null)
-                    {
-                        HolsterGun();
-                        _playerController.SwitchState<PushingState>(obstacle);
-                    }
-                }break;
-            case GunScript gun:
-                {
-                    _gunScript.DropGun();
-
-                    HoldGun(gun);
-                    _playerController.RemoveTriggersFromList(_closestGameObject.GetComponents<Collider>());
-                    _gunScript = gun;
-                }
-                break;
-            case LadderScript ladder:
-                {
-                    if (GetGunInHolster() == null)
-                    {
-                        if (!ladder.IsPersonClimbing)
-                        {
-                            HolsterGun();
-                            _playerController.SwitchState<ClimbingState>(ladder);
-                        }                          
-                    }
-                }
-                break;
-            case TurretScript turret:
-                {
-                    if (GetGunInHolster() == null)
-                    {
-                        HolsterGun();
-                        _playerController.SwitchState<TurretState>(turret);
-                    }
-                }
-                break;
+            interactable.Interact(this);
         }
-        
     }
 
     private void Punch()
@@ -232,6 +190,8 @@ public class GunState : BasePlayerState
 
     public void DropGun()
     {
+        if (_gunScript == null) return;
+
         _isAiming = false;
         AimGun();
 
@@ -300,5 +260,42 @@ public class GunState : BasePlayerState
         DropGun();
     }
 
+    public void ObstacleInteraction(ObstacleScript obstacle)
+    {
+        if (GetGunInHolster() == null)
+        {
+            HolsterGun();
+            _playerController.SwitchState<PushingState>(obstacle);
+        }
+    }
 
+    public void GunInteraction(GunScript gun)
+    {
+        _gunScript.DropGun();
+
+        HoldGun(gun);
+        _playerController.RemoveTriggersFromList(_closestGameObject.GetComponents<Collider>());
+        _gunScript = gun;
+    }
+
+    public void LadderInteraction(LadderScript ladder)
+    {
+        if (GetGunInHolster() == null)
+        {
+            if (!ladder.IsPersonClimbing)
+            {
+                HolsterGun();
+                _playerController.SwitchState<ClimbingState>(ladder);
+            }
+        }
+    }
+
+    public void TurretInteraction(TurretScript turret)
+    {
+        if (GetGunInHolster() == null)
+        {
+            HolsterGun();
+            _playerController.SwitchState<TurretState>(turret);
+        }
+    }
 }

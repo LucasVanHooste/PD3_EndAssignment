@@ -25,4 +25,9 @@ public class ObstacleScript : MonoBehaviour, IInteractable {
     {
         _rigidbody.useGravity = gravity;
     }
+
+    public void Interact(IInteractor interactor)
+    {
+        interactor.ObstacleInteraction(this);
+    }
 }

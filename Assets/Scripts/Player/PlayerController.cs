@@ -86,7 +86,7 @@ public class PlayerController : MonoBehaviour, IDamageable {
         _startRotation = _transform.rotation;
 
         _playerStateManager = new PlayerStateManager(_playerMotor, this, _animationsController);
-        _state = new NormalState(_playerMotor, this, _animationsController);
+        SwitchState<NormalState>();
         SetHealthBar();
     }
 
@@ -100,7 +100,9 @@ public class PlayerController : MonoBehaviour, IDamageable {
 
     public void SwitchState<T>(IInteractable interactableObject = null) where T : IState
     {
+        if(_state!=null)
         _state.OnStateExit();
+
         _state = _playerStateManager.GetState<T>(interactableObject);
         _state.OnStateEnter();
     }
@@ -180,27 +182,30 @@ public class PlayerController : MonoBehaviour, IDamageable {
         _animationsController.TakeDamage();
         SetHealthBar();
 
-        Die(originOfDamage);
+        if (Health <= 0)
+            DieFromHit(originOfDamage);
     }
 
-    private void Die(Vector3 originOfDamage)
+    private void Die()
     {
-        if (Health > 0) return;
+        _state.Die();
+        SwitchState<DeadState>();
+    }
 
+    private void DieFromHit(Vector3 originOfDamage)
+    {
         Vector3 transformedOrigin = _transform.InverseTransformPoint(originOfDamage);
         //added this because the directional death animations didn't blend well
         transformedOrigin = transformedOrigin.TransformToHorizontalAxisVector();
 
         _animationsController.Die(transformedOrigin.x, transformedOrigin.z);
 
-        _state.Die();
-        SwitchState<DeadState>();
+        Die();
     }
 
     private void DieFromFalling()
     {
-        _state.Die();
-        SwitchState<DeadState>();
+        Die();
     }
 
     public void Respawn()

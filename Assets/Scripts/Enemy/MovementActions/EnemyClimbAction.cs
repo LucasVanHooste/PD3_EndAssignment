@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyLadderAction : IEnemyMovementAction
+public class EnemyClimbAction : IEnemyMovementAction
 {
     AnimationsController _animationsController;
-    EnemyMotor _navMeshAgentController;
+    EnemyMotor _enemyMotor;
     EnemyBehaviour _enemyBehaviour;
     Transform _transform;
     Transform _ladder;
@@ -16,15 +16,16 @@ public class EnemyLadderAction : IEnemyMovementAction
 
     private bool _isClimbing = false;
 
-    public EnemyLadderAction(AnimationsController animationsController, EnemyMotor navMeshAgentController, EnemyBehaviour enemyBehaviour, Transform ladder)
+    public EnemyClimbAction(EnemyMotor enemyMotor, EnemyBehaviour enemyBehaviour, AnimationsController animationsController)
     {
         _animationsController = animationsController;
-        _navMeshAgentController = navMeshAgentController;
+        _enemyMotor = enemyMotor;
         _enemyBehaviour = enemyBehaviour;
         _transform = _enemyBehaviour.transform;
-        _ladder = ladder;
-        _ladderScript = _ladder.GetComponent<LadderScript>();
+    }
 
+    public void OnActionEnter()
+    {
         _climbLadder = _enemyBehaviour.StartCoroutine(InteractWithLadder());
     }
 
@@ -35,16 +36,15 @@ public class EnemyLadderAction : IEnemyMovementAction
         //animaitons
         _animationsController.ClimbBottomLadderIK.LadderIKHands = ladderScript.BottomLadderIKHands;
         _animationsController.ClimbTopLadderPart1IK.Ladder = ladderScript;
-        _animationsController.ClimbTopLadderPart2IK.SetBehaviour(_enemyBehaviour, _navMeshAgentController, _animationsController);
+        _animationsController.ClimbTopLadderPart2IK.SetBehaviour(_enemyBehaviour, _enemyMotor, _animationsController);
 
         //physics
-        _navMeshAgentController.UpdateTransformToNavmesh = false;
-        _navMeshAgentController.RigidBody.isKinematic = false;
-        _navMeshAgentController.RigidBody.useGravity = false;
+        _enemyMotor.UpdateTransformToNavmesh = false;
+        _enemyMotor.RigidBody.isKinematic = false;
+        _enemyMotor.RigidBody.useGravity = false;
 
         while (ladderScript.IsPersonClimbing)
         {
-            Debug.Log("wait for climb");
             yield return null;
         }
 
@@ -65,7 +65,7 @@ public class EnemyLadderAction : IEnemyMovementAction
             yield return null;
         }
 
-        _navMeshAgentController.RigidBody.constraints = RigidbodyConstraints.FreezeRotation;
+        _enemyMotor.RigidBody.constraints = RigidbodyConstraints.FreezeRotation;
         _climbLadder = _enemyBehaviour.StartCoroutine(MoveToLadder());
     }
 
@@ -76,10 +76,10 @@ public class EnemyLadderAction : IEnemyMovementAction
         while (Vector3.Scale(ladderPosition - _transform.position, new Vector3(1, 0, 1)).sqrMagnitude > _ladderPaddingDistance * _ladderPaddingDistance)
         {
             Vector3 direction = ladderPosition - _transform.position;
-            _navMeshAgentController.RigidBody.velocity = direction.normalized;
+            _enemyMotor.RigidBody.velocity = direction.normalized;
             yield return null;
         }
-        _navMeshAgentController.RigidBody.velocity = Vector3.zero;
+        _enemyMotor.RigidBody.velocity = Vector3.zero;
         ClimbLadder();
 
     }
@@ -99,6 +99,9 @@ public class EnemyLadderAction : IEnemyMovementAction
         {
             _enemyBehaviour.StopCoroutine(_climbLadder);
         }
+
+        _animationsController.Climb(false);
+        _animationsController.ApplyRootMotion(false);
     }
 
     public void OnTriggerExit(Collider other)
@@ -114,5 +117,11 @@ public class EnemyLadderAction : IEnemyMovementAction
     public void OnCollisionEnter(Collision collision)
     {
 
+    }
+
+    public void ResetAction(Transform actionTrigger)
+    {
+        _ladder = actionTrigger;
+        _ladderScript = _ladder.GetComponent<LadderScript>();
     }
 }

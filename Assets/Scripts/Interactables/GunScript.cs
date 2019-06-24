@@ -97,4 +97,8 @@ public class GunScript : BaseWeapon, IInteractable {
         }
     }
 
+    public void Interact(IInteractor interactor)
+    {
+        interactor.GunInteraction(this);
+    }
 }

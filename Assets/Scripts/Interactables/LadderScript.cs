@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LadderScript : MonoBehaviour, IInteractable {
+public class LadderScript : MonoBehaviour, IInteractable, IEnemyMovementActionTrigger {
 
     public Transform TakeOfPoint;
     public Transform TopLadderLeftHandIK;
@@ -13,4 +13,15 @@ public class LadderScript : MonoBehaviour, IInteractable {
     public Transform[] BottomLadderIKHands;
 
     public bool IsPersonClimbing { get; set; }
+
+
+    public void Interact(IInteractor interactor)
+    {
+        interactor.LadderInteraction(this);
+    }
+
+    public void TriggerAction(EnemyBehaviour enemy)
+    {
+        enemy.SwitchAction<EnemyClimbAction>(transform);
+    }
 }

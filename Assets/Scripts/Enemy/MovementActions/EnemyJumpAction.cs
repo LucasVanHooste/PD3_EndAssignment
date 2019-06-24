@@ -4,46 +4,42 @@ using UnityEngine;
 
 public class EnemyJumpAction : IEnemyMovementAction
 {
-    EnemyMotor _navMeshAgentController;
+    EnemyMotor _enemyMotor;
     EnemyBehaviour _enemyBehaviour;
     Transform _transform;
     Transform _offMeshLink;
 
-    Coroutine _jump;
-
-    public EnemyJumpAction(EnemyMotor navMeshAgentController,EnemyBehaviour enemyBehaviour, Transform offMeshLink)
+    public EnemyJumpAction(EnemyMotor enemyMotor,EnemyBehaviour enemyBehaviour)
     {
-        _navMeshAgentController = navMeshAgentController;
+        _enemyMotor = enemyMotor;
         _enemyBehaviour = enemyBehaviour;
-        _transform = _navMeshAgentController.transform;
-        _offMeshLink = offMeshLink;
-
-        _jump = _navMeshAgentController.StartCoroutine(Jump());
+        _transform = _enemyMotor.transform;
     }
 
-    private IEnumerator Jump()
+    public void OnActionEnter()
     {
-        _navMeshAgentController.Jump(_offMeshLink);
-        yield return null;
+        Jump();
+    }
+
+    private void Jump()
+    {
+        _enemyMotor.Jump(_offMeshLink);
     }
 
     public void Stop()
     {
-        if (_jump != null)
-        {
-            _navMeshAgentController.StopCoroutine(_jump);
-        }
+
     }
 
     public void OnCollisionEnter(Collision collision)
     {
-        if (_navMeshAgentController.IsGrounded)
+        if (_enemyMotor.IsGrounded)
         {
-                _navMeshAgentController.UpdateTransformToNavmesh = true;
-                _navMeshAgentController.Warp(_transform.position);
+                _enemyMotor.UpdateTransformToNavmesh = true;
+                _enemyMotor.Warp(_transform.position);
 
-                _navMeshAgentController.RigidBody.useGravity = false;
-                _navMeshAgentController.RigidBody.isKinematic = true;
+                _enemyMotor.RigidBody.useGravity = false;
+                _enemyMotor.RigidBody.isKinematic = true;
 
             _enemyBehaviour.StopMovementAction();
         }
@@ -52,6 +48,11 @@ public class EnemyJumpAction : IEnemyMovementAction
     public void OnTriggerExit(Collider other)
     {
 
+    }
+
+    public void ResetAction(Transform actionTrigger)
+    {
+        _offMeshLink = actionTrigger;
     }
 }
 

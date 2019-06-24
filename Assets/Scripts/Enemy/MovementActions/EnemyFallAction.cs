@@ -4,27 +4,26 @@ using UnityEngine;
 
 public class EnemyFallAction : IEnemyMovementAction
 {
-    EnemyMotor _navMeshAgentController;
+    EnemyMotor _enemyMotor;
     EnemyBehaviour _enemyBehaviour;
     Transform _transform;
     Transform _offMeshLink;
 
-    Coroutine _jump;
-
-    public EnemyFallAction(EnemyMotor navMeshAgentController,EnemyBehaviour enemyBahvriour, Transform offMeshLink)
+    public EnemyFallAction(EnemyMotor enemyMotor,EnemyBehaviour enemyBahvriour)
     {
-        _navMeshAgentController = navMeshAgentController;
+        _enemyMotor = enemyMotor;
         _enemyBehaviour = enemyBahvriour;
-        _transform = _navMeshAgentController.transform;
-        _offMeshLink = offMeshLink;
-
-        _jump = _navMeshAgentController.StartCoroutine(Fall());
+        _transform = _enemyMotor.transform;
     }
 
-    private IEnumerator Fall()
+    public void OnActionEnter()
     {
-        _navMeshAgentController.Fall(_offMeshLink);
-        yield return null;
+        Fall();
+    }
+
+    private void Fall()
+    {
+        _enemyMotor.Fall(_offMeshLink);
     }
 
     public void OnTriggerExit(Collider other)
@@ -34,23 +33,24 @@ public class EnemyFallAction : IEnemyMovementAction
 
     public void Stop()
     {
-        if (_jump != null)
-        {
-            _navMeshAgentController.StopCoroutine(_jump);
-        }
     }
 
     public void OnCollisionEnter(Collision collision)
     {
-        if (_navMeshAgentController.IsGrounded)
+        if (_enemyMotor.IsGrounded)
         {
-            _navMeshAgentController.UpdateTransformToNavmesh = true;
-            _navMeshAgentController.Warp(_transform.position);
+            _enemyMotor.UpdateTransformToNavmesh = true;
+            _enemyMotor.Warp(_transform.position);
 
-            _navMeshAgentController.RigidBody.useGravity = false;
-            _navMeshAgentController.RigidBody.isKinematic = true;
+            _enemyMotor.RigidBody.useGravity = false;
+            _enemyMotor.RigidBody.isKinematic = true;
 
             _enemyBehaviour.StopMovementAction();
         }
+    }
+
+    public void ResetAction(Transform actionTrigger)
+    {
+        _offMeshLink = actionTrigger;
     }
 }

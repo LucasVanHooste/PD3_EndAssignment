@@ -56,5 +56,8 @@ public class TurretScript : BaseWeapon, IInteractable {
         _verticalAnchorTransform.eulerAngles = new Vector3(_verticalRotation, _verticalAnchorTransform.eulerAngles.y, _verticalAnchorTransform.eulerAngles.z);
     }
 
-    
+    public void Interact(IInteractor interactor)
+    {
+        interactor.TurretInteraction(this);
+    }
 }

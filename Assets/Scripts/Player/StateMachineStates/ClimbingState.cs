@@ -15,7 +15,7 @@ public class ClimbingState : BasePlayerState
     private const float _ladderPaddingDistance = 0.15f;
     private Coroutine _climbLadder;
 
-    public ClimbingState(PlayerMotor physicsController, PlayerController playerController, AnimationsController animationsController, LadderScript ladder)
+    public ClimbingState(PlayerMotor physicsController, PlayerController playerController, AnimationsController animationsController)
     {
         _playerTransform = PlayerController.PlayerTransform;
         _physicsController = physicsController;
@@ -98,7 +98,7 @@ public class ClimbingState : BasePlayerState
 
     public override void OnTriggerExit(Collider other)
     {
-        if (_playerController.Health>0 && other.gameObject.tag == "Ladder" && !_physicsController.IsGrounded)
+        if (_playerController.Health>0 && other.gameObject.CompareTag("Ladder") && !_physicsController.IsGrounded)
         {
             int mask = LayerMask.NameToLayer("NoCollisions");
 

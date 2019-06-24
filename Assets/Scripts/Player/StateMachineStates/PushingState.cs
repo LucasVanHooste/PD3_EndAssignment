@@ -19,8 +19,7 @@ public class PushingState : BasePlayerState
     private Vector3 _direction;
     bool _hasHitObstacle = false;
 
-    public PushingState(PlayerMotor physicsController, PlayerController playerController, AnimationsController animationsController, 
-        ObstacleScript obstacle)
+    public PushingState(PlayerMotor physicsController, PlayerController playerController, AnimationsController animationsController)
     {
         _playerTransform = PlayerController.PlayerTransform;
         _physicsController = physicsController;

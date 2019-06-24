@@ -11,6 +11,7 @@ public class EnemyBehaviour : MonoBehaviour, IDamageable
     private INode _behaviourTree;
     private Coroutine _treeCoroutine;
     private IEnemyMovementAction _enemyMovementAction;
+    private EnemyMovementActionManager _enemyMovementActionManager;
     private Transform _transform;
     private EnemyMotor _enemyMotor;
     private Animator _animator;
@@ -20,14 +21,8 @@ public class EnemyBehaviour : MonoBehaviour, IDamageable
 
     [Header("Combat Parameters")]
     [SerializeField] private int _maxHealth;
-    private int _health;
-    public int Health
-    {
-        get
-        {
-            return _health;
-        }
-    }
+    public int Health { get; private set; }
+
     [SerializeField] private float FOV;
     [SerializeField] private LayerMask _canSeePlayerLayerMask;
     [SerializeField] private float _minDistanceFromPlayer;
@@ -70,25 +65,19 @@ public class EnemyBehaviour : MonoBehaviour, IDamageable
     [SerializeField] private RangeTriggerCheckerScript _rangeTriggerChecker;
 
     private List<Collider> _triggers = new List<Collider>();
-    public bool IsInMovementAction {
-        get
-        {
-            return _enemyMovementAction != null ? true : false;
-        }
-    }
+    public bool IsInMovementAction { get=> _enemyMovementAction != null; }
 
     void Start()
     {
-        _health = _maxHealth;
+        Health = _maxHealth;
         _transform = transform;
         _enemyMotor = GetComponent<EnemyMotor>();
 
         _animator = GetComponent<Animator>();
         _animationsController = new AnimationsController(_animator);
-        _animationsController.HoldGunIK.Player = _transform;
-        _animationsController.LookAtIK.LookAtPosition = _lookAtPosition;
-        _animationsController.ClimbBottomLadderIK.LeftHand = _leftHand;
-        _animationsController.ClimbBottomLadderIK.RightHand =_rightHand;
+        SetUpAnimationStateBehaviours();
+
+        _enemyMovementActionManager = new EnemyMovementActionManager(this, _enemyMotor, _animationsController);
 
         _playerTransform = PlayerController.PlayerTransform;
         _playerController = _playerTransform.GetComponent<PlayerController>();
@@ -133,13 +122,25 @@ public class EnemyBehaviour : MonoBehaviour, IDamageable
         _treeCoroutine= StartCoroutine(RunTree());
     }
 
+    private void SetUpAnimationStateBehaviours()
+    {
+        _animationsController.HoldGunIK.Player = _transform;
+        _animationsController.LookAtIK.LookAtPosition = _lookAtPosition;
+        _animationsController.ClimbBottomLadderIK.LeftHand = _leftHand;
+        _animationsController.ClimbBottomLadderIK.RightHand = _rightHand;
+        _animationsController.FallFlatBehaviour.EnemyGunHolder = this;
+    }
+
+    public void SwitchAction<T>(Transform actionTrigger) where T : IEnemyMovementAction
+    {
+        _enemyMovementAction = _enemyMovementActionManager.GetMovementAction<T>(actionTrigger);
+        _enemyMovementAction.OnActionEnter();
+    }
+
     // Update is called once per frame
     void Update()
     {
-        if (_health <= 0) return;
-
-        if (_enemyMotor.RigidBody.velocity.y < -7f)
-            DropGun();
+        if (Health <= 0) return;
 
         if (_gun != null)
         {
@@ -149,32 +150,31 @@ public class EnemyBehaviour : MonoBehaviour, IDamageable
         _fireGun = false;
         _aimGun = false;
 
-        if (!IsInMovementAction && _enemyMotor.IsOnOffMeshLink() && _triggers.Count > 0)
+        if (CanLookForMovementAction())
         {
-             GameObject _object = GetClosestTriggerObject();
-
-            switch (_object.tag)
-            {
-                case "Ladder":
-                    {
-                        _enemyMovementAction = new EnemyLadderAction(_animationsController, _enemyMotor, this, _object.transform);
-                    }break;
-                case "Jump":
-                    {
-                        _enemyMovementAction = new EnemyJumpAction(_enemyMotor,this, _object.transform);
-                    }break;
-                case "Fall":
-                    {
-                        _enemyMovementAction = new EnemyFallAction(_enemyMotor,this, _object.transform);
-                    }
-                    break;
-            }
+            LookForMovementAction();
         }
 
         UpdateAnimations();
 
         _punchCoolDownTimer += Time.deltaTime;
         _roamingTimer += Time.deltaTime;
+    }
+
+    private bool CanLookForMovementAction()
+    {
+        return !IsInMovementAction && _enemyMotor.IsOnOffMeshLink() && _triggers.Count > 0;
+    }
+
+    private void LookForMovementAction()
+    {
+        GameObject closestObject = GetClosestTriggerObject();
+        IEnemyMovementActionTrigger movementTrigger = closestObject.GetComponent<IEnemyMovementActionTrigger>();
+
+        if (movementTrigger != null)
+        {
+            movementTrigger.TriggerAction(this);
+        }        
     }
 
     private void UpdateAnimations()
@@ -196,7 +196,7 @@ public class EnemyBehaviour : MonoBehaviour, IDamageable
 
     IEnumerator RunTree()
     {
-        while (_health > 0)
+        while (Health > 0)
         {
             yield return _behaviourTree.Tick();
         }
@@ -470,7 +470,7 @@ public class EnemyBehaviour : MonoBehaviour, IDamageable
         }
     }
 
-    private void DropGun()
+    public void DropGun()
     {
         if (_gun == null) return;
 
@@ -561,44 +561,41 @@ public class EnemyBehaviour : MonoBehaviour, IDamageable
 
     public void TakeDamage(int damage, Vector3 originOfDamage)
     {
-        _health -= damage;
+        Health -= damage;
         _animationsController.TakeDamage();
 
-        Die(originOfDamage);
+        if (Health <= 0)
+            DieFromHit(originOfDamage);
     }
 
-    private void Die(Vector3 originOfDamage)
+    private void Die()
     {
-        if (_health > 0) return;
+        StopMovementAction();
 
-        if(IsInMovementAction)
-        _enemyMovementAction.Stop();
+        DropGun();
+        DropHolsterGun();
+
+        Health = 0;
+        _enemyMotor.Die();
+        gameObject.layer = LayerMask.NameToLayer("NoCollisionWithPlayer");
+        StopCoroutine(_treeCoroutine);
+        this.enabled = false;
+    }
+
+    private void DieFromHit(Vector3 originOfDamage)
+    {
+        Die();
 
         Vector3 transformedOrigin = _transform.InverseTransformPoint(originOfDamage);
         //added this because the directional death animations didn't blend well
         transformedOrigin = transformedOrigin.TransformToHorizontalAxisVector();
 
         _animationsController.Die(transformedOrigin.x, transformedOrigin.z);
-        _animationsController.Climb(false);
-        _animationsController.ApplyRootMotion(false);
-        _enemyMotor.RigidBody.constraints = RigidbodyConstraints.FreezeRotation;
-        _enemyMotor.RigidBody.isKinematic = false;  
-        _enemyMotor.RigidBody.useGravity = true;
-
-        DropGun();
-        DropHolsterGun();
-
-        ToDeadState();
     }
     
-
-    public void ToDeadState()
+    private void DieFromFalling()
     {
-        _health = 0;
-        _enemyMotor.Die();
-        gameObject.layer = LayerMask.NameToLayer("NoCollisionWithPlayer");
-        StopCoroutine(_treeCoroutine);
-        GameObject.Destroy(this);
+        Die();
     }
 
     public void StopMovementAction()
@@ -646,7 +643,7 @@ public class EnemyBehaviour : MonoBehaviour, IDamageable
 
     private GameObject GetClosestTriggerObject()
     {
-        Vector3 position = _playerTransform.position;
+        Vector3 position = _transform.position;
         float distance = 100;
         GameObject closest = null;
         foreach (Collider col in _triggers)

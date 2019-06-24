@@ -23,7 +23,7 @@ public class TurretState : BasePlayerState
 
     float _turretPaddingDistance = 0.15f;
 
-    public TurretState(PlayerMotor physicsController, PlayerController playerController, AnimationsController animationsController, TurretScript turret)
+    public TurretState(PlayerMotor physicsController, PlayerController playerController, AnimationsController animationsController)
     {
         _playerTransform = PlayerController.PlayerTransform;
         _physicsController = physicsController;
@@ -61,7 +61,7 @@ public class TurretState : BasePlayerState
     {
         if (!_isReady) return;
 
-        if (Input.GetAxis("TriggerLeft") > 0.2f && _physicsController.IsGrounded)
+        if (InputController.LeftTrigger > 0.2f && _physicsController.IsGrounded)
         {
             _isAiming = true;
         }
@@ -69,7 +69,7 @@ public class TurretState : BasePlayerState
 
         AimTurret();
 
-        if (Input.GetAxis("TriggerRight") > 0.2f && _isAiming)
+        if (InputController.RightTrigger > 0.2f && _isAiming)
         {
             _isShooting = true;
         }
@@ -78,13 +78,13 @@ public class TurretState : BasePlayerState
         FireTurret();
 
 
-        if (Input.GetButton("Interact"))
+        if (InputController.InteractButtonDown)
         {
             _playerController.SwitchState<NormalState>();
             return;
         }
 
-        RotateTurret(Input.GetAxis("RightJoystickX"), Input.GetAxis("RightJoystickY"));
+        RotateTurret(InputController.RightJoystickX, InputController.RightJoystickY);
         FollowTurret();
     }
 

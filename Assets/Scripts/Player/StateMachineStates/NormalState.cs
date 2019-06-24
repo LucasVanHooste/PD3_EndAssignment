@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NormalState : BasePlayerState
+public class NormalState : BasePlayerState, IInteractor
 {
     private Transform _playerTransform;
     private PlayerMotor _playerMotor;
@@ -42,33 +42,33 @@ public class NormalState : BasePlayerState
     {
         
         if (_playerMotor.IsGrounded)
-            _playerMotor.Movement = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+            _playerMotor.Movement = new Vector3(InputController.LeftJoystickX, 0, InputController.LeftJoystickY);
 
-        _playerMotor.Aim = new Vector3(Input.GetAxis("RightJoystickX"), 0, Input.GetAxis("RightJoystickY"));
+        _playerMotor.Aim = new Vector3(InputController.RightJoystickX, 0, InputController.RightJoystickY);
 
 
-        if (Input.GetButtonDown("Jump") && _playerMotor.IsGrounded)
+        if (InputController.JumpButtonDown && _playerMotor.IsGrounded)
         {
             _playerMotor.Jump = true;
             return;
         }
 
         
-        if (Input.GetButtonDown("Interact") && _playerMotor.IsGrounded)
+        if (InputController.InteractButtonDown && _playerMotor.IsGrounded)
         {
             InteractWithObject();
             return;
         }
 
 
-        if (Input.GetButtonDown("HolsterGun"))
+        if (InputController.HolsterButtonDown)
         {
             _playerController.SwitchState<GunState>(null);
             return;
         }
 
 
-        if (Input.GetButtonDown("Punch"))
+        if (InputController.PunchButtonDown)
         {
             if (_punchCoolDownTimer >= _playerController.PunchCoolDown)
             {
@@ -87,32 +87,9 @@ public class NormalState : BasePlayerState
         _closestGameObject = _playerController.GetClosestTriggerObject();
         IInteractable interactable = _closestGameObject.GetComponent<IInteractable>();
 
-        switch (interactable)
+        if (interactable != null)
         {
-            case ObstacleScript obstacle:
-                {
-                    _playerController.SwitchState<PushingState>(obstacle);
-                }
-                break;
-            case GunScript gun:
-                {
-                    _playerController.RemoveTriggersFromList(_closestGameObject.GetComponents<Collider>());
-                    _playerController.SwitchState<GunState>(gun);
-                }
-                break;
-            case LadderScript ladder:
-                {
-                    if (!ladder.IsPersonClimbing)
-                    {
-                        _playerController.SwitchState<ClimbingState>(ladder);
-                    }
-                }
-                break;
-            case TurretScript turret:
-                {
-                    _playerController.SwitchState<TurretState>(turret);
-                }
-                break;
+            interactable.Interact(this);
         }
     }
 
@@ -131,5 +108,27 @@ public class NormalState : BasePlayerState
         }
     }
 
-   
+    public void ObstacleInteraction(ObstacleScript obstacle)
+    {
+        _playerController.SwitchState<PushingState>(obstacle);
+    }
+
+    public void GunInteraction(GunScript gun)
+    {
+        _playerController.RemoveTriggersFromList(_closestGameObject.GetComponents<Collider>());
+        _playerController.SwitchState<GunState>(gun);
+    }
+
+    public void LadderInteraction(LadderScript ladder)
+    {
+        if (!ladder.IsPersonClimbing)
+        {
+            _playerController.SwitchState<ClimbingState>(ladder);
+        }
+    }
+
+    public void TurretInteraction(TurretScript turret)
+    {
+        _playerController.SwitchState<TurretState>(turret);
+    }
 }
