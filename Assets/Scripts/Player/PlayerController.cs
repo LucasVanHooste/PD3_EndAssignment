@@ -86,6 +86,9 @@ public class PlayerController : MonoBehaviour, IDamageable {
 
         _playerStateManager = new PlayerStateManager(_playerMotor, this, _animationsController);
         SwitchState<NormalState>();
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
         SetHealthBar();
     }
 

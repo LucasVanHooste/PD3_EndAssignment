@@ -20,6 +20,8 @@ public class PlayerMotor : MonoBehaviour {
 
     [SerializeField] private float _walkingSpeedMultiplier;
 
+    [SerializeField] private float _walkingAimMultiplier;
+
     private CharacterController _characterController;
     private CameraController _cameraController;
     private Transform _playerTransform;
@@ -36,7 +38,7 @@ public class PlayerMotor : MonoBehaviour {
         get
         {
             if (IsWalking)
-                return Vector3.ClampMagnitude(_movement, _walkingSpeedMultiplier);
+                return _movement* _walkingSpeedMultiplier;
             return _movement;
         }
         set { _movement = value; }
@@ -46,7 +48,7 @@ public class PlayerMotor : MonoBehaviour {
         get
         {
             if (IsWalking)
-                return Vector3.ClampMagnitude(_aim, _walkingSpeedMultiplier);
+                return _aim* _walkingAimMultiplier;
             return _aim;
         }
         set { _aim = value; }

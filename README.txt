@@ -1,13 +1,14 @@
-This game can only be played using an Xbox controller.
+This game can be played using an Xbox controller or with mouse & keyboard.
+(Xbox controller for the best experience.)
 
 Controls:
-Left Joystick - Walk
-Right Joystick - Camera
+Left Joystick		W,A,S,D 	Walk
+Right Joystick		Mouse 		Camera
 
-A BUtton - Jump
-B button - Interact, (Hold) Drop Weapon
-X Button - Punch
-Y Button - Switch Weapon
+A Button		Space 		Jump
+B Button		R		Interact, (Hold) Drop Weapon
+X Button		Right mouse	Punch
+Y Button		Q		Switch Weapon
 
-Left Trigger - Aim Gun
-Right Trigger - Fire Gun
+Left Trigger		Left mouse	 Aim Gun
+Right Trigger		Right mouse	 Fire Gun

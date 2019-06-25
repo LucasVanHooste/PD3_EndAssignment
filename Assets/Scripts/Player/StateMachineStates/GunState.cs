@@ -76,9 +76,9 @@ public class GunState : BasePlayerState, IInteractor
     public override void Update()
     {
         if (_playerMotor.IsGrounded)
-            _playerMotor.Movement = new Vector3(InputController.LeftJoystickX, 0, InputController.LeftJoystickY);
+            _playerMotor.Movement = new Vector3(InputController.RunXAxis, 0, InputController.RunYAxis);
 
-        _playerMotor.Aim = new Vector3(InputController.RightJoystickX, 0, InputController.RightJoystickY);
+        _playerMotor.Aim = new Vector3(InputController.LookXAxis, 0, InputController.LookYAxis);
         _playerController.GunAnchor.rotation = _cameraController.CameraRoot.rotation;
 
 
@@ -101,6 +101,7 @@ public class GunState : BasePlayerState, IInteractor
             if (_dropGunTimer >= _dropGunTime)
             {
                 DropGun();
+                return;
             }
         }
         else
@@ -111,12 +112,13 @@ public class GunState : BasePlayerState, IInteractor
         if(InputController.HolsterButtonDown && !_isAiming)
         {
             HolsterGun();
+            return;
         }
 
-        _isAiming = InputController.LeftTrigger > 0.2f && _playerMotor.IsGrounded;
+        _isAiming = InputController.AimGunAxis > 0.2f && _playerMotor.IsGrounded;
         AimGun();
 
-        _isFiring = InputController.RightTrigger > 0.2f && _isAiming;
+        _isFiring = InputController.FireGunAxis > 0.2f && _isAiming;
         FireGun();
 
         if (InputController.PunchButtonDown && !_gunScript.IsTwoHanded && !_isAiming)

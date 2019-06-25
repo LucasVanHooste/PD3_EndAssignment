@@ -4,26 +4,26 @@ using UnityEngine;
 
 public static class InputController
 {
-    private const string _leftJoystickX = "LeftJoystickX";
-    private const string _leftJoystickY = "LeftJoystickY";
-    private const string _rightJoystickX = "RightJoystickX";
-    private const string _rightJoystickY = "RightJoystickY";
-    private const string _triggerLeft = "TriggerLeft";
-    private const string _triggerRight = "TriggerRight";
+    private const string _runXAxis = "RunX";
+    private const string _runYAxis = "RunY";
+    private const string _lookXAxis = "LookX";
+    private const string _lookYAxis = "LookY";
+    private const string _aimGunAxis = "AimGun";
+    private const string _fireGunAxis = "FireGun";
 
     private const string _jumpButton = "Jump";
     private const string _interactButton = "Interact";
     private const string _holsterButton = "HolsterGun";
     private const string _punchButton = "Punch";
 
-    public static float LeftJoystickX{get=> Input.GetAxis(_leftJoystickX); }
-    public static float LeftJoystickY { get=> Input.GetAxis(_leftJoystickY); }
+    public static float RunXAxis{get=> Input.GetAxis(_runXAxis); }
+    public static float RunYAxis { get=> Input.GetAxis(_runYAxis); }
 
-    public static float RightJoystickX { get => Input.GetAxis(_rightJoystickX); }
-    public static float RightJoystickY { get => Input.GetAxis(_rightJoystickY); }
+    public static float LookXAxis { get => Input.GetAxis(_lookXAxis); }
+    public static float LookYAxis { get => Input.GetAxis(_lookYAxis); }
 
-    public static float LeftTrigger { get => Input.GetAxis(_triggerLeft); }
-    public static float RightTrigger { get => Input.GetAxis(_triggerRight); }
+    public static float AimGunAxis { get => Input.GetAxis(_aimGunAxis); }
+    public static float FireGunAxis { get => Input.GetAxis(_fireGunAxis); }
 
     public static bool JumpButtonDown { get => Input.GetButtonDown(_jumpButton); }
     public static bool InteractButtonDown { get => Input.GetButtonDown(_interactButton); }

@@ -42,9 +42,9 @@ public class NormalState : BasePlayerState, IInteractor
     {
         
         if (_playerMotor.IsGrounded)
-            _playerMotor.Movement = new Vector3(InputController.LeftJoystickX, 0, InputController.LeftJoystickY);
+            _playerMotor.Movement = new Vector3(InputController.RunXAxis, 0, InputController.RunYAxis);
 
-        _playerMotor.Aim = new Vector3(InputController.RightJoystickX, 0, InputController.RightJoystickY);
+        _playerMotor.Aim = new Vector3(InputController.LookXAxis, 0, InputController.LookYAxis);
 
 
         if (InputController.JumpButtonDown && _playerMotor.IsGrounded)

@@ -61,10 +61,10 @@ public class TurretState : BasePlayerState
     {
         if (!_isReady) return;
 
-        _isAiming = InputController.LeftTrigger > 0.2f && _physicsController.IsGrounded;
+        _isAiming = InputController.AimGunAxis > 0.2f && _physicsController.IsGrounded;
         AimTurret();
 
-        _isFiring = InputController.RightTrigger > 0.2f && _isAiming;
+        _isFiring = InputController.FireGunAxis > 0.2f && _isAiming;
         FireTurret();
 
         if (InputController.InteractButtonDown)
@@ -73,7 +73,7 @@ public class TurretState : BasePlayerState
             return;
         }
 
-        RotateTurret(InputController.RightJoystickX, InputController.RightJoystickY);
+        RotateTurret(InputController.LookXAxis, InputController.LookYAxis);
         FollowTurret();
     }
 
