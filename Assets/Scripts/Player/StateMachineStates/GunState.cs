@@ -64,7 +64,6 @@ public class GunState : BasePlayerState, IInteractor
     {
         if (_gunScript == null)
         {
-            Debug.Log("to normal please");
             _playerController.SwitchState<NormalState>();
         }
     }
@@ -76,17 +75,43 @@ public class GunState : BasePlayerState, IInteractor
 
     public override void Update()
     {
-        _playerController.GunAnchor.rotation = _cameraController.CameraRoot.rotation;
-
-        if (InputController.JumpButtonDown && _playerMotor.IsGrounded)
-        {
-            _playerMotor.Jump = true;
-        }
-
         if (_playerMotor.IsGrounded)
             _playerMotor.Movement = new Vector3(InputController.LeftJoystickX, 0, InputController.LeftJoystickY);
 
         _playerMotor.Aim = new Vector3(InputController.RightJoystickX, 0, InputController.RightJoystickY);
+        _playerController.GunAnchor.rotation = _cameraController.CameraRoot.rotation;
+
+
+        if (InputController.JumpButtonDown && _playerMotor.IsGrounded)
+        {
+            _playerMotor.Jump = true;
+            return;
+        }
+
+        if (InputController.InteractButtonDown && _playerMotor.IsGrounded && !_isAiming)
+        {
+            InteractWithObject();
+            return;
+        }
+
+        if (InputController.InteractButton)
+        {
+            _dropGunTimer += Time.deltaTime;
+
+            if (_dropGunTimer >= _dropGunTime)
+            {
+                DropGun();
+            }
+        }
+        else
+        {
+            _dropGunTimer = 0;
+        }
+
+        if(InputController.HolsterButtonDown && !_isAiming)
+        {
+            HolsterGun();
+        }
 
         _isAiming = InputController.LeftTrigger > 0.2f && _playerMotor.IsGrounded;
         AimGun();
@@ -104,29 +129,6 @@ public class GunState : BasePlayerState, IInteractor
 
         }
         _punchCoolDownTimer += Time.deltaTime;
-        if (InputController.InteractButtonDown && _playerMotor.IsGrounded && !_isAiming)
-        {
-            InteractWithObject();
-        }
-
-        if (InputController.InteractButtonDown)
-        {
-            _dropGunTimer += Time.deltaTime;
-        }
-        else
-        {
-            _dropGunTimer = 0;
-        }
-
-        if (_dropGunTimer >= _dropGunTime)
-        {
-            DropGun();
-        }
-
-        if(InputController.HolsterButtonDown && !_isAiming)
-        {
-            HolsterGun();
-        }
     }
 
     private void InteractWithObject()

@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class ObstacleCollisionCheckerScript : MonoBehaviour{
 
-    private bool _hasCollided=false;
-    private bool _hasGravity = false;
+    public bool HasCollided { get; private set; }
+    public bool HasGravity { get; private set; }
+
     private int _gravityBoxLayer;
 
     private void Start()
@@ -18,24 +19,14 @@ public class ObstacleCollisionCheckerScript : MonoBehaviour{
         if (!other.isTrigger)
         {
             if (other.gameObject.layer != _gravityBoxLayer)
-                _hasCollided = true;
+                HasCollided = true;
             else
             {
-                _hasGravity = true;
+                HasGravity = true;
                 GameObject.Destroy(other.gameObject);
             }
 
         }
 
-    }
-
-    public bool GetHasCollided()
-    {
-        return _hasCollided;
-    }
-
-    public bool GetHasGravity()
-    {
-        return _hasGravity;
     }
 }

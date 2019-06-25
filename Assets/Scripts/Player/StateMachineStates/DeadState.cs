@@ -10,13 +10,16 @@ public class DeadState : BasePlayerState
     private AnimationsController _animationsController;
 
     private GameObject _object;
+    private const float _respawnTime=4;
+    private WaitForSeconds _waitForRespawn;
 
     public DeadState(PlayerMotor physicsController, PlayerController playerController, AnimationsController animationsController)
     {
         _physicsController = physicsController;
         _playerController = playerController;
         _animationsController = animationsController;
-        
+
+        _waitForRespawn = new WaitForSeconds(_respawnTime);
     }
 
     public override void ResetState(IInteractable interactable)
@@ -40,7 +43,7 @@ public class DeadState : BasePlayerState
         _physicsController.Aim = Vector3.zero;
         _physicsController.Movement = Vector3.zero;
 
-        yield return new WaitForSeconds(4);
+        yield return _waitForRespawn;
         _playerController.Respawn();
     }
 

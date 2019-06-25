@@ -104,12 +104,7 @@ public class PushingState : BasePlayerState
 
     private bool CheckIfObstacleCanBePushed()
     {
-        if (!_obstacleCollisionChecker.GetComponent<ObstacleCollisionCheckerScript>().GetHasCollided())
-            return true;
-        else
-        {
-            return false;
-        }
+        return !_obstacleCollisionChecker.GetComponent<ObstacleCollisionCheckerScript>().HasCollided;
     }
 
     private IEnumerator PushObstacle(bool canPlayerPushObstacle)
@@ -146,7 +141,7 @@ public class PushingState : BasePlayerState
         _hasHitObstacle = false;
 
         //if obstacle is above pit, drop
-        if (_obstacleCollisionChecker.GetComponent<ObstacleCollisionCheckerScript>().GetHasGravity())
+        if (_obstacleCollisionChecker.GetComponent<ObstacleCollisionCheckerScript>().HasGravity)
         {
             _obstacleScript.SetConstraints(RigidbodyConstraints.None);
             _obstacleScript.UseGravity(true);

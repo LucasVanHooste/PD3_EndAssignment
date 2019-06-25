@@ -64,7 +64,6 @@ public class PlayerController : MonoBehaviour, IDamageable {
     public GameObject CrossHair { get => _crossHair; }
     [SerializeField] private Slider _healthbar=null;
 
-
     public List<Collider> Triggers { get; private set; } = new List<Collider>();
 
     private void Awake()

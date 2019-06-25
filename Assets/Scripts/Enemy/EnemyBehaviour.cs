@@ -228,12 +228,17 @@ public class EnemyBehaviour : MonoBehaviour, IDamageable
         _enemyMotor.Run();
         if (_enemyMotor.HasNavMeshReachedDestination())
         {
-            if ((_playerTransform.position - _transform.position).sqrMagnitude < _hearingDistance * _hearingDistance)
-                _enemyMotor.SetDestination(_enemyMotor.RandomNavSphere(_playerTransform.position, 4, -1));
-            else
-                _forgetAboutPlayerTimer = _forgetAboutPlayerTime;
+            SetNewTargetPositionIfPlayerInRange();
         }
         yield return NodeResult.Succes;
+    }
+
+    private void SetNewTargetPositionIfPlayerInRange()
+    {
+        if ((_playerTransform.position - _transform.position).sqrMagnitude < _hearingDistance * _hearingDistance)
+            _enemyMotor.SetDestination(_enemyMotor.RandomNavSphere(_playerTransform.position, 4, -1));
+        else
+            _forgetAboutPlayerTimer = _forgetAboutPlayerTime;
     }
 
     private IEnumerator<NodeResult> SetPlayerPositionAsTarget()
@@ -322,6 +327,24 @@ public class EnemyBehaviour : MonoBehaviour, IDamageable
 
     private bool SeesPlayer()
     {
+        if (CanSeePlayer())
+        {
+            _forgetAboutPlayerTimer = 0;
+            _hasBeenAttacked = false;
+
+            _gunAnchorPoint.LookAt(_playerTransform.position + new Vector3(0, 1.4f, 0));
+            _gunAnchorPoint.localEulerAngles = new Vector3(_gunAnchorPoint.localEulerAngles.x, 0, 0);
+            return true;
+        }
+        else
+        {
+            _gunAnchorPoint.localEulerAngles = Vector3.zero;
+            return false;
+        }
+    }
+
+    private bool CanSeePlayer()
+    {
         Vector3 directionPlayer = _playerTransform.position - _transform.position;
         if (Quaternion.Angle(_transform.rotation, Quaternion.LookRotation(directionPlayer)) < FOV / 2)
         {
@@ -330,43 +353,24 @@ public class EnemyBehaviour : MonoBehaviour, IDamageable
             {
                 if (hit.transform.gameObject.layer == 9)
                 {
-                    _forgetAboutPlayerTimer = 0;
-                    _hasBeenAttacked = false;
-
-                    //this might need a fix 
-
-                    //Vector3 flatDirection = Vector3.Scale(_playerTransform.position - _transform.position, new Vector3(1, 0, 1));
-                    //_gunAnchorPoint.localEulerAngles = new Vector3(Vector3.SignedAngle(flatDirection, _playerTransform.position - _transform.position, _transform.right), 0, 0);
-                    _gunAnchorPoint.LookAt(_playerTransform.position + new Vector3(0, 1.4f, 0));
-                    _gunAnchorPoint.localEulerAngles = new Vector3(_gunAnchorPoint.localEulerAngles.x, 0, 0);
                     return true;
                 }
             }
         }
-        _gunAnchorPoint.localEulerAngles = Vector3.zero;
-
         return false;
     }
 
     private bool HasSeenPlayerRecently()
     {
         _forgetAboutPlayerTimer += Time.deltaTime;
-        if (_forgetAboutPlayerTimer < _forgetAboutPlayerTime)
-        {
-            return true;
-        }
-        return false;
+
+        return _forgetAboutPlayerTimer < _forgetAboutPlayerTime;
     }
 
     private bool IsWithinPunchRangeOfPlayer()
     {
-        if (Vector3.Magnitude(Vector3.Scale(_playerTransform.position - _transform.position, new Vector3(1, 0, 1))) <= _horizontalPunchReach
-            && _playerTransform.position.y - _transform.position.y <= _verticalPunchReach)
-        {
-            return true;
-        }
-        else
-            return false;
+        return Vector3.Magnitude(Vector3.Scale(_playerTransform.position - _transform.position, new Vector3(1, 0, 1))) <= _horizontalPunchReach
+            && _playerTransform.position.y - _transform.position.y <= _verticalPunchReach;
     }
 
     private bool IsGunCloserThanPlayer()
@@ -554,6 +558,8 @@ public class EnemyBehaviour : MonoBehaviour, IDamageable
 
     public void TakeDamage(int damage, Vector3 originOfDamage)
     {
+        _hasBeenAttacked = true;
+
         Health -= damage;
         _animationsController.TakeDamage();
 

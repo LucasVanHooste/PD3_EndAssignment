@@ -19,7 +19,7 @@ public class GunScript : BaseWeapon, IInteractable {
     private Transform _gunCollisionChecker;
     private Collider _trigger;
 
-    //I know this i wrong but didnt wan't to change it because I'd have to enter all that values again
+    //public variables are generally bad practive but I had already set the values in the editor before I realised this
     public Vector3 LocalPositionOnPlayer;
     public Vector3 LocalRotationOnPlayer;
 

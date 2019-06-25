@@ -18,7 +18,7 @@ public class TurretState : BasePlayerState
     private TurretScript _turretScript;
 
     private bool _isAiming = false;
-    private bool _isShooting = false;
+    private bool _isFiring = false;
     private bool _isReady = false;
 
     float _turretPaddingDistance = 0.15f;
@@ -40,7 +40,7 @@ public class TurretState : BasePlayerState
         _turretScript = (TurretScript)turret;
 
         _isAiming = false;
-        _isShooting = false;
+        _isFiring = false;
         _isReady = false;
 }
 
@@ -61,22 +61,11 @@ public class TurretState : BasePlayerState
     {
         if (!_isReady) return;
 
-        if (InputController.LeftTrigger > 0.2f && _physicsController.IsGrounded)
-        {
-            _isAiming = true;
-        }
-        else _isAiming = false;
-
+        _isAiming = InputController.LeftTrigger > 0.2f && _physicsController.IsGrounded;
         AimTurret();
 
-        if (InputController.RightTrigger > 0.2f && _isAiming)
-        {
-            _isShooting = true;
-        }
-        else _isShooting = false;
-
+        _isFiring = InputController.RightTrigger > 0.2f && _isAiming;
         FireTurret();
-
 
         if (InputController.InteractButtonDown)
         {
@@ -163,7 +152,7 @@ public class TurretState : BasePlayerState
     private void FireTurret()
     {
         Ray centerOfScreenRay = _cameraController.PlayerCamera.ViewportPointToRay(new Vector3(.5f, .5f, 0));
-        _turretScript.FireWeapon(_isShooting, centerOfScreenRay, _bulletLayerMask);
+        _turretScript.FireWeapon(_isFiring, centerOfScreenRay, _bulletLayerMask);
     }
 
     private void AimTurret()

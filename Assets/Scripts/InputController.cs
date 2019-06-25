@@ -27,6 +27,7 @@ public static class InputController
 
     public static bool JumpButtonDown { get => Input.GetButtonDown(_jumpButton); }
     public static bool InteractButtonDown { get => Input.GetButtonDown(_interactButton); }
+    public static bool InteractButton { get => Input.GetButton(_interactButton); }
 
     public static bool HolsterButtonDown { get => Input.GetButtonDown(_holsterButton); }
     public static bool PunchButtonDown { get => Input.GetButtonDown(_punchButton); }
