@@ -15,6 +15,7 @@ public static class InputController
     private const string _interactButton = "Interact";
     private const string _holsterButton = "HolsterGun";
     private const string _punchButton = "Punch";
+    private const string _restartButton = "Restart";
 
     public static float RunXAxis{get=> Input.GetAxis(_runXAxis); }
     public static float RunYAxis { get=> Input.GetAxis(_runYAxis); }
@@ -32,4 +33,5 @@ public static class InputController
     public static bool HolsterButtonDown { get => Input.GetButtonDown(_holsterButton); }
     public static bool PunchButtonDown { get => Input.GetButtonDown(_punchButton); }
 
+    public static bool RestartButtonDown { get => Input.GetButtonDown(_restartButton); }
 }
